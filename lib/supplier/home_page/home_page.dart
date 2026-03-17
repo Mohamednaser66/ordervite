@@ -1,0 +1,476 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:flutter_maps/Core/routes_manager.dart';
+import 'package:flutter_maps/Divider.dart';
+import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/lang.dart';
+import 'package:flutter_maps/supplier/home_page/widgets/home_drawer.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:location/location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
+const _googleGeocodeApiKey = 'AIzaSyDl8LFLQn24CbaZyQ0F4wnzoF9NY3_gMWY';
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key? key, this.title}) : super(key: key);
+  final String? title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  String? username;
+  String? email;
+  String? id;
+  String? token2;
+  String? logo_src;
+  bool isSignIn = false;
+
+  late StreamController _shipperController;
+  StreamSubscription<LocationData>? _locationSubscription;
+  StreamSubscription? _mapIdleSubscription;
+  Location _locationTracker = Location();
+
+  LatLng? _initialLocation;
+  GoogleMapController? _controller;
+  final Set<Marker> _markers = {};
+  Circle? _circle;
+  late BitmapDescriptor iconHalte;
+  late BitmapDescriptor iconMe;
+
+  double bottomPaddingOfMap = 0;
+  String placeaddress = "address";
+
+  final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
+
+  Future<List<dynamic>> getShippers() async {
+    try {
+      String Url = "https://www.ordervite.com/api/supplier/shippiers";
+      var response = await http.get(
+        Uri.parse(Url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token2',
+        },
+      );
+      var reposnsebody = jsonDecode(response.body);
+      return reposnsebody["data"];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<void> loadShipper() async {
+    var res = await getShippers();
+
+    Set<Marker> tempMarkers = {};
+
+    for (var shipper in res) {
+      double lat = double.tryParse(shipper["cur_latitude"].toString()) ?? 0;
+      double lng = double.tryParse(shipper["cur_longitude"].toString()) ?? 0;
+
+      tempMarkers.add(
+        Marker(
+          markerId: MarkerId(shipper["id"].toString()),
+          icon: iconHalte,
+          position: LatLng(lat, lng),
+          infoWindow: InfoWindow(title: shipper["name"]),
+        ),
+      );
+    }
+
+    if (mounted) {
+      setState(() {
+        _markers.addAll(tempMarkers);
+      });
+    }
+  }
+
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    username = preferences.getString("username");
+    email = preferences.getString("email");
+    token2 = preferences.getString("token");
+    id = preferences.getString("id");
+
+    if (username != null && email != null) {
+      setState(() {
+        isSignIn = true;
+      });
+    }
+
+    if (id != null) {
+      int myid = int.parse(id!);
+      String Url = "https://www.ordervite.com/api/supplier/show/$myid";
+      var response = await http.get(
+        Uri.parse(Url),
+        headers: {'Authorization': 'Bearer $token2'},
+      );
+      var reposnsebody = jsonDecode(response.body);
+      if (reposnsebody["success"] == true && mounted) {
+        setState(() {
+          logo_src = reposnsebody["data"]["logo"].toString();
+          preferences.setString('logo_src', logo_src!);
+          preferences.setString(
+            'email',
+            reposnsebody["data"]["name"]["email"].toString(),
+          );
+          preferences.setString(
+            'username',
+            reposnsebody["data"]["name"]["name"].toString(),
+          );
+        });
+      }
+    }
+  }
+
+  Future<Uint8List> getMarker() async {
+    ByteData byteData = await DefaultAssetBundle.of(
+      context,
+    ).load("assets/mark.png");
+    return byteData.buffer.asUint8List();
+  }
+
+  void updateMarkerAndCircle(LocationData newLocalData, Uint8List imageData) {
+    final latlng = LatLng(
+      newLocalData.latitude ?? 0,
+      newLocalData.longitude ?? 0,
+    );
+
+    final marker = Marker(
+      markerId: const MarkerId("home"),
+      position: latlng,
+      rotation: newLocalData.heading ?? 0,
+      draggable: false,
+      zIndex: 2,
+      flat: true,
+      anchor: const Offset(0.5, 0.5),
+      icon: BitmapDescriptor.fromBytes(imageData),
+    );
+
+    _circle = Circle(
+      circleId: const CircleId("car"),
+      radius: newLocalData.accuracy ?? 0,
+      zIndex: 1,
+      strokeColor: Colors.blue,
+      center: latlng,
+      fillColor: Colors.blue.withAlpha(70),
+    );
+
+    setState(() {
+      _markers.removeWhere((m) => m.markerId == const MarkerId("home"));
+      _markers.add(marker);
+    });
+  }
+
+  void getCurrentLocation() async {
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+
+    serviceEnabled = await _locationTracker.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await _locationTracker.requestService();
+      if (!serviceEnabled) return;
+    }
+
+    permissionGranted = await _locationTracker.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await _locationTracker.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) return;
+    }
+
+    var locationData = await _locationTracker.getLocation();
+
+    LatLng currentLatLng = LatLng(
+      locationData.latitude ?? 0,
+      locationData.longitude ?? 0,
+    );
+
+    if (mounted) {
+      setState(() {
+        _initialLocation = currentLatLng;
+      });
+    }
+    await _saveLocationAddress();
+
+    if (_controller != null) {
+      _controller!.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: currentLatLng, zoom: 16),
+        ),
+      );
+    }
+  }
+
+  Future<void> _saveLocationAddress() async {
+    final locationData = await _locationTracker.getLocation();
+
+    try {
+      final url =
+          "https://maps.googleapis.com/maps/api/geocode/json?latlng=${locationData.latitude},${locationData.longitude}&key=$_googleGeocodeApiKey";
+      final response = await http.get(Uri.parse(url));
+      final reposnsebody = jsonDecode(response.body);
+
+      if (mounted) {
+        setState(() {
+          if (reposnsebody["results"] != null &&
+              reposnsebody["results"].isNotEmpty) {
+            placeaddress =
+                "${reposnsebody["results"][0]["address_components"][0]["long_name"]}   ${reposnsebody["results"][0]["address_components"][1]["long_name"]}";
+          } else {
+            placeaddress =
+                "${locationData.latitude}, ${locationData.longitude}";
+          }
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          placeaddress = "${locationData.latitude}, ${locationData.longitude}";
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _shipperController = StreamController();
+    getPref();
+    _saveLocationAddress();
+    loadShipper();
+    getCurrentLocation();
+
+    Future.wait([
+      BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2.5),
+        'assets/orderViteBicycle.png',
+      ),
+      BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2),
+        'assets/meMark.png',
+      ),
+    ]).then((icons) {
+      iconHalte = icons[0];
+      iconMe = icons[1];
+    });
+
+    Future.delayed(const Duration(seconds: 5)).then((_) {
+      if (mounted) showMessage();
+    });
+  }
+
+  @override
+  void dispose() {
+    _shipperController.close();
+    _locationSubscription?.cancel();
+    _mapIdleSubscription?.cancel();
+    super.dispose();
+  }
+
+  void showMessage() {
+    if (!mounted) return;
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args == null || args is! Message) return;
+
+    Message message = args;
+    String messageShow = message.message.toString();
+    if (messageShow.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text(
+            messageShow,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Lang lang = Lang.of(context);
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Directionality(
+        textDirection: lang.lang == "en"
+            ? TextDirection.ltr
+            : TextDirection.rtl,
+        child: Scaffold(
+          key: _scaffoldkey,
+          drawer: SupplierDrawer(
+            username: username ?? '',
+            email: email ?? '',
+            lang: lang,
+            isSignIn: isSignIn,
+          ),
+          appBar: buildAppBar(lang),
+          body: buildBody(lang),
+          floatingActionButton: FloatingActionButton(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
+            child: Icon(Icons.location_searching),
+            onPressed: () => getCurrentLocation(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  AppBar buildAppBar(Lang lang) {
+    return AppBar(
+      title: Text(
+        lang.lang == "en" ? "OrderVite" : "أوردرفيت",
+        style: TextStyle(
+          fontSize: 25,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Widget buildBody(Lang lang) {
+    return SafeArea(
+      child: Stack(
+        children: [
+          _initialLocation == null
+              ? Center(child: CircularProgressIndicator(color: Colors.blue,))
+              : GoogleMap(
+                  padding: EdgeInsets.only(bottom: 300.h),
+                  mapType: MapType.normal,
+                  markers: _markers,
+                  circles: _circle != null ? {_circle!} : {},
+                  initialCameraPosition: CameraPosition(
+                    target: _initialLocation!,
+                    zoom: 16,
+                  ),
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: false,
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller = controller;
+                  },
+                ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: 300.h,
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(21, 42, 72, 0.9),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(18.0.r),
+                  topRight: Radius.circular(18.0.r),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black,
+                    blurRadius: 16.0.r,
+                    spreadRadius: 0.5.r,
+                    offset: Offset(0.7, 0.7),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 18,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      lang.lang == "en"
+                          ? "Hi  ${username ?? ''}"
+                          : "مرحبًا   ${username ?? ''}",
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      lang.lang == "en"
+                          ? "Create a shipping order "
+                          : " قم بإنشاء امر الشحن ",
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontFamily: "Brand-bold",
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(18)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black54,
+                            blurRadius: 6,
+                            spreadRadius: 0.5,
+                            offset: Offset(0.7, 0.7),
+                          ),
+                        ],
+                      ),
+                      child: TextButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(RoutesManager.terms);
+                        },
+                        icon: Icon(Icons.search, color: Colors.red),
+                        label: Text(
+                          lang.lang == "en"
+                              ? "Search your destination  "
+                              : " ابحث عن وجهتك ",
+                          style: TextStyle(fontSize: 15, color: Colors.red),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    DividerWidget(),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Icon(Icons.work, color: Colors.white, size: 30),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                lang.lang == "en"
+                                    ? "Your Address "
+                                    : " عناوينك ",
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                placeaddress,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

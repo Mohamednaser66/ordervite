@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "610950052144",
+    "project_id": "orderviteapp-fa32e",
+    "storage_bucket": "orderviteapp-fa32e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:610950052144:android:cfdbfcbf9b6a208ee2f0f5",
+        "android_client_info": {
+          "package_name": "com.ordervite.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1oyXPGv8yrJAYwYBIbfP0L5qc1BpdS1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
