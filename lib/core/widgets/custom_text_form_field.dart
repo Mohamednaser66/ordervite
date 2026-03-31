@@ -24,16 +24,17 @@ class CustomTextFormField extends StatelessWidget {
       validator: validation,
       obscureText: secure,
 
-      style: TextStyle(fontSize: 20, color: Colors.black),
-      maxLength: 30,
+      style: TextStyle(fontSize: 20, color: Colors.black,),
+      maxLength: 50,
+      cursorColor: Colors.blue,
+
       decoration: InputDecoration(
         contentPadding: EdgeInsets.only(top: 10, bottom: 10),
         hintText: hintText,
-
+          hoverColor: Colors.blue,
         fillColor: Colors.white,
         filled: true,
         prefixIcon: Padding(padding: EdgeInsets.only(left: 5), child: icon),
-
         prefixStyle: TextStyle(fontSize: 50, color: Colors.blue),
         labelText: lable,
         labelStyle: TextStyle(
@@ -42,6 +43,8 @@ class CustomTextFormField extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+        errorBorder:  OutlineInputBorder(borderRadius: BorderRadius.circular(20),borderSide: BorderSide(color: Colors.red)),
+        focusedBorder: OutlineInputBorder(borderRadius:BorderRadius.circular(20),borderSide: BorderSide(color: Colors.blue) )
       ),
     );
   }

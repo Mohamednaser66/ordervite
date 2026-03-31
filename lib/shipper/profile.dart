@@ -1,9 +1,13 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/shipper/shipper_drawer.dart';
+import 'package:flutter_maps/shipper/widgets/profile_bottom_sheet.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -120,16 +124,40 @@ class _CreatProfileState extends State<SHProfilePage> {
 
   @override
   void dispose() {
-    _username.dispose;
-    _email.dispose;
-    _password.dispose;
-    _c_password.dispose;
-    _mobile1.dispose;
-    _mobile2.dispose;
+    _username.dispose();
+    _email.dispose();
+    _password.dispose();
+    _c_password.dispose();
+    _mobile1.dispose();
+    _mobile2.dispose();
     super.dispose();
   }
 
   final ImagePicker _picker = ImagePicker();
+
+  void takeIdPhoto(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageIdFile = pickedFile;
+      });
+    } else {
+      print("No ID image selected");
+    }
+  }
+
+  takePhoto(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = pickedFile;
+      });
+    } else {
+      print("No image selected");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,16 +257,63 @@ class _CreatProfileState extends State<SHProfilePage> {
                     ),
               SizedBox(height: 10),
 
-              imageProfile(),
+              Center(
+                child: Stack(
+                  children: <Widget>[
+                    CircleAvatar(
+                      radius: 80.0,
+                      backgroundImage: logo_src == null
+                          ? AssetImage("assets/app_face.png")
+                          : NetworkImage('https://www.ordervite.com/$logo_src'),
+                    ),
+                    Positioned(
+                      bottom: 20.0,
+                      right: 20.0,
+                      child: InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: ((builder) => ProfileBottomSheet(
+                              onCameraClick: () =>
+                                  takePhoto(ImageSource.camera),
+                              onGalleryClick: () =>
+                                  takePhoto(ImageSource.gallery),
+                              title: lang.lang == 'en'
+                                  ? 'Choose Profile Photo'
+                                  : 'اختار الصوره الشخصيه',
+                            )),
+                          );
+                        },
+                        child: Icon(
+                          Icons.camera_alt,
+                          color: Colors.teal,
+                          size: 28.0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               SizedBox(height: 20),
-              usernameTextField(),
+              CustomTextFormField(
+                validation: AppValidators.validateFullName,
+                controller: _username,
+                icon: Icon(Icons.person, color: Colors.blue),
+                hintText: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
+                lable: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
+              ),
               SizedBox(height: 20),
-              emailTextField(),
+              CustomTextFormField(
+                validation: AppValidators.validateEmail,
+                controller: _email,
+                icon: Icon(Icons.mail, color: Colors.blue),
+                hintText: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',
+                lable: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',
+              ),
               SizedBox(height: 20),
-
               Text(
                 lang.lang == "en"
-                    ? "If you do not change password please passord must be empty "
+                    ? "If you do not change password please password must be empty "
                     : "لو لم تريد تغيير كلمة السر يجب ترك الخانات فارغه ",
                 style: TextStyle(
                   color: Colors.red,
@@ -247,13 +322,51 @@ class _CreatProfileState extends State<SHProfilePage> {
                 ),
               ),
               SizedBox(height: 20),
-              password(),
+              CustomTextFormField(
+                validation: AppValidators.validateChangePassword,
+                controller: _password,
+                icon: Icon(Icons.key, color: Colors.blue),
+                hintText: lang.lang == 'en'
+                    ? 'Enter Password'
+                    : 'ادخل كلمة السر',
+                lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
+                secure: true,
+              ),
               SizedBox(height: 20),
-              cpassword(),
+              CustomTextFormField(
+                validation: (val) =>
+                    AppValidators.validateConfirmChangePassword(val, _password.text),
+
+                secure: true,
+                controller: _c_password,
+                icon: Icon(Icons.key, color: Colors.blue),
+                hintText: lang.lang == 'en'
+                    ? 'Confirm Password'
+                    : 'تاكيد كلمة السر',
+                lable: lang.lang == 'en'
+                    ? 'Confirm Password'
+                    : 'تاكيد كلمة السر',
+              ),
               SizedBox(height: 20),
-              mobile1TextField(),
+              CustomTextFormField(
+                validation: AppValidators.validatePhoneNumber,
+                controller: _mobile1,
+                icon: Icon(Icons.phone, color: Colors.blue),
+                hintText: lang.lang == 'en'
+                    ? 'Enter Mobile 1'
+                    : 'ادخل رقم التليفون 1',
+                lable: lang.lang == 'en' ? ' Mobile 1' : ' رقم التليفون 1',
+              ),
               SizedBox(height: 20),
-              mobile2TextField(),
+              CustomTextFormField(
+                validation: AppValidators.validatePhoneNumber,
+                controller: _mobile2,
+                icon: Icon(Icons.phone, color: Colors.blue),
+                hintText: lang.lang == 'en'
+                    ? 'Enter Mobile 2'
+                    : 'ادخل رقم التليفون 2',
+                lable: lang.lang == 'en' ? ' Mobile 2' : ' رقم التليفون 2',
+              ),
               SizedBox(height: 20),
               Row(
                 children: <Widget>[
@@ -269,13 +382,62 @@ class _CreatProfileState extends State<SHProfilePage> {
                       ),
                     ),
                   ),
-                  imageIdProfile(),
+                  Center(
+                    child: Stack(
+                      children: <Widget>[
+                        Container(
+                          height: 100.0,
+                          width: 100.0,
+
+                          decoration: new BoxDecoration(
+                            borderRadius: new BorderRadius.circular(15.0),
+
+                            image: DecorationImage(
+                              image: id_image_src == null
+                                  ? AssetImage("assets/app_face.png")
+                                  : NetworkImage(
+                                      'https://www.ordervite.com/$id_image_src',
+                                    ),
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                        ),
+
+                        Positioned(
+                          bottom: 20.0,
+                          right: 20.0,
+                          child: InkWell(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: ((builder) => ProfileBottomSheet(
+                                  onCameraClick:()=> takeIdPhoto(ImageSource.camera),
+                                  onGalleryClick:()=> takeIdPhoto(
+                                    ImageSource.gallery,
+                                  ),
+                                  title: lang.lang == 'en'
+                                      ? 'Choose ID Photo'
+                                      : 'اختار صورة البطاقه',
+                                )),
+                              );
+                            },
+                            child: Icon(
+                              Icons.camera_alt,
+                              color: Colors.teal,
+                              size: 28.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
 
               SizedBox(height: 20),
               InkWell(
                 onTap: () async {
+                  if(!_globalkey.currentState!.validate())return;
                   setState(() {
                     circular = true;
                   });
@@ -307,7 +469,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                     request.fields['name'] = _username.text;
                     request.fields['email'] = _email.text;
                     request.fields['password'] = _password.text;
-                    request.fields['c_passord'] = _c_password.text;
+                    request.fields['c_password'] = _c_password.text;
                     request.fields['mobile1'] = _mobile1.text;
                     request.fields['mobile2'] = _mobile2.text;
                     request.headers.addAll({
@@ -325,7 +487,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                       _email.text,
                       this.token,
                       this.id,
-                      "supplier",
+                      'shipper',
                       this.logo_src ?? '',
                       this.id_image_src ?? '',
                     );
@@ -384,326 +546,6 @@ class _CreatProfileState extends State<SHProfilePage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget imageProfile() {
-    return Center(
-      child: Stack(
-        children: <Widget>[
-          CircleAvatar(
-            radius: 80.0,
-            backgroundImage: logo_src == null
-                ? AssetImage("assets/app_face.png")
-                : NetworkImage('https://www.ordervite.com/$logo_src'),
-          ),
-          Positioned(
-            bottom: 20.0,
-            right: 20.0,
-            child: InkWell(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: ((builder) => bottomSheet()),
-                );
-              },
-              child: Icon(Icons.camera_alt, color: Colors.teal, size: 28.0),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget imageIdProfile() {
-    return Center(
-      child: Stack(
-        children: <Widget>[
-          Container(
-            height: 100.0,
-            width: 100.0,
-
-            decoration: new BoxDecoration(
-              borderRadius: new BorderRadius.circular(15.0),
-
-              image: DecorationImage(
-                image: id_image_src == null
-                    ? AssetImage("assets/app_face.png")
-                    : NetworkImage('https://www.ordervite.com/$id_image_src'),
-                fit: BoxFit.fill,
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 20.0,
-            right: 20.0,
-            child: InkWell(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: ((builder) => bottomIdSheet()),
-                );
-              },
-              child: Icon(Icons.camera_alt, color: Colors.teal, size: 28.0),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget bottomSheet() {
-    Lang lang = Lang.of(context);
-    return Container(
-      height: 100.0,
-      width: MediaQuery.of(context).size.width,
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              lang.lang == "en"
-                  ? "Choose Profile photo"
-                  : "اختار صوره البروفايل ",
-              style: TextStyle(fontSize: 20.0),
-            ),
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              ElevatedButton.icon(
-                icon: Icon(Icons.camera),
-                onPressed: () {
-                  takePhoto(ImageSource.camera);
-                },
-                label: Text(lang.lang == "en" ? "Camera" : "كاميرا "),
-              ),
-              ElevatedButton.icon(
-                icon: Icon(Icons.image),
-                onPressed: () {
-                  takePhoto(ImageSource.gallery);
-                },
-                label: Text(lang.lang == "en" ? "Gallery" : "معرض الصور "),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget bottomIdSheet() {
-    Lang lang = Lang.of(context);
-    return Container(
-      height: 100.0,
-      width: MediaQuery.of(context).size.width,
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              lang.lang == "en"
-                  ? "Choose ID photo"
-                  : "أختار صورة البطاقة الشخصية ",
-              style: TextStyle(fontSize: 20.0),
-            ),
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              ElevatedButton.icon(
-                icon: Icon(Icons.camera),
-                onPressed: () {
-                  takeIdPhoto(ImageSource.camera);
-                },
-                label: Text(lang.lang == "en" ? "Camera" : "كاميرا "),
-              ),
-              TextButton.icon(
-                icon: Icon(Icons.image),
-                label: Text(lang.lang == "en" ? "Gallery" : "معرض الصور "),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  textStyle: TextStyle(fontSize: 16),
-                ),
-                onPressed: () {
-                  takeIdPhoto(ImageSource.gallery);
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void takePhoto(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source);
-
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = pickedFile;
-      });
-    } else {
-      print("No image selected");
-    }
-  }
-
-  void takeIdPhoto(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source);
-
-    if (pickedFile != null) {
-      setState(() {
-        _imageIdFile = pickedFile;
-      });
-    } else {
-      print("No ID image selected");
-    }
-  }
-
-  Widget usernameTextField() {
-    Lang lang = Lang.of(context);
-    return TextFormField(
-      controller: _username,
-      validator: (value) {
-        if (value!.isEmpty) return "Name can't be empty";
-
-        return null;
-      },
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.orange, width: 2),
-        ),
-        prefixIcon: Icon(Icons.person, color: Colors.green),
-        labelText: lang.lang == "en" ? " Username" : "اسم المستخدم ",
-        helperText: "Username can't be empty",
-        hintText: lang.lang == "en" ? " Username" : "ادخل اسم المستخدم ",
-      ),
-    );
-  }
-
-  Widget emailTextField() {
-    Lang lang = Lang.of(context);
-    return TextFormField(
-      controller: _email,
-      keyboardType: TextInputType.emailAddress,
-      validator: (value) {
-        if (value!.isEmpty) return "Email can't be empty";
-        String pattern =
-            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-        RegExp regex = new RegExp(pattern);
-        if (!regex.hasMatch(value)) {
-          return 'Invalid email address';
-        }
-
-        return null;
-      },
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderSide: BorderSide(color: Colors.teal)),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.orange, width: 2),
-        ),
-        prefixIcon: Icon(Icons.email, color: Colors.green),
-        labelText: lang.lang == "en"
-            ? " Email Address"
-            : "  عنوان  البريد الالكتروني ",
-        helperText: "Email can't be empty",
-        hintText: lang.lang == "en"
-            ? "Enter Email Address"
-            : " أدخل عنوان البريد الالكتروني  ",
-      ),
-    );
-  }
-
-  Widget password() {
-    Lang lang = Lang.of(context);
-    return TextFormField(
-      controller: _password,
-      obscureText: true,
-      validator: (value) {
-        return null;
-      },
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderSide: BorderSide(color: Colors.teal)),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.orange, width: 2),
-        ),
-        prefixIcon: Icon(Icons.vpn_key, color: Colors.green),
-        labelText: lang.lang == "en" ? " password" : " كلمة السر ",
-        helperText: " Password",
-        hintText: lang.lang == "en" ? "Enter password" : " أدخل كلمة السر ",
-      ),
-    );
-  }
-
-  Widget cpassword() {
-    Lang lang = Lang.of(context);
-    return TextFormField(
-      controller: _c_password,
-      obscureText: true,
-      validator: (value) {
-        if (value != _password.text) return 'Password does not match ';
-
-        return null;
-      },
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderSide: BorderSide(color: Colors.teal)),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.orange, width: 2),
-        ),
-        prefixIcon: Icon(Icons.vpn_key, color: Colors.green),
-        labelText: lang.lang == "en" ? "Confirm password" : "تاكيد كلمة السر",
-        helperText: " Confirm password",
-        hintText: lang.lang == "en" ? "Confirm password" : "تاكيد كلمة السر",
-      ),
-    );
-  }
-
-  Widget mobile1TextField() {
-    Lang lang = Lang.of(context);
-    return TextFormField(
-      controller: _mobile1,
-      validator: (value) {
-        if (value!.isEmpty) return "Mobile1 can't be empty";
-
-        return null;
-      },
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderSide: BorderSide(color: Colors.teal)),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.orange, width: 2),
-        ),
-        prefixIcon: Icon(Icons.mobile_friendly, color: Colors.green),
-        labelText: lang.lang == "en" ? " Mobile1" : " رقم التليفون 1",
-        helperText: "Mobile1 can't be empty",
-        hintText: lang.lang == "en" ? "Enter Mobile1" : " ادخل رقم التليفون 1",
-      ),
-    );
-  }
-
-  Widget mobile2TextField() {
-    Lang lang = Lang.of(context);
-    return TextFormField(
-      controller: _mobile2,
-      validator: (value) {
-        if (value!.isEmpty) return "Mobile2 can't be empty";
-
-        return null;
-      },
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderSide: BorderSide(color: Colors.teal)),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.orange, width: 2),
-        ),
-        prefixIcon: Icon(Icons.mobile_friendly, color: Colors.green),
-        labelText: lang.lang == "en" ? " Mobile2" : " رقم التليفون 2",
-        helperText: "Mobile1 can't be empty",
-        hintText: lang.lang == "en" ? "Enter Mobile 2" : "ادخل رقم التليفون 2",
       ),
     );
   }

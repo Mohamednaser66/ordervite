@@ -215,15 +215,6 @@ class _LogInState extends State<LogIn> {
                               context,
                             ).pushNamed(RoutesManager.suHome);
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  lang.lang == "en"
-                                      ? 'Sign IN Has Succesful'
-                                      : 'تم تسجيل الدخول بنجاح ',
-                                ),
-                              ),
-                            );
                           } else {
                             setState(() => isLoading = false);
 

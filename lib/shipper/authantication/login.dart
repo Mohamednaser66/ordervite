@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
+import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/constant_manager.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/auth.dart';
@@ -27,8 +29,8 @@ showdialog(context) {
 }
 
 class _LogInSHState extends State<LogInSH> {
-  TextEditingController email = new TextEditingController();
-  TextEditingController password = new TextEditingController();
+  late TextEditingController email ;
+ late  TextEditingController password ;
 
   bool isLoading = false;
 
@@ -36,24 +38,7 @@ class _LogInSHState extends State<LogInSH> {
 
   final mykey = GlobalKey<ScaffoldState>();
 
-  String? validemail(String? val) {
-    if (val == null || val.trim().isEmpty) return 'Email address is required';
 
-    final pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    final regex = RegExp(pattern);
-
-    if (!regex.hasMatch(val)) return 'Email address is not valid';
-    if (val.length < 6) return 'Email is too short';
-
-    return null; // صحيح
-  }
-
-  String? validepassword(String? val) {
-    if (val == null || val.trim().isEmpty) return 'Password is required';
-    if (val.length < 6) return 'Password is too short';
-    return null;
-  }
 
   savePref(
     String username,
@@ -73,9 +58,21 @@ class _LogInSHState extends State<LogInSH> {
   }
 
   @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
+     email =  TextEditingController();
+ password =  TextEditingController();
+
   }
+
+  String roles = ConstantManager.shipper;
 
   Widget build(BuildContext context) {
     Lang lang = Lang.of(context);
@@ -137,7 +134,7 @@ class _LogInSHState extends State<LogInSH> {
                       ),
                       CustomTextFormField(
                         controller: email,
-                        validation: validemail,
+                        validation: AppValidators.validateEmail,
                         icon: Icon(Icons.email, color: Colors.blue),
                         hintText: lang.lang == 'en'
                             ? 'Email Address'
@@ -150,7 +147,7 @@ class _LogInSHState extends State<LogInSH> {
                       CustomTextFormField(
                         secure: true,
                         controller: password,
-                        validation: validepassword,
+                        validation: AppValidators.validepassword,
                         icon: Icon(Icons.key, color: Colors.blue),
                         hintText: lang.lang == 'en' ? 'Password' : 'كلمة السر',
                         lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
@@ -196,11 +193,6 @@ class _LogInSHState extends State<LogInSH> {
                                 context,
                               ).pushNamed(RoutesManager.shHome);
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Sign IN Has Succesful'),
-                                ),
-                              );
                             } else {
                               setState(() {
                                 isLoading = false;
@@ -273,8 +265,13 @@ class _LogInSHState extends State<LogInSH> {
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
+
                         ],
                       ),
+                SizedBox(height: 10.h,),
+                TextButton(onPressed: (){
+                  Navigator.pushNamed(context, RoutesManager.registerWithPhone,arguments: roles);
+                }, child: Text(lang.lang=='en'?'Register by Phone Number':'سجل برقم الهاتف',style: TextStyle(color: Colors.white ),))
                     ],
                   ),
                 ),

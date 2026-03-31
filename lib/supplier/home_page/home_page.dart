@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late BitmapDescriptor iconMe;
 
   double bottomPaddingOfMap = 0;
-  String placeaddress = "address";
+  String? placeAddress ;
 
   final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
 
@@ -222,10 +222,10 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           if (reposnsebody["results"] != null &&
               reposnsebody["results"].isNotEmpty) {
-            placeaddress =
+            placeAddress =
                 "${reposnsebody["results"][0]["address_components"][0]["long_name"]}   ${reposnsebody["results"][0]["address_components"][1]["long_name"]}";
           } else {
-            placeaddress =
+            placeAddress =
                 "${locationData.latitude}, ${locationData.longitude}";
           }
         });
@@ -233,7 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (_) {
       if (mounted) {
         setState(() {
-          placeaddress = "${locationData.latitude}, ${locationData.longitude}";
+          placeAddress = "${locationData.latitude}, ${locationData.longitude}";
         });
       }
     }
@@ -341,11 +341,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget buildBody(Lang lang) {
     return SafeArea(
-      child: Stack(
+      child:  _initialLocation == null
+          ? Center(child: CircularProgressIndicator(color: Colors.blue,)): Stack(
         children: [
-          _initialLocation == null
-              ? Center(child: CircularProgressIndicator(color: Colors.blue,))
-              : GoogleMap(
+               GoogleMap(
                   padding: EdgeInsets.only(bottom: 300.h),
                   mapType: MapType.normal,
                   markers: _markers,
@@ -432,7 +431,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    DividerWidget(),
+                    Divider(
+            height:10.0,
+             thickness: 1.0,
+         ),
                     SizedBox(height: 10),
                     Row(
                       children: [
@@ -452,13 +454,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                               SizedBox(height: 4),
-                              Text(
-                                placeaddress,
+                              placeAddress!=null?Text(
+                                placeAddress!,
                                 style: TextStyle(
                                   fontSize: 15,
                                   color: Colors.white,
                                 ),
-                              ),
+                              ):const Center(child: CircularProgressIndicator(color: Colors.blue,),),
                             ],
                           ),
                         ),

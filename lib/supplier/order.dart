@@ -7,6 +7,8 @@ import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/supplier/models/named_icon.dart';
+import 'package:flutter_maps/supplier/widgets/su_order_states_widget.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
@@ -16,8 +18,6 @@ String GoogleApiKEY = "AIzaSyDl8LFLQn24CbaZyQ0F4wnzoF9NY3_gMWY";
 
 class OrderPage extends StatefulWidget {
   OrderPage({Key? key}) : super(key: key);
-
-  final String title = "OrderVite";
 
   @override
   _OrderState createState() => _OrderState();
@@ -53,13 +53,14 @@ class _OrderState extends State<OrderPage> {
 
   String? order_cost;
   String? order_pricecheck;
-  String order_shippier_id = "pending";
+  String? order_shippier_id;
+
   String? order_price;
   String? order_state;
   int order_messges_count = 0;
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  late StreamController _orderController =StreamController();
+  late StreamController _orderController = StreamController();
 
   bool isConfirm = false;
   bool isShConfirm = false;
@@ -396,7 +397,7 @@ class _OrderState extends State<OrderPage> {
               _timerStarted = false;
             }
 
-            int sub_id = int.parse(this.order_shippier_id, radix: 10);
+            int sub_id = int.parse(this.order_shippier_id ?? '', radix: 10);
 
             String Url =
                 "https://www.ordervite.com/api/supplier/shippier/$sub_id";
@@ -518,40 +519,44 @@ class _OrderState extends State<OrderPage> {
 
   Widget customRadio(String txt, int index) {
     Lang lang = Lang.of(context);
-    return ElevatedButton(
-      onPressed: () => changeIndex(index),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: selectedIndex == index
-            ? Colors.blueAccent
-            : Colors.grey,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
+    return SizedBox(
+      height: 50.h,
+      child: ElevatedButton(
+        onPressed: () => changeIndex(index),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: selectedIndex == index
+              ? Colors.blueAccent
+              : Colors.grey,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          padding: REdgeInsets.symmetric(vertical: 4),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            lang.lang == "en"
-                ? txt
-                : (txt == "small"
-                      ? "صغير"
-                      : (txt == "medium" ? "وسط" : "كبير")),
-            style: TextStyle(
-              color: selectedIndex == index ? Colors.white : Colors.black,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              lang.lang == "en"
+                  ? txt
+                  : (txt == "small"
+                        ? "صغير"
+                        : (txt == "medium" ? "وسط" : "كبير")),
+              style: TextStyle(
+                color: selectedIndex == index ? Colors.white : Colors.black,
+                fontSize: 12.sp,
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            (index == 0 ? ' 1-5 ' : (index == 1 ? ' 5-10 ' : ' 10+ ')) +
-                (lang.lang == "en" ? 'KG' : 'كجم'),
-            style: TextStyle(
-              color: selectedIndex == index ? Colors.white : Colors.black,
-              fontSize: 10,
+            SizedBox(height: 2.h),
+            Text(
+              (index == 0 ? ' 1-5 ' : (index == 1 ? ' 5-10 ' : ' 10+ ')) +
+                  (lang.lang == "en" ? 'KG' : 'كجم'),
+              style: TextStyle(
+                color: selectedIndex == index ? Colors.white : Colors.black,
+                fontSize: 10.sp,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -565,21 +570,24 @@ class _OrderState extends State<OrderPage> {
 
   Widget customRadio2(String txt, int index) {
     Lang lang = Lang.of(context);
-    return ElevatedButton(
-      onPressed: () => changeIndex2(index),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: selectedIndex2 == index
-            ? Colors.blueAccent
-            : Colors.grey,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
+    return SizedBox(
+      height: 40.h,
+      child: ElevatedButton(
+        onPressed: () => changeIndex2(index),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: selectedIndex2 == index
+              ? Colors.blueAccent
+              : Colors.grey,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          padding: REdgeInsets.symmetric(vertical: 4, horizontal: 12),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      ),
-      child: Text(
-        lang.lang == "en" ? txt : (txt == "cash" ? "كاش" : "تحويل"),
-        style: TextStyle(
-          color: selectedIndex2 == index ? Colors.white : Colors.black,
+        child: Text(
+          lang.lang == "en" ? txt : (txt == "cash" ? "كاش" : "تحويل"),
+          style: TextStyle(
+            color: selectedIndex2 == index ? Colors.white : Colors.black,
+          ),
         ),
       ),
     );
@@ -729,7 +737,7 @@ class _OrderState extends State<OrderPage> {
             ? "Order is Canceled by shipper"
             : "     تم إلغاء الطلب من قِبل مسئول الشحن  ",
       );
-      Navigator.pushNamed(context, "suhome", arguments: message);
+      Navigator.pushNamed(context, RoutesManager.suHome, arguments: message);
     } else if (statename == "shipper confirmed") {
       setState(() {
         isShConfirm = true;
@@ -859,150 +867,144 @@ class _OrderState extends State<OrderPage> {
                           ),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
+                          padding: REdgeInsets.symmetric(
                             horizontal: 24.0,
-                            vertical: 18.0,
+                            vertical: 10.0,
                           ),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Text(
-                                        lang.lang == "en"
-                                            ? 'Choose Package Size '
-                                            : 'اختار حجم الطرد ',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.white,
-                                        ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      lang.lang == "en"
+                                          ? 'Choose Package Size '
+                                          : 'اختار حجم الطرد ',
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: FontStyle.normal,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                  ],
-                                ),
-                                SizedBox(height: 6.0),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(18.0),
-                                    ),
                                   ),
-                                  child: Center(
-                                    child: Row(
-                                      children: <Widget>[
-                                        SizedBox(width: 10.0),
-                                        Expanded(child: customRadio(lst[0], 0)),
-                                        SizedBox(width: 10.0),
-                                        Expanded(child: customRadio(lst[1], 1)),
-                                        SizedBox(width: 10.0),
-                                        Expanded(child: customRadio(lst[2], 2)),
-                                        SizedBox(width: 10.0),
-                                      ],
-                                    ),
+                                ],
+                              ),
+                              SizedBox(height: 6.0.h),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(18.0),
                                   ),
                                 ),
-                                SizedBox(height: 6.0),
-                                Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Text(
-                                        lang.lang == "en"
-                                            ? 'Distance: $distance km'
-                                            : 'المسافة: $distance كم',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.white,
-                                        ),
+                                child: Center(
+                                  child: Row(
+                                    children: <Widget>[
+                                      SizedBox(width: 10.0),
+                                      Expanded(child: customRadio(lst[0], 0)),
+                                      SizedBox(width: 10.0),
+                                      Expanded(child: customRadio(lst[1], 1)),
+                                      SizedBox(width: 10.0),
+                                      Expanded(child: customRadio(lst[2], 2)),
+                                      SizedBox(width: 10.0),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 6.0),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      lang.lang == "en"
+                                          ? 'Distance: $distance km'
+                                          : 'المسافة: $distance كم',
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: FontStyle.normal,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                  ],
-                                ),
-                                SizedBox(height: 6.0),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 6.0),
 
-                                Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Text(
-                                        lang.lang == "en"
-                                            ? 'Choose Payment Method'
-                                            : ' اختر  نظام الدفع  ',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.white,
-                                        ),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      lang.lang == "en"
+                                          ? 'Choose Payment Method'
+                                          : ' اختر  نظام الدفع  ',
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: FontStyle.normal,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                  ],
-                                ),
-
-                                SizedBox(height: 6.0),
-
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(18.0),
-                                    ),
                                   ),
-                                  child: Center(
-                                    child: Row(
-                                      children: <Widget>[
-                                        SizedBox(width: 10.0),
-                                        Expanded(
-                                          child: customRadio2(lst2[0], 0),
-                                        ),
-                                        SizedBox(width: 10.0),
-                                        Expanded(
-                                          child: customRadio2(lst2[1], 1),
-                                        ),
-                                        SizedBox(width: 10.0),
-                                      ],
-                                    ),
+                                ],
+                              ),
+
+                              SizedBox(height: 6.0),
+
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(18.0),
                                   ),
                                 ),
+                                child: Center(
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 10.0),
+                                      Expanded(child: customRadio2(lst2[0], 0)),
+                                      SizedBox(width: 10.0),
+                                      Expanded(child: customRadio2(lst2[1], 1)),
+                                      SizedBox(width: 10.0),
+                                    ],
+                                  ),
+                                ),
+                              ),
 
-                                SizedBox(height: 6.0),
+                              SizedBox(height: 6.0),
 
-                                Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Text(
-                                        lang.lang == "en"
-                                            ? 'Enter Package Price  '
-                                            : '  ادخل سعر الطرد  ',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.white,
-                                        ),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      lang.lang == "en"
+                                          ? 'Enter Package Price  '
+                                          : '  ادخل سعر الطرد  ',
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: FontStyle.normal,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
+                              ),
 
-                                SizedBox(height: 6.0),
+                              SizedBox(height: 6.0.h),
 
-                                Row(
-                                  children: <Widget>[
-                                    Expanded(
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 60.h,
                                       child: TextFormField(
                                         controller: price,
                                         validator: validprice,
 
                                         keyboardType: TextInputType.number,
-
-                                        scrollPadding: EdgeInsets.only(top: 10),
-
                                         style: TextStyle(
                                           fontSize: 15,
                                           color: Colors.black,
@@ -1019,18 +1021,12 @@ class _OrderState extends State<OrderPage> {
                                             _price = value;
                                           });
                                         },
-                                        onTap: () {},
-
                                         decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.only(
-                                            top: 20,
-                                            bottom: 20,
-                                          ),
                                           hintText: lang.lang == "en"
                                               ? "Package Price"
                                               : "  سعر الطرد ",
                                           hintStyle: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 14.h,
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -1038,87 +1034,177 @@ class _OrderState extends State<OrderPage> {
                                           fillColor: Colors.white,
                                           filled: true,
                                           prefixIcon: Padding(
-                                            padding: EdgeInsets.only(left: 5),
+                                            padding: REdgeInsets.only(left: 5),
                                             child: Icon(
                                               Icons.money,
-                                              size: 30,
                                               color: Colors.blue,
                                             ),
                                           ),
-                                          prefixStyle: TextStyle(
-                                            fontSize: 50,
-                                            color: Colors.red,
-                                          ),
 
                                           labelText: lang.lang == "en"
-                                              ? "click here to set the price"
-                                              : "اضغط هنا لتحديد السعر",
+                                              ? "Package Price"
+                                              : "  سعر الطرد ",
                                           labelStyle: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 12.sp,
                                             color: Colors.black,
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                           border: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(
                                               20,
                                             ),
                                             borderSide: BorderSide(
-                                              color: Colors.black,
+                                              color: Colors.blue,
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                                SizedBox(height: 5.0),
+                                  ),
+                                ],
+                              ),
 
-                                Row(
-                                  children: <Widget>[
-                                    SizedBox(width: 10.0),
+                              Row(
+                                children: <Widget>[
+                                  SizedBox(width: 10.0),
 
-                                    Expanded(
-                                      child: ElevatedButton.icon(
-                                        onPressed: () async {
-                                          if (isConfirm) {
-                                            _showSnackBar(
-                                              lang,
-                                              en: 'Please wait to Response your order have sended ...',
-                                              ar: 'الرجاء الانتظار للرد على طلبك الذي تم إرساله...',
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () async {
+                                        if (isConfirm) {
+                                          _showSnackBar(
+                                            lang,
+                                            en: 'Please wait to Response your order have sended ...',
+                                            ar: 'الرجاء الانتظار للرد على طلبك الذي تم إرساله...',
+                                          );
+                                        } else {
+                                          double distance = double.parse(
+                                            this.distance ?? '',
+                                          );
+                                          double cost = 0.0;
+
+                                          late double PPKS,
+                                              PPKM,
+                                              PPKL,
+                                              min_charge,
+                                              cash_cc,
+                                              percentage,
+                                              commission,
+                                              shipper_pay;
+
+                                          SharedPreferences preferences =
+                                              await SharedPreferences.getInstance();
+
+                                          token = preferences.getString(
+                                            "token",
+                                          );
+                                          id = preferences.getString("id");
+
+                                          try {
+                                            String url =
+                                                "https://www.ordervite.com/api/supplier/finance";
+
+                                            var response = await http.get(
+                                              Uri.parse(url),
+                                              headers: {
+                                                'Content-Type':
+                                                    'application/json',
+                                                'Accept': 'application/json',
+                                                'Authorization':
+                                                    'Bearer $token',
+                                              },
                                             );
-                                          } else {
-                                            double distance = double.parse(
-                                              this.distance ?? '',
+
+                                            var reposnsebody = jsonDecode(
+                                              response.body,
                                             );
-                                            double cost = 0.0;
 
-                                            late double PPKS,
-                                                PPKM,
-                                                PPKL,
-                                                min_charge,
-                                                cash_cc,
-                                                percentage,
-                                                commission,
-                                                shipper_pay;
+                                            if (reposnsebody["data"] != null) {
+                                              PPKS = double.parse(
+                                                reposnsebody["data"]["PPKS"]
+                                                    .toString(),
+                                              );
+                                              PPKM = double.parse(
+                                                reposnsebody["data"]["PPKM"]
+                                                    .toString(),
+                                              );
+                                              PPKL = double.parse(
+                                                reposnsebody["data"]["PPKL"]
+                                                    .toString(),
+                                              );
+                                              min_charge = double.parse(
+                                                reposnsebody["data"]["min_charge"]
+                                                    .toString(),
+                                              );
+                                              cash_cc = double.parse(
+                                                reposnsebody["data"]["cash_cc"]
+                                                    .toString(),
+                                              );
+                                              percentage = double.parse(
+                                                reposnsebody["data"]["percentage"]
+                                                    .toString(),
+                                              );
 
-                                            SharedPreferences preferences =
-                                                await SharedPreferences.getInstance();
+                                              if (_size == "small") {
+                                                cost = PPKS;
+                                              } else if (_size == "medium") {
+                                                cost = PPKM;
+                                              } else if (_size == "large") {
+                                                cost = PPKL;
+                                              }
 
-                                            token = preferences.getString(
-                                              "token",
-                                            );
-                                            id = preferences.getString("id");
+                                              if (cost < min_charge)
+                                                cost = min_charge;
 
+                                              if (_priceCheck == "cash") {
+                                                cost = (cost * cash_cc);
+                                              }
+
+                                              commission =
+                                                  (percentage / 100) * cost;
+                                              shipper_pay = cost - commission;
+
+                                              setState(() {
+                                                this.cost = cost.toString();
+                                              });
+                                            }
+                                          } catch (e) {
+                                            await _showNetworkErrorDialog(lang);
+                                            return;
+                                          }
+
+                                          if (_price != "default") {
                                             try {
                                               String url =
-                                                  "https://www.ordervite.com/api/supplier/finance";
+                                                  "https://www.ordervite.com/api/supplier/orders";
 
-                                              var response = await http.get(
+                                              var response = await http.post(
                                                 Uri.parse(url),
+                                                body: {
+                                                  "supplier_id": id.toString(),
+                                                  "cost": this.cost.toString(),
+                                                  "size": _size,
+                                                  "price": _price,
+                                                  "order_state": "new",
+                                                  "pricecheck": _priceCheck,
+                                                  "so_longitude": sorlong
+                                                      .toString(),
+                                                  "so_latitude": sorLat
+                                                      .toString(),
+                                                  "dist_longitude": disLong
+                                                      .toString(),
+                                                  "dist_latitude": disLat
+                                                      .toString(),
+                                                  "distance": distance
+                                                      .toString(),
+                                                  'percentage': percentage
+                                                      .toString(),
+                                                  'shipper_pay': shipper_pay
+                                                      .toStringAsFixed(2),
+                                                  'commission': commission
+                                                      .toStringAsFixed(2),
+                                                },
                                                 headers: {
-                                                  'Content-Type':
-                                                      'application/json',
-                                                  'Accept': 'application/json',
                                                   'Authorization':
                                                       'Bearer $token',
                                                 },
@@ -1128,268 +1214,161 @@ class _OrderState extends State<OrderPage> {
                                                 response.body,
                                               );
 
-                                              if (reposnsebody["data"] !=
-                                                  null) {
-                                                PPKS = double.parse(
-                                                  reposnsebody["data"]["PPKS"]
-                                                      .toString(),
-                                                );
-                                                PPKM = double.parse(
-                                                  reposnsebody["data"]["PPKM"]
-                                                      .toString(),
-                                                );
-                                                PPKL = double.parse(
-                                                  reposnsebody["data"]["PPKL"]
-                                                      .toString(),
-                                                );
-                                                min_charge = double.parse(
-                                                  reposnsebody["data"]["min_charge"]
-                                                      .toString(),
-                                                );
-                                                cash_cc = double.parse(
-                                                  reposnsebody["data"]["cash_cc"]
-                                                      .toString(),
-                                                );
-                                                percentage = double.parse(
-                                                  reposnsebody["data"]["percentage"]
-                                                      .toString(),
-                                                );
+                                              setState(() {
+                                                isConfirm = true;
+                                                order_id =
+                                                    reposnsebody["data"]["id"]
+                                                        .toString();
+                                                order_cost =
+                                                    reposnsebody["data"]["cost"]
+                                                        .toString();
+                                                order_price =
+                                                    reposnsebody["data"]["price"]
+                                                        .toString();
+                                                order_pricecheck =
+                                                    reposnsebody["data"]["pricecheck"]
+                                                        .toString();
+                                                order_state =
+                                                    reposnsebody["data"]["order_state"]
+                                                        .toString();
+                                              });
 
-                                                if (_size == "small") {
-                                                  cost = PPKS;
-                                                } else if (_size == "medium") {
-                                                  cost = PPKM;
-                                                } else if (_size == "large") {
-                                                  cost = PPKL;
-                                                }
-
-                                                if (cost < min_charge)
-                                                  cost = min_charge;
-
-                                                if (_priceCheck == "cash") {
-                                                  cost = (cost * cash_cc);
-                                                }
-
-                                                commission =
-                                                    (percentage / 100) * cost;
-                                                shipper_pay = cost - commission;
-
-                                                setState(() {
-                                                  this.cost = cost.toString();
-                                                });
-                                              }
+                                              _showSnackBar(
+                                                lang,
+                                                en: 'Your order is created successfully, please wait for a shipper confirmation ...',
+                                                ar: 'تم إنشاء طلبك بنجاح، يُرجى انتظار التأكيد من قِبل مسئول الشحن...',
+                                              );
                                             } catch (e) {
                                               await _showNetworkErrorDialog(
                                                 lang,
                                               );
                                               return;
                                             }
-
-                                            if (_price != "default") {
-                                              try {
-                                                String url =
-                                                    "https://www.ordervite.com/api/supplier/orders";
-
-                                                var response = await http.post(
-                                                  Uri.parse(url),
-                                                  body: {
-                                                    "supplier_id": id
-                                                        .toString(),
-                                                    "cost": this.cost
-                                                        .toString(),
-                                                    "size": _size,
-                                                    "price": _price,
-                                                    "order_state": "new",
-                                                    "pricecheck": _priceCheck,
-                                                    "so_longitude": sorlong
-                                                        .toString(),
-                                                    "so_latitude": sorLat
-                                                        .toString(),
-                                                    "dist_longitude": disLong
-                                                        .toString(),
-                                                    "dist_latitude": disLat
-                                                        .toString(),
-                                                    "distance": distance
-                                                        .toString(),
-                                                    'percentage': percentage
-                                                        .toString(),
-                                                    'shipper_pay': shipper_pay
-                                                        .toStringAsFixed(2),
-                                                    'commission': commission
-                                                        .toStringAsFixed(2),
-                                                  },
-                                                  headers: {
-                                                    'Authorization':
-                                                        'Bearer $token',
-                                                  },
-                                                );
-
-                                                var reposnsebody = jsonDecode(
-                                                  response.body,
-                                                );
-
-                                                setState(() {
-                                                  isConfirm = true;
-                                                  order_id =
-                                                      reposnsebody["data"]["id"]
-                                                          .toString();
-                                                  order_cost =
-                                                      reposnsebody["data"]["cost"]
-                                                          .toString();
-                                                  order_price =
-                                                      reposnsebody["data"]["price"]
-                                                          .toString();
-                                                  order_pricecheck =
-                                                      reposnsebody["data"]["pricecheck"]
-                                                          .toString();
-                                                  order_state =
-                                                      reposnsebody["data"]["order_state"]
-                                                          .toString();
-                                                });
-
-                                                _showSnackBar(
-                                                  lang,
-                                                  en: 'Your order is created successfully, please wait for a shipper confirmation ...',
-                                                  ar: 'تم إنشاء طلبك بنجاح، يُرجى انتظار التأكيد من قِبل مسئول الشحن...',
-                                                );
-                                              } catch (e) {
-                                                await _showNetworkErrorDialog(
-                                                  lang,
-                                                );
-                                                return;
-                                              }
-                                            } else {
-                                              _showSnackBar(
-                                                lang,
-                                                en: 'Please fill all order entries',
-                                                ar: 'يُرجى ملء جميع بيانات الطلب',
-                                              );
-                                            }
+                                          } else {
+                                            _showSnackBar(
+                                              lang,
+                                              en: 'Please fill all order entries',
+                                              ar: 'يُرجى ملء جميع بيانات الطلب',
+                                            );
                                           }
-                                        },
-                                        icon: const Icon(
-                                          Icons.done_all,
-                                          size: 20,
+                                        }
+                                      },
+                                      icon: const Icon(
+                                        Icons.done_all,
+                                        size: 20,
+                                      ),
+                                      label: Text(
+                                        lang.lang == "en"
+                                            ? "Confirm"
+                                            : "تأكيد ",
+                                        style: const TextStyle(
+                                          fontSize: 12.0,
+                                          color: Colors.white,
                                         ),
-                                        label: Text(
-                                          lang.lang == "en"
-                                              ? "Confirm"
-                                              : "تأكيد ",
-                                          style: const TextStyle(
-                                            fontSize: 12.0,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.green,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12.0,
-                                            ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12.0,
                                           ),
                                         ),
                                       ),
                                     ),
+                                  ),
 
-                                    SizedBox(width: 40.0),
+                                  SizedBox(width: 40.0),
 
-                                    Expanded(
-                                      child: ElevatedButton.icon(
-                                        onPressed: () async {
-                                          setState(() {
-                                            isConfirm = false;
-                                          });
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () async {
+                                        setState(() {
+                                          isConfirm = false;
+                                        });
 
-                                          showDialog<bool>(
-                                            context: context,
-                                            builder: (c) => AlertDialog(
-                                              title: Text(
-                                                lang.lang == "en"
-                                                    ? 'Confirm'
-                                                    : 'تأكيد',
-                                                style: const TextStyle(
-                                                  color: Colors.red,
-                                                ),
+                                        showDialog<bool>(
+                                          context: context,
+                                          builder: (c) => AlertDialog(
+                                            title: Text(
+                                              lang.lang == "en"
+                                                  ? 'Confirm'
+                                                  : 'تأكيد',
+                                              style: const TextStyle(
+                                                color: Colors.red,
                                               ),
-                                              content: Text(
-                                                lang.lang == "en"
-                                                    ? 'Are you sure you want to cancel?  '
-                                                    : 'هل أنت متأكد أنك تريد الإلغاء؟',
-                                                style: const TextStyle(
-                                                  fontSize: 15,
-                                                  color: Colors.red,
-                                                ),
+                                            ),
+                                            content: Text(
+                                              lang.lang == "en"
+                                                  ? 'Are you sure you want to cancel?  '
+                                                  : 'هل أنت متأكد أنك تريد الإلغاء؟',
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.red,
                                               ),
-                                              actions: [
-                                                TextButton(
-                                                  child: Text(
-                                                    lang.lang == "en"
-                                                        ? 'Yes'
-                                                        : 'نعم',
-                                                  ),
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-
-                                                    Message message = Message(
-                                                      lang.lang == "en"
-                                                          ? "You have canceld"
-                                                          : " تم الإلغاء ",
-                                                    );
-
-                                                    Navigator.pushNamedAndRemoveUntil(
-                                                      context,
-                                                      RoutesManager.suHome,
-                                                      (route) => false,
-                                                      arguments: message,
-                                                    );
-                                                  },
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                child: Text(
+                                                  lang.lang == "en"
+                                                      ? 'Yes'
+                                                      : 'نعم',
                                                 ),
-                                                TextButton(
-                                                  child: Text(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+
+                                                  Message message = Message(
                                                     lang.lang == "en"
-                                                        ? 'No'
-                                                        : 'لا',
-                                                  ),
-                                                  onPressed: () => Navigator.of(
+                                                        ? "You have canceld"
+                                                        : " تم الإلغاء ",
+                                                  );
+
+                                                  Navigator.pushNamedAndRemoveUntil(
                                                     context,
-                                                  ).pop(),
+                                                    RoutesManager.suHome,
+                                                    (route) => false,
+                                                    arguments: message,
+                                                  );
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: Text(
+                                                  lang.lang == "en"
+                                                      ? 'No'
+                                                      : 'لا',
                                                 ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                        icon: const Icon(
-                                          Icons.cancel,
-                                          size: 20,
-                                        ),
-                                        label: Text(
-                                          lang.lang == "en"
-                                              ? "Cancel"
-                                              : "إلغاء",
-                                          style: const TextStyle(
-                                            fontSize: 12.0,
-                                            color: Colors.white,
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                              ),
+                                            ],
                                           ),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.cancel, size: 20),
+                                      label: Text(
+                                        lang.lang == "en" ? "Cancel" : "إلغاء",
+                                        style: const TextStyle(
+                                          fontSize: 12.0,
+                                          color: Colors.white,
                                         ),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.red,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12.0,
-                                            ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12.0,
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       )
                     : Container(
-                        height: 300.00,
+                        height: 300.00.h,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topRight,
@@ -1408,647 +1387,40 @@ class _OrderState extends State<OrderPage> {
                         ),
 
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24.0,
-                            vertical: 18.0,
+                          padding: REdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
                           ),
-                          child: SingleChildScrollView(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(18.0),
-                                  topRight: Radius.circular(18.0),
-                                ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(18.0),
+                                topRight: Radius.circular(18.0),
                               ),
-                              child: Padding(
-                                padding: EdgeInsets.all(20.0),
+                            ),
+                            child: Padding(
+                              padding: REdgeInsets.all(12),
 
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Column(
-                                      children: <Widget>[
-                                        Row(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Text(
-                                                lang.lang == "en"
-                                                    ? "Order State: $order_state"
-                                                    : (order_state == "new"
-                                                          ? "حالة الطلب : جديد"
-                                                          : (order_state ==
-                                                                    "shipper confirmed"
-                                                                ? "حالة الطلب : تأكيد مسئول الشحن  "
-                                                                : (order_state ==
-                                                                          "order received"
-                                                                      ? "حالة الطلب :   استلام الشحنة   "
-                                                                      : (order_state ==
-                                                                                "order delivered"
-                                                                            ? "حالة الطلب :      اكتمال الطلب    "
-                                                                            : "حالة الطلب :   توصيل الشحنة  الشحنة   ")))),
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-
-                                        SizedBox(height: 20),
-
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Container(
-                                                height: 30.0,
-                                                width: 20.0,
-
-                                                decoration: new BoxDecoration(
-                                                  borderRadius:
-                                                      new BorderRadius.circular(
-                                                        50.0,
-                                                      ),
-                                                  color: isConfirm
-                                                      ? Color(0xFF18D191)
-                                                      : Color(0xFFFC6A7F),
-                                                  image: DecorationImage(
-                                                    image: AssetImage(
-                                                      'assets/icons_New order.png',
-                                                    ),
-                                                    fit: BoxFit.fill,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-
-                                            SizedBox(width: 5),
-                                            Expanded(
-                                              child: Container(
-                                                height: 30.0,
-                                                width: 20.0,
-
-                                                decoration: new BoxDecoration(
-                                                  borderRadius:
-                                                      new BorderRadius.circular(
-                                                        50.0,
-                                                      ),
-                                                  color: isShConfirm
-                                                      ? Color(0xFF18D191)
-                                                      : Color(0xFFFC6A7F),
-                                                  image: DecorationImage(
-                                                    image: AssetImage(
-                                                      'assets/icons_shipper confirm.png',
-                                                    ),
-                                                    fit: BoxFit.fill,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-
-                                            SizedBox(width: 5),
-                                            Expanded(
-                                              child: Container(
-                                                height: 30.0,
-                                                width: 20.0,
-                                                decoration: new BoxDecoration(
-                                                  borderRadius:
-                                                      new BorderRadius.circular(
-                                                        50.0,
-                                                      ),
-                                                  color: isShReceived
-                                                      ? Color(0xFF18D191)
-                                                      : Color(0xFFFC6A7F),
-                                                  image: DecorationImage(
-                                                    image: AssetImage(
-                                                      'assets/icons_shipper received.png',
-                                                    ),
-                                                    fit: BoxFit.fill,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: 5),
-                                            Expanded(
-                                              child: Container(
-                                                height: 30.0,
-                                                width: 20.0,
-                                                decoration: new BoxDecoration(
-                                                  borderRadius:
-                                                      new BorderRadius.circular(
-                                                        50.0,
-                                                      ),
-                                                  color: isShDelviered
-                                                      ? Color(0xFF18D191)
-                                                      : Color(0xFFFC6A7F),
-
-                                                  image: DecorationImage(
-                                                    image: AssetImage(
-                                                      'assets/icons_package delivered.png',
-                                                    ),
-                                                    fit: BoxFit.fill,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: 5),
-                                            Expanded(
-                                              child: Container(
-                                                height: 30.0,
-                                                width: 20.0,
-                                                decoration: new BoxDecoration(
-                                                  borderRadius:
-                                                      new BorderRadius.circular(
-                                                        50.0,
-                                                      ),
-                                                  color: Color(0xFFFC6A7F),
-                                                  image: DecorationImage(
-                                                    image: AssetImage(
-                                                      'assets/icons_order complete.png',
-                                                    ),
-                                                    fit: BoxFit.fill,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 15),
-
-                                        Row(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Text(
-                                                lang.lang == "en"
-                                                    ? "Order ID: $order_id"
-                                                    : "كود الطلب :$order_id",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-
-                                            SizedBox(width: 20.0),
-                                            Expanded(
-                                              child: isShConfirm
-                                                  ? Text(
-                                                      lang.lang == "en"
-                                                          ? "Shipper ID: $order_shippier_id "
-                                                          : "كود المسئول : $order_shippier_id",
-                                                      style: TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontStyle:
-                                                            FontStyle.normal,
-                                                        color: Colors.white,
-                                                      ),
-                                                    )
-                                                  : Text(
-                                                      lang.lang == "en"
-                                                          ? "Shipper ID: Pending "
-                                                          : "كود المسئول : .... ",
-                                                      style: TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontStyle:
-                                                            FontStyle.normal,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                            ),
-                                          ],
-                                        ),
-
-                                        SizedBox(height: 10),
-
-                                        Row(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Text(
-                                                lang.lang == "en"
-                                                    ? "Shipping Cost:"
-                                                    : "تكلفة الشحن ",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-
-                                            SizedBox(width: 20),
-                                            Expanded(
-                                              child: Text(
-                                                lang.lang == "en"
-                                                    ? "Package Price:"
-                                                    : "سعر الشحنة ",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 5),
-
-                                        Row(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Text(
-                                                lang.lang == "en"
-                                                    ? "$order_cost L.E."
-                                                    : "$order_cost جم",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-
-                                            SizedBox(width: 20),
-                                            Expanded(
-                                              child: Text(
-                                                lang.lang == "en"
-                                                    ? "$order_price L.E."
-                                                    : "$order_price جم",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 20),
-                                        Row(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Text(
-                                                lang.lang == "en"
-                                                    ? "Payment Method : $order_pricecheck"
-                                                    : (order_pricecheck ==
-                                                              "cash"
-                                                          ? "نظام الدفع  : كاش"
-                                                          : "نظام الدفع  : تحويل"),
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-
-                                    SizedBox(height: 10),
-
-                                    Row(
-                                      children: <Widget>[
-                                        SizedBox(width: 10.0),
-
-                                        Expanded(
-                                          child: ElevatedButton.icon(
-                                            onPressed: () async {
-                                              try {
-                                                if (order_id != null) {
-                                                  if (isConfirmOrder) {
-                                                    showDialog<bool>(
-                                                      context: context,
-                                                      builder: (c) => AlertDialog(
-                                                        title: Text(
-                                                          lang.lang == "en"
-                                                              ? 'Confirm'
-                                                              : 'تحذير ',
-                                                          style:
-                                                              const TextStyle(
-                                                                color:
-                                                                    Colors.red,
-                                                              ),
-                                                        ),
-                                                        content: Text(
-                                                          lang.lang == "en"
-                                                              ? 'Please confirm that the order is complete '
-                                                              : '     يرجي تأكيد عملية اكتمال الطلب ',
-                                                          style:
-                                                              const TextStyle(
-                                                                fontSize: 15,
-                                                                color:
-                                                                    Colors.red,
-                                                              ),
-                                                        ),
-                                                        actions: [
-                                                          TextButton(
-                                                            child: Text(
-                                                              lang.lang == "en"
-                                                                  ? 'Yes'
-                                                                  : 'نعم',
-                                                            ),
-                                                            onPressed: () async {
-                                                              int id =
-                                                                  int.parse(
-                                                                    order_id ??
-                                                                        '',
-                                                                    radix: 10,
-                                                                  );
-
-                                                              String url =
-                                                                  "https://www.ordervite.com/api/supplier/order_update/$id";
-
-                                                              var response = await http.put(
-                                                                Uri.parse(url),
-                                                                body: {
-                                                                  "order_state":
-                                                                      "order complete",
-                                                                },
-                                                                headers: {
-                                                                  'Authorization':
-                                                                      'Bearer $token',
-                                                                },
-                                                              );
-
-                                                              var reposnsebody =
-                                                                  jsonDecode(
-                                                                    response
-                                                                        .body,
-                                                                  );
-
-                                                              String
-                                                              shipper_api_token =
-                                                                  api_token
-                                                                      .toString();
-
-                                                              String text =
-                                                                  lang.lang ==
-                                                                      "en"
-                                                                  ? "your order is complete great work !!!"
-                                                                  : "   هنيأ تم إكمال الطلب !!!   ";
-
-                                                              String url3 =
-                                                                  "https://www.ordervite.com/api/notify/page/ordervite/$text/$shipper_api_token/1/ordervite/supplier/order complete";
-
-                                                              await http.get(
-                                                                Uri.parse(url3),
-                                                                headers: {
-                                                                  'Content-Type':
-                                                                      'application/json',
-                                                                  'Accept':
-                                                                      'application/json',
-                                                                  'Authorization':
-                                                                      'Bearer $token',
-                                                                },
-                                                              );
-
-                                                              Navigator.of(
-                                                                context,
-                                                              ).pop();
-
-                                                              if (reposnsebody !=
-                                                                  null) {
-                                                                OrderView
-                                                                orderView = OrderView(
-                                                                  order_id
-                                                                      .toString(),
-                                                                  api_token
-                                                                      .toString(),
-                                                                );
-
-                                                                Navigator.pushNamed(
-                                                                  context,
-                                                                  "review",
-                                                                  arguments:
-                                                                      orderView,
-                                                                );
-                                                              }
-                                                            },
-                                                          ),
-                                                          TextButton(
-                                                            child: Text(
-                                                              lang.lang == "en"
-                                                                  ? 'No'
-                                                                  : 'لا',
-                                                            ),
-                                                            onPressed: () =>
-                                                                Navigator.of(
-                                                                  context,
-                                                                ).pop(),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    _showSnackBar(
-                                                      lang,
-                                                      en: 'You can not complete the order before its delivered',
-                                                      ar: 'لا يمكنك اكمال الطلب قبل أن يتم تسليمه',
-                                                    );
-                                                  }
-                                                }
-                                              } catch (e) {
-                                                await _showNetworkErrorDialog(
-                                                  lang,
-                                                );
-                                                return;
-                                              }
-                                            },
-                                            icon: const Icon(
-                                              Icons.done_all,
-                                              size: 20,
-                                            ),
-                                            label: Text(
-                                              lang.lang == "en"
-                                                  ? "Complete "
-                                                  : "اكمال ",
-                                              style: const TextStyle(
-                                                fontSize: 12.0,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.green,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12.0),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 20.0),
-                                        Expanded(
-                                          child: ElevatedButton.icon(
-                                            onPressed: () async {
-                                              try {
-                                                showDialog<bool>(
-                                                  context: context,
-                                                  builder: (c) => AlertDialog(
-                                                    title: Text(
-                                                      lang.lang == "en"
-                                                          ? 'Confirm'
-                                                          : "تأكيد ",
-                                                      style: const TextStyle(
-                                                        color: Colors.red,
-                                                      ),
-                                                    ),
-                                                    content: Text(
-                                                      lang.lang == "en"
-                                                          ? 'Are you sure you want to cancel the order (a fine may apply) '
-                                                          : 'هل أنت متأكد لإلغاء الطلب ',
-                                                      style: const TextStyle(
-                                                        fontSize: 15,
-                                                        color: Colors.red,
-                                                      ),
-                                                    ),
-                                                    actions: [
-                                                      TextButton(
-                                                        child: const Text(
-                                                          'Yes',
-                                                        ),
-                                                        onPressed: () async {
-                                                          try {
-                                                            if (order_id !=
-                                                                null) {
-                                                              String name =
-                                                                  "$id   supplier  $username";
-                                                              int parsedId =
-                                                                  int.parse(
-                                                                    order_id ??
-                                                                        '',
-                                                                    radix: 10,
-                                                                  );
-                                                              String url =
-                                                                  "https://www.ordervite.com/api/supplier/order_update/$parsedId";
-                                                              var response = await http.put(
-                                                                Uri.parse(url),
-                                                                body: {
-                                                                  "order_cancel":
-                                                                      "$name cancel order",
-                                                                },
-                                                                headers: {
-                                                                  'Authorization':
-                                                                      'Bearer $token',
-                                                                },
-                                                              );
-                                                              var reposnsebody =
-                                                                  jsonDecode(
-                                                                    response
-                                                                        .body,
-                                                                  );
-                                                              String
-                                                              shipperApiToken =
-                                                                  api_token
-                                                                      .toString();
-                                                              String text =
-                                                                  lang.lang ==
-                                                                      "en"
-                                                                  ? "your order is cancled by supplier!"
-                                                                  : "  تم إلغاء الطلب بواسطة المورد  ";
-                                                              String url3 =
-                                                                  "https://www.ordervite.com/api/notify/page/ordervite/$text/$shipperApiToken/1/ordervite/supplier/order cancel";
-                                                              await http.get(
-                                                                Uri.parse(url3),
-                                                                headers: {
-                                                                  'Content-Type':
-                                                                      'application/json',
-                                                                  'Accept':
-                                                                      'application/json',
-                                                                  'Authorization':
-                                                                      'Bearer $token',
-                                                                },
-                                                              );
-                                                              Navigator.pop(
-                                                                context,
-                                                              );
-                                                              if (reposnsebody !=
-                                                                  null) {
-                                                                Message
-                                                                message = Message(
-                                                                  lang.lang ==
-                                                                          "en"
-                                                                      ? "Order is Canceled"
-                                                                      : "تم إلغاء الطلب ",
-                                                                );
-                                                                Navigator.pushNamedAndRemoveUntil(
-                                                                  context,
-                                                                  RoutesManager
-                                                                      .suHome,
-                                                                  (route) =>
-                                                                      false,
-                                                                  arguments:
-                                                                      message,
-                                                                );
-                                                              }
-                                                            }
-                                                          } catch (e) {
-                                                            await _showNetworkErrorDialog(
-                                                              lang,
-                                                            );
-                                                            return;
-                                                          }
-                                                        },
-                                                      ),
-                                                      TextButton(
-                                                        child: const Text('No'),
-                                                        onPressed: () =>
-                                                            Navigator.pop(
-                                                              context,
-                                                            ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              } catch (e) {
-                                                await _showNetworkErrorDialog(
-                                                  lang,
-                                                );
-                                                return;
-                                              }
-                                            },
-                                            icon: const Icon(
-                                              Icons.cancel,
-                                              size: 20,
-                                            ),
-                                            label: Text(
-                                              lang.lang == "en"
-                                                  ? "Cancel"
-                                                  : "إلغاء",
-                                              style: const TextStyle(
-                                                fontSize: 12.0,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.red,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12.0),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                              child: SuOrderStatesWidget(
+                                lang: lang,
+                                order_state: order_state ?? '',
+                                isConfirm: isConfirm,
+                                isShConfirm: isShConfirm,
+                                isShReceived: isShReceived,
+                                isShDelviered: isShDelviered,
+                                order_id: order_id ?? '',
+                                order_shippier_id: order_shippier_id ?? '',
+                                order_cost: order_cost ?? '',
+                                username: username ?? '',
+                                showSnackBar: _showSnackBar,
+                                showNetworkErrorDialog: _showNetworkErrorDialog,
+                                id: id ?? '',
+                                api_token: api_token ?? '',
+                                token: token ?? '',
+                                order_price: order_price ?? '',
+                                order_pricecheck: order_pricecheck ?? '',
+                                isConfirmOrder: isConfirmOrder,
                               ),
                             ),
                           ),

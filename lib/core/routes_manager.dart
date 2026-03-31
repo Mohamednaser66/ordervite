@@ -2,20 +2,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_maps/authpages.dart';
 import 'package:flutter_maps/chat_screen.dart';
 import 'package:flutter_maps/order.dart';
+import 'package:flutter_maps/shipper/authantication/otp_screen.dart';
+import 'package:flutter_maps/shipper/authantication/register_with_phone.dart';
 import 'package:flutter_maps/shipper/chat_screen.dart';
 import 'package:flutter_maps/shipper/home.dart';
-import 'package:flutter_maps/shipper/login.dart';
+import 'package:flutter_maps/shipper/authantication/login.dart';
 import 'package:flutter_maps/shipper/order.dart';
 import 'package:flutter_maps/shipper/orders.dart';
 import 'package:flutter_maps/shipper/profile.dart';
-import 'package:flutter_maps/shipper/register.dart';
+import 'package:flutter_maps/shipper/authantication/register.dart';
 import 'package:flutter_maps/supplier/chat_screen.dart';
 import 'package:flutter_maps/supplier/home_page/home_page.dart';
-import 'package:flutter_maps/supplier/login.dart';
+import 'package:flutter_maps/supplier/authantication/login.dart';
 import 'package:flutter_maps/supplier/order.dart';
 import 'package:flutter_maps/supplier/products/presantation/cart.dart';
 import 'package:flutter_maps/supplier/profile.dart';
-import 'package:flutter_maps/supplier/register.dart';
+import 'package:flutter_maps/supplier/authantication/register.dart';
 import 'package:flutter_maps/supplier/review.dart';
 import 'package:flutter_maps/supplier/searchscreen.dart';
 import 'package:flutter_maps/supplier/terms.dart';
@@ -25,6 +27,7 @@ import '../supplier/products/presantation/products_screen.dart';
 
 class RoutesManager {
   static const String login = '/login';
+  static const String registerWithPhone = '/registerWithPhone';
   static const String register = '/register';
   static const String home = '/homepage';
   static const String suHome = '/suhome';
@@ -50,9 +53,12 @@ class RoutesManager {
   static const String shProfile = '/shProfile';
   static const String landingPage = '/landingPage';
   static const String productsScreen = '/productsScreen';
+  static const String otpScreen = '/otpScreen';
 
   static Map<String, WidgetBuilder> router = {
     login: (_) => LogIn(),
+    otpScreen: (_) => OtpScreen(verificationId: '', role: '',),
+    registerWithPhone: (_) => RegisterWithPhone(),
     cart: (_) {
       return Cart();
     },

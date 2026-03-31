@@ -6,6 +6,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
+import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/constant_manager.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/auth.dart';
@@ -34,111 +36,23 @@ showdialog(context) {
 class _RegisterSHState extends State<RegisterSH> {
   late TapGestureRecognizer _changesign;
 
-  TextEditingController username = new TextEditingController();
-  TextEditingController email = new TextEditingController();
-  TextEditingController password = new TextEditingController();
-  TextEditingController cpassword = new TextEditingController();
-  TextEditingController mobile1 = new TextEditingController();
-  TextEditingController mobile2 = new TextEditingController();
+ late TextEditingController username ;
+ late TextEditingController email ;
+ late TextEditingController password ;
+ late TextEditingController cpassword ;
+ late TextEditingController mobile1 ;
+ late TextEditingController mobile2 ;
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   Location _locationTracker = Location();
   late Marker marker;
   late Circle circle;
-
-  //GoogleMapController _controller;
-
   bool isLoading = false;
 
   GlobalKey<FormState> formstatesignup = new GlobalKey<FormState>();
 
   final mykey2 = GlobalKey<ScaffoldState>();
-
-  String? validusername(String? val) {
-    if (val == null || val.trim().isEmpty) {
-      return 'Username is required';
-    }
-
-    if (val.trim().length < 3) {
-      return 'Username is too short';
-    }
-
-    if (!RegExp(r'^[a-zA-Z0-9_-]+$').hasMatch(val.trim())) {
-      return 'Username contains invalid characters';
-    }
-
-    return null;
-  }
-
-  String? validemail(String? val) {
-    if (val == null || val.trim().isEmpty) {
-      return 'Email address is required';
-    }
-
-    if (val.trim().length < 6) {
-      return 'Email is too short';
-    }
-
-    String pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@'
-        r'((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|'
-        r'(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = RegExp(pattern);
-
-    if (!regex.hasMatch(val.trim())) {
-      return 'Invalid email address';
-    }
-
-    return null;
-  }
-
-  String? validepassword(String? val) {
-    if (val!.isEmpty) {
-      return 'Password is Required';
-    }
-    if (val.length < 6) {
-      return 'Password is too short';
-    }
-    return null;
-  }
-
-  String? validecpassword(String? val) {
-    if (val == null || val.isEmpty) {
-      return 'Password is not confirmed';
-    }
-
-    if (val.length < 6) {
-      return 'Password is too short';
-    }
-
-    if (val != password.text) {
-      return 'Password does not match';
-    }
-
-    return null;
-  }
-
-  String? validmobile1(String? val) {
-    if (val!.isEmpty) {
-      return 'Mobile 1 is required';
-    }
-    if (val.length < 9) {
-      return 'Mobile 1 is too short';
-    }
-    return null;
-  }
-
-  String? validmobile2(String? val) {
-    if (val!.isEmpty) {
-      return 'Mobile 2 is required';
-    }
-    if (val.length < 9) {
-      return 'Mobile 2 is too short';
-    }
-
-    return null;
-  }
 
   Future<Uint8List> getMarker() async {
     ByteData byteData = await DefaultAssetBundle.of(
@@ -161,16 +75,33 @@ class _RegisterSHState extends State<RegisterSH> {
     preferences.setString('id', id);
     preferences.setString('type', type);
   }
+  @override
+  void dispose() {
+    username.dispose();
+    email.dispose();
+    password.dispose();
+    cpassword.dispose();
+    mobile1.dispose();
+    mobile2.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
-    _changesign = new TapGestureRecognizer()
+    _changesign =  TapGestureRecognizer()
       ..onTap = () {
         Navigator.of(context).pushNamed(RoutesManager.shLogin);
       };
     super.initState();
+    username =  TextEditingController();
+    email =  TextEditingController();
+    password =  TextEditingController();
+    cpassword =  TextEditingController();
+    mobile1 =  TextEditingController();
+    mobile2 =  TextEditingController();
   }
 
+String roles = ConstantManager.shipper;
   Widget build(BuildContext context) {
     Lang lang = Lang.of(context);
 
@@ -223,7 +154,7 @@ class _RegisterSHState extends State<RegisterSH> {
                     SizedBox(height: 20.h),
                     CustomTextFormField(
                       icon: Icon(Icons.person, color: Colors.blue),
-                      validation: validusername,
+                      validation: AppValidators.validateUsername,
                       controller: username,
                       hintText: lang.lang == 'en'
                           ? "User Name"
@@ -233,7 +164,7 @@ class _RegisterSHState extends State<RegisterSH> {
                     CustomTextFormField(
                       icon: Icon(Icons.email, color: Colors.blue),
                       controller: email,
-                      validation: validemail,
+                      validation: AppValidators.validateEmail,
                       hintText: lang.lang == 'en'
                           ? 'Email Address'
                           : 'عنوان البريد الالكترونى',
@@ -241,7 +172,7 @@ class _RegisterSHState extends State<RegisterSH> {
                     ),
                     CustomTextFormField(
                       icon: Icon(Icons.key, color: Colors.blue),
-                      validation: validepassword,
+                      validation: AppValidators.validepassword,
                       secure: true,
                       controller: password,
                       hintText: lang.lang == 'en' ? 'Password' : 'كلمة السر',
@@ -250,7 +181,7 @@ class _RegisterSHState extends State<RegisterSH> {
                     CustomTextFormField(
                       secure: true,
                       controller: cpassword,
-                      validation: validecpassword,
+                      validation:(val) => AppValidators.validecpassword(val, password.text),
                       icon: Icon(Icons.key, color: Colors.blue),
                       hintText: lang.lang == 'en'
                           ? 'Re Password'
@@ -261,7 +192,7 @@ class _RegisterSHState extends State<RegisterSH> {
                     ),
                     CustomTextFormField(
                       controller: mobile1,
-                      validation: validmobile1,
+                      validation: AppValidators.validatePhoneNumber,
                       icon: Icon(
                         Icons.phone_android_outlined,
                         color: Colors.blue,
@@ -272,7 +203,7 @@ class _RegisterSHState extends State<RegisterSH> {
                       lable: lang.lang == 'en' ? 'Mobile 1' : 'رقم التليفون 1 ',
                     ),
                     CustomTextFormField(
-                      validation: validmobile2,
+                      validation: AppValidators.validatePhoneNumber,
                       controller: mobile2,
                       icon: Icon(
                         Icons.phone_android_outlined,
@@ -349,11 +280,6 @@ class _RegisterSHState extends State<RegisterSH> {
                                 reposnsebody["data"]["name"]["id"].toString(),
                                 "shipper",
                               );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Sign UP Has Succesful'),
-                                ),
-                              );
 
                               AuthService.setToken(
                                 reposnsebody["data"]["token"],
@@ -364,7 +290,6 @@ class _RegisterSHState extends State<RegisterSH> {
                                 context,
                               ).pushNamed(RoutesManager.shProfile);
                             } else {
-                              //    print("data is error");
                               setState(() {
                                 isLoading = false;
                               });
@@ -403,6 +328,7 @@ class _RegisterSHState extends State<RegisterSH> {
                         }
                       },
                     ),
+                    SizedBox(height: 10.h,),
                     Container(
                       margin: EdgeInsets.only(left: 5),
                       child: RichText(
@@ -433,6 +359,10 @@ class _RegisterSHState extends State<RegisterSH> {
                         ),
                       ),
                     ),
+                    SizedBox(height: 10.h,),
+                    TextButton(onPressed: (){
+                      Navigator.pushNamed(context, RoutesManager.registerWithPhone,arguments: roles);
+                    }, child: Text(lang.lang=='en'?'Register by Phone Number':'سجل برقم الهاتف',style: TextStyle(color: Colors.white ),))
                   ],
                 ),
               ),

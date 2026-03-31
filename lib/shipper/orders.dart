@@ -9,6 +9,7 @@ import 'package:flutter_maps/core/routes_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/shipper/shipper_drawer.dart';
 import 'package:flutter_maps/supplier/order.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
@@ -183,7 +184,7 @@ class _ShOrdersState extends State<ShOrders> {
     });
   }
 
-  showMessage() {
+  showMessage(Message args) {
     Message message = ModalRoute.of(context)?.settings.arguments as Message;
 
     if (isMessage) {
@@ -206,7 +207,48 @@ class _ShOrdersState extends State<ShOrders> {
       timer?.cancel();
     }
   }
+  void _handleMessage(RemoteMessage message) {
+    if (!mounted) return;
 
+    String stateName = message.data["state_name"] ?? "";
+    String stateType = message.data["state_type"] ?? "";
+
+    setState(() {
+      statename = stateName;
+    });
+
+    if (stateName == "new order" || stateName == "order cancel") {
+      loaddailyOrders();
+    }
+
+    if (stateName == "order review") {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              stateType,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ),
+        );
+      });
+    }
+  }
+  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+    await Firebase.initializeApp();
+    print('Handling background message: ${message.messageId}');
+  }
+  void showMessageSafe() {
+    final args = ModalRoute.of(context)?.settings.arguments;
+
+    if (args != null && args is Message) {
+      showMessage(args);
+    }
+  }
   @override
   void dispose() {
     timer?.cancel();
@@ -214,93 +256,51 @@ class _ShOrdersState extends State<ShOrders> {
     super.dispose();
   }
 
-  void initState() {
-    getPref();
-    _orderController = StreamController();
-    loaddailyOrders();
+  bool _isInit = true;
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isInit) {
+      loaddailyOrders();
+
+      Future.delayed(const Duration(seconds: 5), () {
+        if (!mounted) return;
+        showMessageSafe();
+      });
+
+      _isInit = false;
+    }
+  }
+  @override
+  void initState() {
     super.initState();
+
+    getPref();
+
+    _orderController = StreamController();
+
     timer = Timer.periodic(const Duration(seconds: 100), (timer) {
       if (!mounted) return;
       loaddailyOrders();
     });
-
-    _firebaseMessaging.getToken().then((token) async {
-      String Url =
+    _firebaseMessaging.getToken().then((fcmToken) async {
+      String url =
           "https://www.ordervite.com/api/shippier/complete_profile/$id";
 
       await http.put(
-        Uri.parse(Url),
-        body: {"api_token": token.toString()},
-
-        headers: {'Authorization': 'Bearer  ' + this.token!},
+        Uri.parse(url),
+        body: {"api_token": fcmToken.toString()},
+        headers: {'Authorization': 'Bearer $token'},
       );
     });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      setState(() {
-        statename = message.data["state_name"] ?? "";
-      });
+    FirebaseMessaging.onMessage.listen(_handleMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
 
-      String stateName = message.data["state_name"] ?? "";
-      String stateType = message.data["state_type"] ?? "";
-
-      if (stateName == "new order" || stateName == "order cancel") {
-        loaddailyOrders();
-      }
-
-      if (stateName == "order review") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.redAccent,
-            content: Text(
-              stateType,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ),
-        );
-      }
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      setState(() {
-        statename = message.data["state_name"] ?? "";
-      });
-
-      String stateName = message.data["state_name"] ?? "";
-      String stateType = message.data["state_type"] ?? "";
-
-      if (stateName == "new order" || stateName == "order cancel") {
-        loaddailyOrders();
-      }
-
-      if (stateName == "order review") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.redAccent,
-            content: Text(
-              stateType,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ),
-        );
-      }
-    });
-
-    Future<void> _firebaseMessagingBackgroundHandler(
-      RemoteMessage message,
-    ) async {
-      await Firebase.initializeApp();
-      print('Handling background message: ${message.messageId}');
-    }
-
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-    Future.delayed(Duration(seconds: 5)).then((_) {
-      this.showMessage();
-    });
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
-
   @override
   Widget build(BuildContext context) {
     Lang lang = Lang.of(context);
@@ -381,7 +381,7 @@ class _ShOrdersState extends State<ShOrders> {
                             );
                             Navigator.pushNamed(
                               context,
-                              "shorder",
+                              RoutesManager.shOrder,
                               arguments: orderData,
                             );
                           },
@@ -396,7 +396,7 @@ class _ShOrdersState extends State<ShOrders> {
                       },
                     );
                   } else {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(child: CircularProgressIndicator(color: Colors.blue,));
                   }
                 },
               ),
@@ -436,8 +436,8 @@ class NamedIcon extends StatelessWidget {
         Navigator.pushNamed(context, RoutesManager.shOrders);
       },
       child: Container(
-        width: 72,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        width: 72.w,
+        padding:  REdgeInsets.symmetric(horizontal: 8),
         child: Stack(
           alignment: Alignment.center,
           children: [

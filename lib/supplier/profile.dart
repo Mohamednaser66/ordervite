@@ -1,11 +1,17 @@
-import 'dart:io';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_maps/classes.dart';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_maps/Core/routes_manager.dart';
+import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
 import 'package:flutter_maps/lang.dart';
+import 'package:flutter_maps/shipper/widgets/profile_bottom_sheet.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SUProfilePage extends StatefulWidget {
   const SUProfilePage({Key? key}) : super(key: key);
@@ -21,12 +27,17 @@ class _CreatProfileState extends State<SUProfilePage> {
 
   final _globalkey = GlobalKey<FormState>();
 
-  late TextEditingController _username ;
-  late TextEditingController _email ;
-  late TextEditingController _password ;
-  late TextEditingController _c_password ;
-  late TextEditingController _mobile1 ;
-  late TextEditingController _mobile2 ;
+  late TextEditingController _username;
+
+  late TextEditingController _email;
+
+  late TextEditingController _password;
+
+  late TextEditingController _c_password;
+
+  late TextEditingController _mobile1;
+
+  late TextEditingController _mobile2;
 
   final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
 
@@ -127,7 +138,7 @@ class _CreatProfileState extends State<SUProfilePage> {
       request.fields['name'] = _username.text;
       request.fields['email'] = _email.text;
       request.fields['password'] = _password.text;
-      request.fields['c_passord'] = _c_password.text;
+      request.fields['c_password'] = _c_password.text;
       request.fields['mobile1'] = _mobile1.text;
       request.fields['mobile2'] = _mobile2.text;
 
@@ -141,8 +152,8 @@ class _CreatProfileState extends State<SUProfilePage> {
 
       Navigator.pushNamedAndRemoveUntil(
         context,
-        "suhome",
-        (route) => false,
+        RoutesManager.suHome,
+            (route) => false,
         arguments: message,
       );
     } catch (e) {
@@ -150,7 +161,8 @@ class _CreatProfileState extends State<SUProfilePage> {
 
       showDialog(
         context: context,
-        builder: (c) => const AlertDialog(
+        builder: (c) =>
+        const AlertDialog(
           title: Text('Warning', style: TextStyle(color: Colors.red)),
           content: Text(
             'Please check your network',
@@ -173,60 +185,101 @@ class _CreatProfileState extends State<SUProfilePage> {
         body: Form(
           key: _globalkey,
           child: ListView(
-            padding: const EdgeInsets.all(20),
+            padding: REdgeInsets.all(20),
             children: [
               Center(
-                child: CircleAvatar(
-                  radius: 80,
-                  backgroundImage: _imageFile != null
-                      ? FileImage(File(_imageFile!.path))
-                      : (logo_src == null
-                            ? const AssetImage("assets/app_face.png")
-                                  as ImageProvider
-                            : NetworkImage(
-                                'https://www.ordervite.com/$logo_src',
-                              )),
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    CircleAvatar(
+                      radius: 80,
+                      backgroundImage: _imageFile != null
+                          ? FileImage(File(_imageFile!.path))
+                          : (logo_src == null
+                          ? const AssetImage("assets/app_face.png")
+                      as ImageProvider
+                          : NetworkImage(
+                        'https://www.ordervite.com/$logo_src',
+                      )),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                            context: context, builder:(_)=> ProfileBottomSheet(
+                          onCameraClick: () => takePhoto(ImageSource.camera),
+                          onGalleryClick: () => takePhoto(ImageSource.gallery),
+                          title: lang.lang == 'en'
+                              ? 'Choose Profile Photo'
+                              : 'اختار الصوره الشخصيه',
+                        )
+                        );
+                      },
+                      icon: Icon(Icons.camera_alt, color: Colors.blue,),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 20),
-              TextFormField(
+              CustomTextFormField(
+                validation: AppValidators.validateUsername,
                 controller: _username,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Name can't be empty";
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(labelText: "Username"),
+                icon: Icon(Icons.person_rounded),
+                hintText: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
+                lable: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
               ),
               const SizedBox(height: 20),
-              TextFormField(
+              CustomTextFormField(
+                validation: AppValidators.validateEmail,
                 controller: _email,
-                decoration: const InputDecoration(labelText: "Email"),
+                icon: Icon(Icons.email, color: Colors.blue,),
+                hintText: lang.lang == 'en'
+                    ? 'Enter Email'
+                    : 'ادخل البريد الالكترونى',
+                lable: lang.lang == 'en'
+                    ? 'Enter Email'
+                    : 'ادخل البريد الالكترونى',
               ),
               const SizedBox(height: 20),
-              TextFormField(
+              CustomTextFormField(
                 controller: _password,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: "Password"),
+                icon: Icon(Icons.key, color: Colors.blue,),
+                validation: AppValidators.validateChangePassword,
+                secure: true,
+                hintText: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
+                lable: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
               ),
               const SizedBox(height: 20),
-              TextFormField(
+              CustomTextFormField(
                 controller: _c_password,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: "Confirm Password",
-                ),
+                icon: Icon(Icons.key, color: Colors.blue,),
+                hintText: lang.lang == 'en'
+                    ? 'Confirm Password'
+                    : 'تاكيد كلمة المرور',
+                lable: lang.lang == 'en'
+                    ? 'Confirm Password'
+                    : 'تاكيد كلمة المرور',
+                secure: true,
+                validation: (val) =>
+                    AppValidators.validateConfirmChangePassword(
+                      val,
+                      _password.text,
+                    ),
               ),
               const SizedBox(height: 20),
-              TextFormField(
+              CustomTextFormField(
                 controller: _mobile1,
-                decoration: const InputDecoration(labelText: "Mobile1"),
+                icon: Icon(Icons.phone, color: Colors.blue,),
+                validation: AppValidators.validatePhoneNumber,
+                hintText: lang.lang == 'en' ? 'Mobile 1' : 'رقم الهاتف 1',
+                lable: lang.lang == 'en' ? 'Mobile 1' : 'رقم الهاتف 1',
               ),
               const SizedBox(height: 20),
-              TextFormField(
+              CustomTextFormField(
                 controller: _mobile2,
-                decoration: const InputDecoration(labelText: "Mobile2"),
+                icon: Icon(Icons.phone, color: Colors.blue,),
+                validation: AppValidators.validatePhoneNumber,
+                hintText: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
+                lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
               ),
               const SizedBox(height: 30),
               ElevatedButton(

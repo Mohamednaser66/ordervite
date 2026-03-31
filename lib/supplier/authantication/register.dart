@@ -300,12 +300,6 @@ class _RegisterState extends State<Register> {
                           "supplier",
                         );
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Sign UP Has Successful"),
-                          ),
-                        );
-
                         Navigator.of(
                           context,
                         ).pushReplacementNamed(RoutesManager.suHome);
