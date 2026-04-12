@@ -61,7 +61,6 @@ class _ChatScreenState extends State<ChatScreen> {
         _error = null;
       }
     });
-
     _scrollToBottom();
   }
 
@@ -70,12 +69,9 @@ class _ChatScreenState extends State<ChatScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       final chat = _chat;
-
       if (token == null || chat == null) return null;
-
       final id = int.tryParse(chat.conservistion_id);
       if (id == null) return null;
-
       final url = 'https://www.ordervite.com/api/supplier/order/$id/messages';
       final response = await http.get(
         Uri.parse(url),

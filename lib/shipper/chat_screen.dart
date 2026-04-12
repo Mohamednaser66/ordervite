@@ -2,14 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/lang.dart';
-
-import 'package:flutter_maps/models/message_model.dart';
-
 import 'package:flutter_maps/widgets/style.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ShChatScreen extends StatefulWidget {
@@ -20,80 +17,102 @@ class ShChatScreen extends StatefulWidget {
 }
 
 class _ShChatScreenState extends State<ShChatScreen> {
-  TextEditingController messageTextEditController = TextEditingController();
+  final TextEditingController messageTextEditController =
+      TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
-  MessageModal? message;
-  ScrollController _scrollController = ScrollController();
+  Chat? _chat;
+  Future<List<dynamic>>? _messagesFuture;
+  bool _isInitialized = false;
 
-  late StreamController _messageController;
-  var data;
+  Future<List<dynamic>> _fetchMessages() async {
+    final preferences = await SharedPreferences.getInstance();
+    final token = preferences.getString("token");
 
-  Future getMessges() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+    if (token == null || token.isEmpty || _chat == null) {
+      return [];
+    }
 
-    String? token = preferences.getString("token");
-
-    Chat chat = ModalRoute.of(context)?.settings.arguments as Chat;
     try {
-      int id = int.parse(chat.conservistion_id, radix: 10);
+      final id = int.tryParse(_chat!.conservistion_id) ?? -1;
+      if (id < 0) return [];
 
-      String Url =
+      final url =
           "https://www.ordervite.com/api/shippier/order/$id/messages/supplier";
 
-      var response = await http.get(
-        Uri.parse(Url),
+      final response = await http.get(
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-
           'Authorization': 'Bearer $token',
         },
       );
 
-      var reposnsebody = jsonDecode(response.body);
-
-      if (reposnsebody["data"] != null) {
-        setState(() {
-          this.data = reposnsebody["data"]["order message"];
-        });
-
-        message?.conversationId = int.parse(
-          chat.conservistion_id.toString(),
-          radix: 10,
-        );
+      final responseBody = jsonDecode(response.body);
+      final messages = responseBody["data"]?["order message"];
+      if (messages is List) {
+        return messages;
       }
-
-      return this.data;
-    } catch (e) {
-      return this.data;
+    } catch (_) {
+      // ignore: avoid_print
+      print('Failed to load messages');
     }
-  }
 
-  loadMessage() async {
-    getMessges().then((res) async {
-      _messageController.add(res);
-      return res;
-    });
+    return [];
   }
 
   @override
   void initState() {
-    _messageController = StreamController();
-    loadMessage();
-
-    message = MessageModal();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-    });
-
     super.initState();
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isInitialized) return;
+
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is Chat) {
+      _chat = args;
+      _messagesFuture = _fetchMessages();
+    }
+
+    _isInitialized = true;
+  }
+
+  @override
+  void dispose() {
+    messageTextEditController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Chat chat = ModalRoute.of(context)?.settings.arguments as Chat;
-    Lang lang = Lang.of(context);
+    final chat = _chat;
+    final lang = Lang.of(context);
+
+    if (chat == null) {
+      return Directionality(
+        textDirection: lang.lang == "en"
+            ? TextDirection.ltr
+            : TextDirection.rtl,
+        child: Scaffold(
+          appBar: AppBar(title: Text(lang.lang == "en" ? 'Chat' : 'محادثة')),
+          body: Center(
+            child: Text(
+              lang.lang == "en"
+                  ? 'Chat data unavailable'
+                  : 'بيانات المحادثة غير متاحة',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Directionality(
       textDirection: lang.lang == "en" ? TextDirection.ltr : TextDirection.rtl,
 
@@ -102,20 +121,33 @@ class _ShChatScreenState extends State<ShChatScreen> {
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
-              OrderData orderData = new OrderData(
-                chat.disLat.toString(),
-                chat.sorLat.toString(),
-                chat.disLong.toString(),
-                chat.sorlong.toString(),
-                chat.conservistion_id.toString(),
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+                return;
+              }
+
+              final chatData = _chat;
+              if (chatData == null) return;
+
+              final orderData = OrderData(
+                chatData.disLat.toString(),
+                chatData.sorLat.toString(),
+                chatData.disLong.toString(),
+                chatData.sorlong.toString(),
+                chatData.conservistion_id.toString(),
                 true,
-                chat.order_cost.toString(),
-                chat.order_price.toString(),
-                chat.order_pricecheck.toString(),
-                chat.order_state.toString(),
-                chat.order_supplier_id.toString(),
+                chatData.order_cost.toString(),
+                chatData.order_price.toString(),
+                chatData.order_pricecheck.toString(),
+                chatData.order_state.toString(),
+                chatData.order_supplier_id.toString(),
               );
-              Navigator.pushNamed(context, "shorder", arguments: orderData);
+
+              Navigator.pushNamed(
+                context,
+                RoutesManager.shOrder,
+                arguments: orderData,
+              );
             },
             icon: Icon(Icons.arrow_back_ios),
           ),
@@ -130,101 +162,91 @@ class _ShChatScreenState extends State<ShChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Expanded(
-              child: FutureBuilder(
-                future: getMessges(),
+              child: FutureBuilder<List<dynamic>>(
+                future: _messagesFuture,
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      controller: _scrollController,
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index) {
-                        if (snapshot.data[index]["type"].toString() ==
-                            "shipper") {
-                          return Align(
-                            alignment: Alignment.centerRight,
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
 
-                            child: Container(
-                              width: 150,
-                              padding: EdgeInsets.all(14),
-                              margin: EdgeInsets.only(bottom: 12),
-                              decoration: BoxDecoration(
-                                color: Colors.blue,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(28),
-                                  topRight: Radius.circular(28),
-                                  bottomLeft: Radius.circular(28),
-                                ),
-                              ),
-
-                              child: Column(
-                                children: <Widget>[
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Text(
-                                          snapshot.data[index]["body"]
-                                              .toString(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        } else {
-                          return Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              width: 150,
-                              padding: EdgeInsets.all(14),
-                              margin: EdgeInsets.only(bottom: 12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(28),
-                                  topRight: Radius.circular(28),
-                                  bottomRight: Radius.circular(28),
-                                ),
-                              ),
-
-                              child: Column(
-                                children: <Widget>[
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Text(
-                                          snapshot.data[index]["body"]
-                                              .toString(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                    );
-                  } else {
+                  if (snapshot.hasError) {
                     return Center(
                       child: Text(
                         lang.lang == "en"
-                            ? "Network missed"
-                            : "تحقق من جوده الانترنت ",
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
-                        ),
+                            ? "Failed to load messages"
+                            : "فشل في تحميل الرسائل",
+                        style: TextStyle(color: Colors.red),
                       ),
                     );
                   }
+
+                  final messages = snapshot.data ?? [];
+
+                  if (messages.isEmpty) {
+                    return Center(
+                      child: Text(
+                        lang.lang == "en"
+                            ? 'No messages yet'
+                            : 'لا توجد رسائل بعد',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
+
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (_scrollController.hasClients) {
+                      _scrollController.jumpTo(
+                        _scrollController.position.maxScrollExtent,
+                      );
+                    }
+                  });
+
+                  return ListView.builder(
+                    controller: _scrollController,
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final item = messages[index] as Map<String, dynamic>;
+                      final messageType = item["type"]?.toString() ?? "";
+                      final messageBody = item["body"]?.toString() ?? "";
+                      if (messageType == "shipper") {
+                        return Align(
+                          alignment: Alignment.centerRight,
+                          child: Container(
+                            width: 150,
+                            padding: EdgeInsets.all(14),
+                            margin: EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(28),
+                                topRight: Radius.circular(28),
+                                bottomLeft: Radius.circular(28),
+                              ),
+                            ),
+                            child: Text(messageBody),
+                          ),
+                        );
+                      }
+                      return Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          width: 150,
+                          padding: EdgeInsets.all(14),
+                          margin: EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(28),
+                              topRight: Radius.circular(28),
+                              bottomRight: Radius.circular(28),
+                            ),
+                          ),
+                          child: Text(messageBody),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
             ),
@@ -255,52 +277,59 @@ class _ShChatScreenState extends State<ShChatScreen> {
                   ),
                   InkWell(
                     onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
+                      FocusScope.of(context).unfocus();
 
-                      if (messageTextEditController.text.isEmpty) return;
-                      message?.body = messageTextEditController.text.trim();
+                      final messageText = messageTextEditController.text.trim();
+                      if (messageText.isEmpty || _chat == null) return;
 
-                      SharedPreferences preferences =
-                          await SharedPreferences.getInstance();
-                      String? token = preferences.getString("token");
+                      final preferences = await SharedPreferences.getInstance();
+                      final token = preferences.getString("token");
+                      final chatData = _chat;
 
-                      Chat? chat =
-                          ModalRoute.of(context)?.settings.arguments as Chat;
+                      if (token == null || token.isEmpty || chatData == null)
+                        return;
+                      if (chatData.shippier_id == null ||
+                          chatData.shippier_id!.isEmpty)
+                        return;
+
                       try {
-                        int id = int.parse(
-                          chat.conservistion_id.toString(),
-                          radix: 10,
-                        );
+                        final id =
+                            int.tryParse(chatData.conservistion_id) ?? -1;
+                        if (id < 0) return;
+
                         final url =
                             "https://www.ordervite.com/api/shippier/order/messages/store/$id";
-                        var response = await http.post(
+                        await http.post(
                           Uri.parse(url),
+                          headers: {'Authorization': 'Bearer $token'},
                           body: {
-                            "user_id": chat.shippier_id.toString(),
+                            "user_id": chatData.shippier_id,
                             "type": "shipper",
-                            "body": messageTextEditController.text.trim(),
+                            "body": messageText,
                           },
-
-                          headers: {'Authorization': 'Bearer  ' + token!},
                         );
 
-                        jsonDecode(response.body);
-
-                        String api_token = chat.api_token.toString();
-                        String message_id = chat.conservistion_id.toString();
-
-                        String Url3 =
-                            "https://www.ordervite.com/api/notify/page/ordervite/you have new message for your order $message_id/$api_token/1/ordervite/shipper/new message";
+                        final apiToken = chatData.api_token;
+                        final messageId = chatData.conservistion_id;
+                        final notifyUrl =
+                            "https://www.ordervite.com/api/notify/page/ordervite/you have new message for your order $messageId/$apiToken/1/ordervite/shipper/new message";
 
                         await http.get(
-                          Uri.parse(Url3),
+                          Uri.parse(notifyUrl),
                           headers: {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
-                            'Authorization': 'Bearer  ' + token,
+                            'Authorization': 'Bearer $token',
                           },
                         );
-                      } catch (e) {}
+
+                        setState(() {
+                          _messagesFuture = _fetchMessages();
+                        });
+                      } catch (e) {
+                        // ignore: avoid_print
+                        print('Failed to send chat message: $e');
+                      }
 
                       messageTextEditController.clear();
                     },

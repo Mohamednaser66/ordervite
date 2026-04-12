@@ -57,9 +57,7 @@ class _SHHomePageState extends State<SHHomePage> {
 
   bool isVerifed = true;
 
-  late StreamController _orderController;
-
-  late BuildContext mainContext;
+  late final StreamController<List<dynamic>?> _orderController;
   dynamic order_id_session;
   dynamic order_data_session;
 
@@ -69,120 +67,238 @@ class _SHHomePageState extends State<SHHomePage> {
   String? statename;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
-  getPref() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+  Map<String, String> get _authHeaders {
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    return headers;
+  }
 
-    order_id_session = await preferences.get("order_id_session");
-    if (order_id_session != null) {
-      order_data_session = await preferences.get(
-        'order_data $order_id_session',
-      );
+  void _showSnackBar(
+    String message, {
+    Color backgroundColor = Colors.redAccent,
+  }) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: backgroundColor,
+        content: Text(
+          message,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+      ),
+    );
+  }
+
+  Future<LocationData?> _getCurrentLocation() async {
+    final locationService = Location();
+
+    bool serviceEnabled = await locationService.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await locationService.requestService();
+      if (!serviceEnabled) {
+        _showSnackBar(
+          Lang.of(context).lang == 'en'
+              ? 'Location services are disabled.'
+              : 'خدمات الموقع معطلة.',
+        );
+        return null;
+      }
     }
 
-    username = preferences.getString("username");
-    email = preferences.getString("email");
-    token = preferences.getString("token");
-    id = preferences.getString("id");
+    PermissionStatus permissionGranted = await locationService.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await locationService.requestPermission();
+    }
+
+    if (permissionGranted != PermissionStatus.granted &&
+        permissionGranted != PermissionStatus.grantedLimited) {
+      _showSnackBar(
+        Lang.of(context).lang == 'en'
+            ? 'Location permission denied.'
+            : 'تم رفض إذن الموقع.',
+      );
+      return null;
+    }
+
+    try {
+      return await locationService.getLocation();
+    } catch (error) {
+      debugPrint('Location read failed: $error');
+      _showSnackBar(
+        Lang.of(context).lang == 'en'
+            ? 'Unable to determine current location.'
+            : 'غير قادر على تحديد الموقع الحالي.',
+      );
+      return null;
+    }
+  }
+
+  void _updateMarker(LatLng position) {
+    _markers
+      ..clear()
+      ..add(
+        Marker(
+          markerId: const MarkerId('1'),
+          position: position,
+          infoWindow: InfoWindow(title: username),
+          icon: BitmapDescriptor.defaultMarker,
+        ),
+      );
+  }
+
+  Future<void> _updateLocationOnServer(LocationData locationData) async {
+    if (id == null || token == null) return;
+
+    final shipperId = int.tryParse(id!);
+    if (shipperId == null) return;
+
+    try {
+      final response = await http.put(
+        Uri.parse(
+          'https://www.ordervite.com/api/shippier/location_update/$shipperId',
+        ),
+        headers: _authHeaders,
+        body: {
+          'cur_longitude': locationData.longitude?.toString() ?? '0',
+          'cur_latitude': locationData.latitude?.toString() ?? '0',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        debugPrint('Location update returned ${response.statusCode}');
+        return;
+      }
+
+      final responseBody = jsonDecode(response.body);
+      final verified = responseBody['data']?['verified']?.toString();
+      if (verified == '0' || verified == '2') {
+        if (!mounted) return;
+        setState(() {
+          isVerifed = false;
+        });
+      }
+    } catch (error) {
+      debugPrint('Location update failed: $error');
+    }
+  }
+
+  Future<void> getPref() async {
+    final preferences = await SharedPreferences.getInstance();
+
+    order_id_session = preferences.get('order_id_session');
+    if (order_id_session != null) {
+      order_data_session = preferences.get('order_data $order_id_session');
+    }
+
+    username = preferences.getString('username');
+    email = preferences.getString('email');
+    token = preferences.getString('token');
+    id = preferences.getString('id');
 
     if (username != null && email != null && token != null && id != null) {
-      setState(() {
-        isSignIn = true;
-      });
+      if (mounted) {
+        setState(() {
+          isSignIn = true;
+        });
+      }
     }
 
     if (token == null || id == null) {
       return;
     }
 
-    int? myid;
-    try {
-      myid = int.parse(id!, radix: 10);
-    } catch (_) {
+    final shipperId = int.tryParse(id!);
+    if (shipperId == null) {
+      _showSnackBar(
+        Lang.of(context).lang == 'en'
+            ? 'Invalid user identifier.'
+            : 'معرف المستخدم غير صالح.',
+      );
       return;
     }
 
-    String Url2 = "https://www.ordervite.com/api/shippier/show/$myid";
-    var response2 = await http.get(
-      Uri.parse(Url2),
-      headers: {'Authorization': 'Bearer $token'},
+    try {
+      final response = await http.get(
+        Uri.parse('https://www.ordervite.com/api/shippier/show/$shipperId'),
+        headers: _authHeaders,
+      );
+
+      if (response.statusCode != 200) {
+        _showSnackBar(
+          Lang.of(context).lang == 'en'
+              ? 'Unable to load profile information.'
+              : 'لا يمكن تحميل معلومات الملف الشخصي.',
+        );
+        return;
+      }
+
+      final responseBody = jsonDecode(response.body);
+      if (responseBody['success'] != true || responseBody['data'] == null) {
+        _showSnackBar(
+          Lang.of(context).lang == 'en'
+              ? 'Profile data is unavailable.'
+              : 'بيانات الملف الشخصي غير متوفرة.',
+        );
+        return;
+      }
+
+      final data = responseBody['data'];
+      final fetchedLogo = data['logo']?.toString();
+      final userEmail = data['name']?['email']?.toString();
+      final userName = data['name']?['name']?.toString();
+
+      if (!mounted) return;
+      setState(() {
+        logo_src = fetchedLogo;
+        if (logo_src != null) {
+          preferences.setString('logo_src', logo_src!);
+        }
+        if (userEmail != null) {
+          email = userEmail;
+          preferences.setString('email', userEmail);
+        }
+        if (userName != null) {
+          username = userName;
+          preferences.setString('username', userName);
+        }
+      });
+    } catch (error) {
+      debugPrint('Profile fetch failed: $error');
+      _showSnackBar(
+        Lang.of(context).lang == 'en'
+            ? 'Failed to load profile. Please try again.'
+            : 'فشل تحميل الملف الشخصي. حاول مرة أخرى.',
+      );
+      return;
+    }
+
+    final location = await _getCurrentLocation();
+    if (location == null) return;
+
+    final currentLocation = LatLng(
+      location.latitude ?? 0,
+      location.longitude ?? 0,
     );
-    var reposnsebody2 = jsonDecode(response2.body);
-    if (reposnsebody2["success"] == true) {}
 
     if (!mounted) return;
-
     setState(() {
-      logo_src = reposnsebody2["data"]["logo"].toString();
-      if (logo_src != null) {
-        preferences.setString('logo_src', logo_src!);
-      }
-      preferences.setString(
-        'email',
-        reposnsebody2["data"]["name"]["email"].toString(),
-      );
-
-      preferences.setString(
-        'username',
-        reposnsebody2["data"]["name"]["name"].toString(),
-      );
-    });
-
-    Location _locationTracker = Location();
-    var location = await _locationTracker.getLocation();
-
-    setState(() {
-      _initialCamera = CameraPosition(
-        target: LatLng(location.latitude ?? 0, location.longitude ?? 0),
-        zoom: 14.0000,
-      );
-
-      sourceLatLong = LatLng(location.latitude ?? 0, location.longitude ?? 0);
+      _initialCamera = CameraPosition(target: currentLocation, zoom: 14.0);
+      sourceLatLong = currentLocation;
+      _updateMarker(currentLocation);
     });
 
     _mapController.future.then((controller) {
-      controller.animateCamera(CameraUpdate.newLatLngZoom(sourceLatLong, 14.0));
+      controller.animateCamera(
+        CameraUpdate.newLatLngZoom(currentLocation, 14.0),
+      );
     });
 
-    _markers.add(
-      Marker(
-        markerId: MarkerId("1"),
-        position: sourceLatLong,
-        infoWindow: InfoWindow(title: this.username),
-        icon: BitmapDescriptor.defaultMarker,
-        visible: true,
-      ),
-    );
-
-    try {
-      if (id == null || token == null) return;
-
-      int shipper_id = int.parse(id!, radix: 10);
-
-      String Url =
-          "https://www.ordervite.com/api/shippier/location_update/$shipper_id";
-
-      var response = await http.put(
-        Uri.parse(Url),
-        body: {
-          "cur_longitude": location.longitude.toString(),
-          "cur_latitude": location.latitude.toString(),
-        },
-        headers: {'Authorization': 'Bearer $token'},
-      );
-
-      var reposnsebody = jsonDecode(response.body);
-
-      if (reposnsebody["data"]["verified"].toString() == "0" ||
-          reposnsebody["data"]["verified"].toString() == "2") {
-        setState(() {
-          isVerifed = false;
-        });
-      }
-    } catch (e) {}
-  }
-
-  changeMainContext(BuildContext context) {
-    mainContext = context;
+    await _updateLocationOnServer(location);
   }
 
   void handleMessage(RemoteMessage message) {
@@ -225,41 +341,25 @@ class _SHHomePageState extends State<SHHomePage> {
   void initState() {
     super.initState();
 
-    _orderController = StreamController();
+    _orderController = StreamController<List<dynamic>?>.broadcast();
 
-    timer = Timer.periodic(const Duration(seconds: 100), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 100), (_) {
       if (mounted) {
         loaddailyOrders();
       }
     });
 
-    getPref();
-    loaddailyOrders();
+    FirebaseMessaging.onMessage.listen(handleMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
 
-    _firebaseMessaging.getToken().then((token) async {
-      if (token == null || id == null || this.token == null) return;
+    _initialize();
+  }
 
-      try {
-        String Url =
-            "https://www.ordervite.com/api/shippier/complete_profile/$id";
-
-        await http.put(
-          Uri.parse(Url),
-          body: {"api_token": token.toString()},
-          headers: {'Authorization': 'Bearer ${this.token}'},
-        );
-      } catch (e) {}
-    });
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      handleMessage(message);
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      handleMessage(message);
-    });
-
-    checkInitialMessage();
+  Future<void> _initialize() async {
+    await getPref();
+    await _registerFcmToken();
+    await loaddailyOrders();
+    await checkInitialMessage();
 
     Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
@@ -268,65 +368,88 @@ class _SHHomePageState extends State<SHHomePage> {
     });
   }
 
-  Future getdailyOrders() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    Lang lang = Lang.of(context);
-    token = preferences.getString("token");
-
+  Future<void> _registerFcmToken() async {
     try {
-      String Url = "https://www.ordervite.com/api/shippier/daily/orders";
+      final fcmToken = await _firebaseMessaging.getToken();
+      if (fcmToken == null || id == null || token == null) return;
 
-      var response = await http.get(
-        Uri.parse(Url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-
-          'Authorization': 'Bearer $token',
-        },
+      final url = 'https://www.ordervite.com/api/shippier/complete_profile/$id';
+      await http.put(
+        Uri.parse(url),
+        body: {'api_token': fcmToken},
+        headers: _authHeaders,
       );
-
-      var reposnsebody = jsonDecode(response.body);
-
-      if (reposnsebody["data"] != null) {
-        if (reposnsebody["data"].length > order_num) {
-          if (!mounted) return;
-
-          setState(() {
-            data = reposnsebody.toString();
-
-            order_num = reposnsebody["data"].length;
-
-            if (order_num >= 1) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: Colors.redAccent,
-                  content: Text(
-                    lang.lang == "en"
-                        ? 'There are $order_num orders you can match'
-                        : 'هناك $order_num طلب يمكنك مشاهدتهم',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-              );
-            }
-          });
-        }
-      }
-      return reposnsebody["data"];
-    } catch (e) {}
+    } catch (error) {
+      debugPrint('FCM registration failed: $error');
+    }
   }
 
-  loaddailyOrders() async {
-    getdailyOrders().then((res) async {
+  Future<List<dynamic>?> getdailyOrders() async {
+    final preferences = await SharedPreferences.getInstance();
+    final lang = Lang.of(context);
+    token = preferences.getString('token');
+
+    if (token == null) {
+      debugPrint('Daily orders prevented: missing auth token.');
+      return null;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('https://www.ordervite.com/api/shippier/daily/orders'),
+        headers: _authHeaders,
+      );
+
+      if (response.statusCode != 200) {
+        _showSnackBar(
+          lang.lang == 'en'
+              ? 'Unable to load daily orders.'
+              : 'غير قادر على تحميل الطلبات اليومية.',
+        );
+        return null;
+      }
+
+      final responseBody = jsonDecode(response.body);
+      final orders = responseBody['data'] as List<dynamic>?;
+
+      if (orders != null && orders.length > order_num) {
+        if (!mounted) return orders;
+
+        setState(() {
+          data = responseBody.toString();
+          order_num = orders.length;
+        });
+
+        if (order_num >= 1) {
+          _showSnackBar(
+            lang.lang == 'en'
+                ? 'There are $order_num orders you can match'
+                : 'هناك $order_num طلب يمكنك مشاهدتهم',
+          );
+        }
+      }
+
+      return orders;
+    } catch (error) {
+      debugPrint('Daily orders request failed: $error');
+      _showSnackBar(
+        lang.lang == 'en'
+            ? 'Failed to load orders. Please try again.'
+            : 'فشل تحميل الطلبات. حاول مرة أخرى.',
+      );
+      return null;
+    }
+  }
+
+  Future<void> loaddailyOrders() async {
+    try {
+      final res = await getdailyOrders();
       if (!_orderController.isClosed) {
         _orderController.add(res);
       }
-      return res;
-    });
+    } catch (error) {
+      debugPrint('loadDailyOrders failed: $error');
+    }
   }
 
   void showMessage() {

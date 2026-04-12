@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
-import 'package:flutter_maps/Divider.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/supplier/home_page/widgets/home_drawer.dart';
@@ -12,7 +12,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 const _googleGeocodeApiKey = 'AIzaSyDl8LFLQn24CbaZyQ0F4wnzoF9NY3_gMWY';
 
@@ -45,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late BitmapDescriptor iconMe;
 
   double bottomPaddingOfMap = 0;
-  String? placeAddress ;
+  String? placeAddress;
 
   final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
 
@@ -177,13 +176,21 @@ class _MyHomePageState extends State<MyHomePage> {
     serviceEnabled = await _locationTracker.serviceEnabled();
     if (!serviceEnabled) {
       serviceEnabled = await _locationTracker.requestService();
-      if (!serviceEnabled) return;
+      if (!serviceEnabled) {
+        _setDefaultLocation();
+        return;
+      }
     }
 
     permissionGranted = await _locationTracker.hasPermission();
     if (permissionGranted == PermissionStatus.denied) {
       permissionGranted = await _locationTracker.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) return;
+    }
+
+    if (permissionGranted != PermissionStatus.granted) {
+      _showLocationDialog();
+      _setDefaultLocation();
+      return;
     }
 
     var locationData = await _locationTracker.getLocation();
@@ -198,24 +205,50 @@ class _MyHomePageState extends State<MyHomePage> {
         _initialLocation = currentLatLng;
       });
     }
-    await _saveLocationAddress();
 
-    if (_controller != null) {
-      _controller!.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: currentLatLng, zoom: 16),
+    await _saveLocationAddress();
+  }
+
+  void _showLocationDialog() {
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Location Required"),
+        content: Text(
+          "Please enable location to get accurate delivery and nearby services.",
         ),
-      );
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _setDefaultLocation() {
+    if (mounted) {
+      setState(() {
+        _initialLocation = LatLng(30.0444, 31.2357);
+        placeAddress = "Cairo, Egypt"; // 🔥 مهم
+      });
     }
   }
 
   Future<void> _saveLocationAddress() async {
-    final locationData = await _locationTracker.getLocation();
-
     try {
+      final locationData = await _locationTracker.getLocation();
+
       final url =
           "https://maps.googleapis.com/maps/api/geocode/json?latlng=${locationData.latitude},${locationData.longitude}&key=$_googleGeocodeApiKey";
-      final response = await http.get(Uri.parse(url));
+
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(Duration(seconds: 10));
+
       final reposnsebody = jsonDecode(response.body);
 
       if (mounted) {
@@ -223,17 +256,17 @@ class _MyHomePageState extends State<MyHomePage> {
           if (reposnsebody["results"] != null &&
               reposnsebody["results"].isNotEmpty) {
             placeAddress =
-                "${reposnsebody["results"][0]["address_components"][0]["long_name"]}   ${reposnsebody["results"][0]["address_components"][1]["long_name"]}";
+                "${reposnsebody["results"][0]["address_components"][0]["long_name"]} ${reposnsebody["results"][0]["address_components"][1]["long_name"]}";
           } else {
             placeAddress =
                 "${locationData.latitude}, ${locationData.longitude}";
           }
         });
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
         setState(() {
-          placeAddress = "${locationData.latitude}, ${locationData.longitude}";
+          placeAddress ??= "Unknown location";
         });
       }
     }
@@ -242,28 +275,28 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+
     _shipperController = StreamController();
+
     getPref();
-    _saveLocationAddress();
-    loadShipper();
     getCurrentLocation();
+    _saveLocationAddress();
 
     Future.wait([
       BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 2.5),
+        const ImageConfiguration(devicePixelRatio: 2.5),
         'assets/orderViteBicycle.png',
       ),
       BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 2),
+        const ImageConfiguration(devicePixelRatio: 2),
         'assets/meMark.png',
       ),
     ]).then((icons) {
       iconHalte = icons[0];
       iconMe = icons[1];
-    });
 
-    Future.delayed(const Duration(seconds: 5)).then((_) {
-      if (mounted) showMessage();
+      // 🔥 هنا فقط نبدأ تحميل الشippers
+      loadShipper();
     });
   }
 
@@ -341,10 +374,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget buildBody(Lang lang) {
     return SafeArea(
-      child:  _initialLocation == null
-          ? Center(child: CircularProgressIndicator(color: Colors.blue,)): Stack(
-        children: [
-               GoogleMap(
+      child: _initialLocation == null
+          ? Center(child: CircularProgressIndicator(color: Colors.blue))
+          : Stack(
+              children: [
+                GoogleMap(
                   padding: EdgeInsets.only(bottom: 300.h),
                   mapType: MapType.normal,
                   markers: _markers,
@@ -359,120 +393,130 @@ class _MyHomePageState extends State<MyHomePage> {
                     _controller = controller;
                   },
                 ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              height: 300.h,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(21, 42, 72, 0.9),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(18.0.r),
-                  topRight: Radius.circular(18.0.r),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black,
-                    blurRadius: 16.0.r,
-                    spreadRadius: 0.5.r,
-                    offset: Offset(0.7, 0.7),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 18,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      lang.lang == "en"
-                          ? "Hi  ${username ?? ''}"
-                          : "مرحبًا   ${username ?? ''}",
-                      style: TextStyle(fontSize: 12, color: Colors.white),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      lang.lang == "en"
-                          ? "Create a shipping order "
-                          : " قم بإنشاء امر الشحن ",
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontFamily: "Brand-bold",
-                        color: Colors.white,
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: 300.h,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(21, 42, 72, 0.9),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(18.0.r),
+                        topRight: Radius.circular(18.0.r),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(18)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black54,
-                            blurRadius: 6,
-                            spreadRadius: 0.5,
-                            offset: Offset(0.7, 0.7),
-                          ),
-                        ],
-                      ),
-                      child: TextButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(RoutesManager.terms);
-                        },
-                        icon: Icon(Icons.search, color: Colors.red),
-                        label: Text(
-                          lang.lang == "en"
-                              ? "Search your destination  "
-                              : " ابحث عن وجهتك ",
-                          style: TextStyle(fontSize: 15, color: Colors.red),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Divider(
-            height:10.0,
-             thickness: 1.0,
-         ),
-                    SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Icon(Icons.work, color: Colors.white, size: 30),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                lang.lang == "en"
-                                    ? "Your Address "
-                                    : " عناوينك ",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              placeAddress!=null?Text(
-                                placeAddress!,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.white,
-                                ),
-                              ):const Center(child: CircularProgressIndicator(color: Colors.blue,),),
-                            ],
-                          ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black,
+                          blurRadius: 16.0.r,
+                          spreadRadius: 0.5.r,
+                          offset: Offset(0.7, 0.7),
                         ),
                       ],
                     ),
-                  ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 18,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            lang.lang == "en"
+                                ? "Hi  ${username ?? ''}"
+                                : "مرحبًا   ${username ?? ''}",
+                            style: TextStyle(fontSize: 12, color: Colors.white),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            lang.lang == "en"
+                                ? "Create a shipping order "
+                                : " قم بإنشاء امر الشحن ",
+                            style: TextStyle(
+                              fontSize: 25,
+                              fontFamily: "Brand-bold",
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(18),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black54,
+                                  blurRadius: 6,
+                                  spreadRadius: 0.5,
+                                  offset: Offset(0.7, 0.7),
+                                ),
+                              ],
+                            ),
+                            child: TextButton.icon(
+                              onPressed: () {
+                                Navigator.of(
+                                  context,
+                                ).pushNamed(RoutesManager.terms);
+                              },
+                              icon: Icon(Icons.search, color: Colors.red),
+                              label: Text(
+                                lang.lang == "en"
+                                    ? "Search your destination  "
+                                    : " ابحث عن وجهتك ",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Divider(height: 10.0, thickness: 1.0),
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Icon(Icons.work, color: Colors.white, size: 30),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      lang.lang == "en"
+                                          ? "Your Address "
+                                          : " عناوينك ",
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    placeAddress != null
+                                        ? Text(
+                                            placeAddress!,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

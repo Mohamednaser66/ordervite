@@ -497,12 +497,13 @@ class _OrderState extends State<OrderPage> {
     }
   }
 
-  Future loadcurrentOrder() async {
+  loadcurrentOrder() async {
     var res = await getcurrentOrder();
-    _orderController.add(res);
-    return res;
+    if (!mounted) return;
+    if (!_orderController.isClosed) {
+      _orderController.add(res);
+    }
   }
-
   List<String> lst = ['small', 'medium', 'large'];
   int selectedIndex = 0;
 

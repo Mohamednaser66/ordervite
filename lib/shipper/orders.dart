@@ -220,6 +220,12 @@ class _ShOrdersState extends State<ShOrders> {
     if (stateName == "new order" || stateName == "order cancel") {
       loaddailyOrders();
     }
+    if (stateName == "order confirmed") {
+      setState(() {
+        isConfirm = true;
+      });
+    }
+
 
     if (stateName == "order review") {
       WidgetsBinding.instance.addPostFrameCallback((_) {

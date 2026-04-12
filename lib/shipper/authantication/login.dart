@@ -269,9 +269,9 @@ class _LogInSHState extends State<LogInSH> {
                         ],
                       ),
                 SizedBox(height: 10.h,),
-                TextButton(onPressed: (){
-                  Navigator.pushNamed(context, RoutesManager.registerWithPhone,arguments: roles);
-                }, child: Text(lang.lang=='en'?'Register by Phone Number':'سجل برقم الهاتف',style: TextStyle(color: Colors.white ),))
+                // TextButton(onPressed: (){
+                //   Navigator.pushNamed(context, RoutesManager.registerWithPhone,arguments: roles);
+                // }, child: Text(lang.lang=='en'?'Register by Phone Number':'سجل برقم الهاتف',style: TextStyle(color: Colors.white ),))
                     ],
                   ),
                 ),

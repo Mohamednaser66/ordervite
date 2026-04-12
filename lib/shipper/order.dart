@@ -289,7 +289,6 @@ class _ShOrderState extends State<ShOrder> {
 
             if (reposnsebody["data"]["order_state"].toString() ==
                 "order delivered") {
-              //  print("delevierd");
               setState(() {
                 isConfirm = true;
                 isReceived = true;
@@ -519,12 +518,12 @@ class _ShOrderState extends State<ShOrder> {
                 iconData: Icons.message,
                 order_id: this.order_id,
                 notificationCount: order_messges_count,
-                api_token: this.api_token,
+                api_token: this.token,
                 disLat: this.disLat.toString(),
                 disLong: this.disLong.toString(),
                 sorLat: this.sorLat.toString(),
                 sorlong: this.sorlong.toString(),
-                isConfirm: true,
+                isConfirm: this.isConfirm,
                 order_cost: this.order_cost.toString(),
                 order_price: this.order_price.toString(),
                 order_pricecheck: this.order_pricecheck.toString(),
@@ -532,7 +531,6 @@ class _ShOrderState extends State<ShOrder> {
                 order_supplier_id: order_supplier_id.toString(),
                 order_shippier_id: this.id.toString(),
                 permission: this.isConfirm,
-                onTap: () {},
               ),
             ],
             automaticallyImplyLeading: false,
@@ -552,7 +550,6 @@ class _ShOrderState extends State<ShOrder> {
                   markers: _markers,
                 ),
               ),
-
               Positioned(
                 left: 0.0,
                 right: 0.0,

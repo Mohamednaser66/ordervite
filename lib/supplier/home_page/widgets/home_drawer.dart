@@ -90,21 +90,21 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
                 ),
               ),
               onTap: () =>
-                  Navigator.of(context).pushNamed(RoutesManager.suHome),
+                  Navigator.of(context).pushNamedAndRemoveUntil(RoutesManager.suHome,(route) => false,),
             ),
-            ListTile(
-              leading: Icon(Icons.card_travel, color: Colors.blue),
-              title: Text(
-                widget.lang.lang == "en" ? 'Orders ' : ' الطلبات  ',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              onTap: () =>
-                  Navigator.of(context).pushNamed(RoutesManager.suListOrders),
-            ),
+            // ListTile(
+            //   leading: Icon(Icons.card_travel, color: Colors.blue),
+            //   title: Text(
+            //     widget.lang.lang == "en" ? 'Orders ' : ' الطلبات  ',
+            //     style: TextStyle(
+            //       fontSize: 15,
+            //       fontWeight: FontWeight.bold,
+            //       color: Colors.white,
+            //     ),
+            //   ),
+            //   onTap: () =>
+            //       Navigator.of(context).pushNamed(RoutesManager.suListOrders),
+            // ),
             ListTile(
               leading: Icon(Icons.card_travel, color: Colors.blue),
               title: Text(
@@ -116,7 +116,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
                 ),
               ),
               onTap: () =>
-                  Navigator.pushNamed(context, RoutesManager.suProfile),
+                  Navigator.pushNamedAndRemoveUntil(context, RoutesManager.suProfile,(route) => false,),
             ),
             ListTile(
               leading: Icon(Icons.logout, color: Colors.blue),
@@ -152,23 +152,23 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
                 });
               },
             ),
-            ListTile(
-              leading: Icon(
-                Icons.production_quantity_limits_outlined,
-                color: Colors.blue,
-              ),
-              title: Text(
-                widget.lang.lang == "en" ? ' Products' : ' المنتجات ',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              onTap: () {
-                Navigator.of(context).pushNamed('/productsScreen');
-              },
-            ),
+            // ListTile(
+            //   leading: Icon(
+            //     Icons.production_quantity_limits_outlined,
+            //     color: Colors.blue,
+            //   ),
+            //   title: Text(
+            //     widget.lang.lang == "en" ? ' Products' : ' المنتجات ',
+            //     style: TextStyle(
+            //       fontSize: 15,
+            //       fontWeight: FontWeight.bold,
+            //       color: Colors.white,
+            //     ),
+            //   ),
+            //   onTap: () {
+            //     Navigator.of(context).pushNamed('/productsScreen');
+            //   },
+            // ),
           ],
         ),
       ),

@@ -8,24 +8,20 @@
         </array>
         <key>FirebaseAppDelegateProxyEnabled</key>
         <true/>
-        <key>NSUserNotificationUsageDescription</key>
-        <string>We need your permission to send you notifications.</string>
-        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-        <string>This app needs access to your location even when the app is in the background.</string>
-        <key>NSCameraUsageDescription</key>
-        <string>We need access to your camera to take photos.</string>
-        <key>NSPhotoLibraryUsageDescription</key>
-        <string>We need access to your photo library to select images.</string>
-        <key>NSUserTrackingUsageDescription</key>
-        <string>We use your device's advertising identifier to show personalized ads.</string>
-        <key>NSLocationWhenInUseUsageDescription</key>
-        <string>This app needs access to your location while using the app.</string>
+      <key>NSLocationWhenInUseUsageDescription</key>
+      <string>We use your location to show nearby restaurants and provide accurate delivery options based on your current position.</string>
+      <key>NSCameraUsageDescription</key>
+      <string>We use the camera to allow you to upload profile photos and capture images within the app.</string>
+      <key>NSPhotoLibraryUsageDescription</key>
+      <string>We use your photo library to let you select and upload images such as profile pictures.</string>
+      <key>NSUserTrackingUsageDescription</key>
+      <string>We use your device identifier to provide personalized content and improve your app experience.</string>
+      <key>NSUserNotificationUsageDescription</key>
+      <string>We send notifications to keep you updated about your orders and important updates.</string>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
-		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>This app needs access to location when open.</string>
 		<key>CFBundleDisplayName</key>
 	<string>Ordervite</string>
 		<key>CFBundleExecutable</key>

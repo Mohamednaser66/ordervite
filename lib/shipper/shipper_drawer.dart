@@ -103,7 +103,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               ),
 
               onTap: () {
-                Navigator.of(context).pushNamed(RoutesManager.shHome);
+                Navigator.of(context).pushNamedAndRemoveUntil(RoutesManager.shHome,(route) => false,);
               },
             ),
             ListTile(
@@ -119,7 +119,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               ),
 
               onTap: () {
-                Navigator.of(context).pushNamed(RoutesManager.shOrders);
+                Navigator.of(context).pushNamedAndRemoveUntil(RoutesManager.shOrders,(route) => false,);
               },
             ),
             ListTile(
@@ -135,7 +135,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               ),
 
               onTap: () {
-                Navigator.pushNamed(context, RoutesManager.shProfile);
+                Navigator.pushNamedAndRemoveUntil(context, RoutesManager.shProfile,(route) => false,);
               },
             ),
 
@@ -156,7 +156,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   RoutesManager.authPage,
-                  (route) => true,
+                  (route) => false,
                 );
               },
             ),
