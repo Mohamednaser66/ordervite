@@ -187,7 +187,6 @@ class _ShOrderStatesWidgetState extends State<ShOrderStatesWidget> {
           ],
         ),
 
-        SizedBox(height: 8.h),
         Row(
           children: [
             Expanded(
@@ -609,7 +608,6 @@ class _ShOrderStatesWidgetState extends State<ShOrderStatesWidget> {
 
                   SizedBox(width: 15.w),
 
-                  /// ===================== CANCEL BUTTON =====================
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () async {

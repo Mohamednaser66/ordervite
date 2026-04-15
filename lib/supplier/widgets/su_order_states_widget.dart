@@ -66,7 +66,7 @@ final Function   _showNetworkErrorDialog;
           ],
         ),
 
-        SizedBox(height: 12.h),
+        SizedBox(height: 10.h),
 
         SuOrderStatesIcons(isConfirm: isConfirm,
           isShConfirm: isShConfirm,
@@ -157,7 +157,6 @@ final Function   _showNetworkErrorDialog;
             ),
           ],
         ),
-        SizedBox(height: 5.h),
 
         Row(
           children: <Widget>[
@@ -191,7 +190,6 @@ final Function   _showNetworkErrorDialog;
             ),
           ],
         ),
-        SizedBox(height: 12.h),
         Row(
           children: <Widget>[
             Expanded(
@@ -383,7 +381,7 @@ final Function   _showNetworkErrorDialog;
                 ),
               ),
             ),
-            SizedBox(width: 16.w),
+            SizedBox(width: 10.w),
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () async {
