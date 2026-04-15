@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_maps/core/routes_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NamedIcon extends StatelessWidget {
   final IconData iconData;
@@ -84,8 +85,8 @@ class NamedIcon extends StatelessWidget {
         }
       },
       child: Container(
-        width: 72,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        width: 72.w,
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -96,17 +97,17 @@ class NamedIcon extends StatelessWidget {
                 Text(
                   text,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12),
+                  style: TextStyle(fontSize: 12.sp),
                 ),
               ],
             ),
             if (notificationCount != null && notificationCount! > 0)
               Positioned(
-                top: 4,
-                right: 4,
+                top: 4.h,
+                right: 4.w,
                 child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
+                  padding: EdgeInsets.all(4.r),
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.red,
                   ),
@@ -116,9 +117,9 @@ class NamedIcon extends StatelessWidget {
                   ),
                   child: Text(
                     '$notificationCount',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 10,
+                      fontSize: 10.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,

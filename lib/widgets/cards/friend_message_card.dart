@@ -1,5 +1,6 @@
 import 'package:flutter_maps/models/message_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FriendMessageCard extends StatelessWidget {
   final MessageModal? message;
@@ -11,7 +12,7 @@ class FriendMessageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     //  print(imageUrl);
     return Padding(
-      padding: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: 1.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
@@ -21,11 +22,11 @@ class FriendMessageCard extends StatelessWidget {
                   'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
             ),
           ),
-          SizedBox(width: 12),
+          SizedBox(width: 12.w),
           Expanded(
             child: Container(
-              width: 310,
-              padding: EdgeInsets.all(21),
+              width: 310.w,
+              padding: EdgeInsets.all(21.r),
               decoration: BoxDecoration(
                 /*gradient: LinearGradient(colors: [
                     Style.primaryColor,
@@ -35,9 +36,9 @@ class FriendMessageCard extends StatelessWidget {
                   ], begin: Alignment.topCenter, end: Alignment.bottomCenter),*/
                 color: Colors.grey,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(28),
-                  topRight: Radius.circular(28),
-                  bottomRight: Radius.circular(28),
+                  topLeft: Radius.circular(28.r),
+                  topRight: Radius.circular(28.r),
+                  bottomRight: Radius.circular(28.r),
                 ),
               ),
               child: Row(

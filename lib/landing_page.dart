@@ -10,6 +10,7 @@ import 'package:flutter_maps/supplier/home_page/home_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:rate_my_app/rate_my_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 const _apiBase = 'https://www.ordervite.com/api';
 
@@ -200,9 +201,9 @@ class _LandingPageState extends State<LandingPage> {
       context: context,
       builder: (c) => AlertDialog(
         title: const Text('Warning', style: TextStyle(color: Colors.red)),
-        content: const Text(
+        content:  Text(
           'Please check your network',
-          style: TextStyle(fontSize: 15, color: Colors.red),
+          style: TextStyle(fontSize: 15.sp, color: Colors.red),
         ),
       ),
     );
@@ -222,7 +223,7 @@ class _LandingPageState extends State<LandingPage> {
           children: [
             Text(
               _language == 'ar' ? 'جارٍ التحميل... ' : 'Loading... ',
-              style: const TextStyle(fontSize: 20, color: Colors.white),
+              style: TextStyle(fontSize: 20.sp, color: Colors.white),
             ),
             CircularProgressIndicator(color: Colors.white),
           ],

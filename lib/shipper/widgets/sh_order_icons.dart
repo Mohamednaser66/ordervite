@@ -14,8 +14,8 @@ class ShOrderIcons extends StatelessWidget {
       children: <Widget>[
         Expanded(
           child: Container(
-            height: 30.0.h,
-            width: 20.0.w,
+            height: 30.h,
+            width: 20.w,
 
             decoration:  BoxDecoration(
               borderRadius:  BorderRadius.circular(
@@ -32,11 +32,11 @@ class ShOrderIcons extends StatelessWidget {
           ),
         ),
 
-        SizedBox(width: 5),
+        SizedBox(width: 5.w),
         Expanded(
           child: Container(
-            height: 30.0.h,
-            width: 20.0.w,
+            height: 30.h,
+            width: 20.w,
 
             decoration:  BoxDecoration(
               borderRadius:  BorderRadius.circular(
@@ -55,11 +55,11 @@ class ShOrderIcons extends StatelessWidget {
           ),
         ),
 
-        SizedBox(width: 5),
+        SizedBox(width: 5.w),
         Expanded(
           child: Container(
-            height: 30.0,
-            width: 20.0,
+            height: 30.h,
+            width: 20.w,
             decoration: new BoxDecoration(
               borderRadius: new BorderRadius.circular(
                 50.0,
@@ -76,11 +76,11 @@ class ShOrderIcons extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: 5),
+        SizedBox(width: 5.w),
         Expanded(
           child: Container(
-            height: 30.0,
-            width: 20.0,
+            height: 30.h,
+            width: 20.w,
             decoration: new BoxDecoration(
               borderRadius: new BorderRadius.circular(
                 50.0,
@@ -97,11 +97,11 @@ class ShOrderIcons extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: 5),
+        SizedBox(width: 5.w),
         Expanded(
           child: Container(
-            height: 30.0,
-            width: 20.0,
+            height: 30.h,
+            width: 20.w,
             decoration:  BoxDecoration(
               borderRadius:  BorderRadius.circular(
                 50.0,

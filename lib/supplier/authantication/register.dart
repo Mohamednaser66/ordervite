@@ -182,15 +182,15 @@ class _RegisterState extends State<Register> {
           child: Form(
             key: formstatesignup,
             child: ListView(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.r),
               children: [
                 SizedBox(
                   height: 70.h,
                   child: CircleAvatar(
                     backgroundColor: Colors.blue,
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(Icons.person, size: 50, color: Colors.white),
+                      padding: EdgeInsets.all(8.0.r),
+                      child: Icon(Icons.person, size: 50.sp, color: Colors.white),
                     ),
                   ),
                 ),
@@ -245,9 +245,9 @@ class _RegisterState extends State<Register> {
                   hintText: lang.lang == 'en' ? 'Mobile 2' : 'رقم التليفون 2 ',
                   lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم التليفون 2 ',
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.app_registration),
+                  icon: Icon(Icons.app_registration),
                   label: Text(lang.lang == "en" ? "Sign UP" : "تسجيل كمورد"),
                   onPressed: () async {
                     if (!formstatesignup.currentState!.validate()) return;

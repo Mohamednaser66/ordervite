@@ -13,7 +13,7 @@ class ThemeManager {
       centerTitle: true,
       iconTheme: IconThemeData(color: Colors.white),
       titleTextStyle: TextStyle(
-        fontSize: 25,
+        fontSize: 25.sp,
         fontWeight: FontWeight.bold,
         color: Colors.white,
       ),

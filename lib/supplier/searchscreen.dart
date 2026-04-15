@@ -10,6 +10,7 @@ import 'package:flutter_maps/supplier/home_page/widgets/home_drawer.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SearchScreen extends StatefulWidget {
   SearchScreen({Key? key}) : super(key: key);
@@ -150,7 +151,7 @@ class _SearchScreenState extends State<SearchScreen> {
           backgroundColor: Colors.redAccent,
           content: Text(
             message.message,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
           ),
         ),
       );
@@ -221,33 +222,33 @@ class _SearchScreenState extends State<SearchScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(width: 10.0),
+              SizedBox(width: 10.w),
               Row(
                 children: [
                   Icon(Icons.add_location, color: Colors.white),
-                  SizedBox(width: 14.0),
+                  SizedBox(width: 14.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 8.0),
+                        SizedBox(height: 8.h),
                         Text(
                           placePredictions.main_text ?? '',
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 12.0, color: Colors.white),
+                          style: TextStyle(fontSize: 12.sp, color: Colors.white),
                         ),
-                        SizedBox(height: 3.0),
+                        SizedBox(height: 3.h),
                         Text(
                           placePredictions.secondary_text ?? '',
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 12.0, color: Colors.white),
+                          style: TextStyle(fontSize: 12.sp, color: Colors.white),
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-              SizedBox(width: 10.0),
+              SizedBox(width: 10.w),
             ],
           ),
         ),
@@ -279,7 +280,7 @@ class _SearchScreenState extends State<SearchScreen> {
         body: Column(
           children: [
             Container(
-              height: 215.0,
+              height: 215.h,
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -292,10 +293,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
               child: Padding(
-                padding: EdgeInsets.all(25.0),
+                padding: EdgeInsets.all(25.0.r),
                 child: Column(
                   children: [
-                    SizedBox(height: 5.0),
+                    SizedBox(height: 5.h),
                     Stack(
                       children: [
                         GestureDetector(
@@ -308,36 +309,36 @@ class _SearchScreenState extends State<SearchScreen> {
                           child: Text(
                             lang.lang == "en" ? "Set Drop off" : " اضف وجهتك ",
                             style: TextStyle(
-                              fontSize: 18.0,
+                              fontSize: 18.sp,
                               fontFamily: "Brand-bold",
                             ),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 16.0),
+                    SizedBox(height: 16.h),
 
                     Row(
                       children: [
                         Icon(
                           Icons.location_city,
-                          size: 30,
+                          size: 30.sp,
                           color: Color.fromRGBO(21, 42, 72, 0.9),
                         ),
-                        SizedBox(width: 18.0),
+                        SizedBox(width: 18.w),
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(5.0),
+                              borderRadius: BorderRadius.circular(5.0.r),
                             ),
                             child: Padding(
-                              padding: EdgeInsets.all(3.0),
+                              padding: EdgeInsets.all(3.0.r),
                               child: TextField(
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                 ),
                                 onChanged: (val) {
                                   findPlace(val, isSource: true);
@@ -348,16 +349,16 @@ class _SearchScreenState extends State<SearchScreen> {
                                   hintStyle: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                                    fontSize: 15.sp,
                                   ),
                                   fillColor: Color.fromRGBO(21, 42, 72, 0.9),
                                   filled: true,
                                   border: InputBorder.none,
                                   isDense: true,
                                   contentPadding: EdgeInsets.only(
-                                    left: 11.0,
-                                    top: 8.0,
-                                    bottom: 8.0,
+                                    left: 1.w,
+                                    top: 8.h,
+                                    bottom: 8.h,
                                   ),
                                 ),
                               ),
@@ -366,28 +367,28 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 10.0),
+                    SizedBox(height: 10.h),
                     Row(
                       children: [
                         Icon(
                           Icons.bike_scooter,
-                          size: 30,
+                          size: 30.sp,
                           color: Color.fromRGBO(21, 42, 72, 0.9),
                         ),
-                        SizedBox(width: 18.0),
+                        SizedBox(width: 18.w),
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(5.0),
+                              borderRadius: BorderRadius.circular(5.0.r),
                             ),
                             child: Padding(
-                              padding: EdgeInsets.all(3.0),
+                              padding: EdgeInsets.all(3.0.r),
                               child: TextField(
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                 ),
                                 onChanged: (val) {
                                   findPlace(val, isSource: false);
@@ -400,16 +401,16 @@ class _SearchScreenState extends State<SearchScreen> {
                                   hintStyle: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                                    fontSize: 15.sp,
                                   ),
                                   fillColor: Color.fromRGBO(21, 42, 72, 0.9),
                                   filled: true,
                                   border: InputBorder.none,
                                   isDense: true,
                                   contentPadding: EdgeInsets.only(
-                                    left: 11.0,
-                                    top: 8.0,
-                                    bottom: 8.0,
+                                    left: 1.w,
+                                    top: 8.h,
+                                    bottom: 8.h,
                                   ),
                                 ),
                               ),
@@ -422,10 +423,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 10.0),
+            SizedBox(height: 10.h),
             Expanded(
               child: ListView(
-                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
                 children: [
                   ...placePredictionsList2.map(
                     (p) => getPlaceAddressSource(context, p.place_id ?? '', p),
@@ -483,7 +484,7 @@ class PredictionsTile extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.add_location, color: Colors.white),
-                SizedBox(width: 14.0),
+                SizedBox(width: 14.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -491,12 +492,12 @@ class PredictionsTile extends StatelessWidget {
                       Text(
                         placePredictions.main_text ?? "",
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12.0, color: Colors.white),
+                        style: TextStyle(fontSize: 12.sp, color: Colors.white),
                       ),
                       Text(
                         placePredictions.secondary_text ?? "",
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12.0, color: Colors.white),
+                        style: TextStyle(fontSize: 12.sp, color: Colors.white),
                       ),
                     ],
                   ),

@@ -61,12 +61,11 @@ class _ShOrderState extends State<ShOrder> {
   String? order_price;
   String? order_state;
 
-  late Timer timer;
+   Timer? timer;
 
   String? statename;
   String? api_token;
-  late StreamController _orderController;
-
+  StreamController _orderController = StreamController();
   bool isConfirm = false;
 
   bool isReceived = false;
@@ -326,7 +325,7 @@ class _ShOrderState extends State<ShOrder> {
 
   @override
   void dispose() {
-    timer.cancel();
+    timer?.cancel();
     size.dispose();
     price.dispose();
     _orderController.close();
@@ -506,7 +505,7 @@ class _ShOrderState extends State<ShOrder> {
             title: Text(
               lang.lang == "en" ? 'OrderVite' : ' أوردرفيت ',
               style: TextStyle(
-                fontSize: 25,
+                fontSize: 25.sp,
                 fontWeight: FontWeight.bold,
                 fontStyle: FontStyle.normal,
                 color: Colors.white,
@@ -551,11 +550,11 @@ class _ShOrderState extends State<ShOrder> {
                 ),
               ),
               Positioned(
-                left: 0.0,
-                right: 0.0,
-                bottom: 0.0,
+                left: 0.0.w,
+                right: 0.0.w,
+                bottom: 0.0.h,
                 child: Container(
-                  height: 300.0.h,
+                  height: 300.h,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topRight,
@@ -568,26 +567,26 @@ class _ShOrderState extends State<ShOrder> {
 
                     color: Color.fromRGBO(7, 15, 33, 0.9),
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(18.0),
-                      topRight: Radius.circular(18.0),
+                      topLeft: Radius.circular(18.0.r),
+                      topRight: Radius.circular(18.0.r),
                     ),
                   ),
 
                   child: Padding(
                     padding: REdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 12.0,
+                      horizontal: 16.0.w,
+                      vertical: 12.0.h,
                     ),
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(18.0),
-                          topRight: Radius.circular(18.0),
+                          topLeft: Radius.circular(18.0.r),
+                          topRight: Radius.circular(18.0.r),
                         ),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0.r),
                         child: ShOrderStatesWidget(
                           order_id: order_id,
                           order_supplier_id: order_supplier_id ?? '',
@@ -625,7 +624,7 @@ class _ShOrderState extends State<ShOrder> {
               lang.lang == "en"
                   ? 'Please you cant exit until order complete'
                   : 'من فضلك تحقق من جودة الانترنت',
-              style: TextStyle(fontSize: 15, color: Colors.red),
+              style: TextStyle(fontSize: 15.sp, color: Colors.red),
             ),
           ),
         );

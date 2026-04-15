@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 String GoogleApiKEY = "AIzaSyDl8LFLQn24CbaZyQ0F4wnzoF9NY3_gMWY";
 
@@ -88,7 +89,7 @@ class _SHHomePageState extends State<SHHomePage> {
         backgroundColor: backgroundColor,
         content: Text(
           message,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
         ),
       ),
     );
@@ -320,7 +321,7 @@ class _SHHomePageState extends State<SHHomePage> {
           backgroundColor: Colors.redAccent,
           content: Text(
             data["state_type"]?.toString() ?? "",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
           ),
         ),
       );
@@ -463,7 +464,7 @@ class _SHHomePageState extends State<SHHomePage> {
             backgroundColor: Colors.redAccent,
             content: Text(
               message.message,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
             ),
           ),
         );
@@ -509,7 +510,7 @@ class _SHHomePageState extends State<SHHomePage> {
             title: Text(
               lang.lang == "en" ? "OrderVite" : "أودرفيت",
               style: TextStyle(
-                fontSize: 25,
+                fontSize: 25.sp,
                 fontWeight: FontWeight.bold,
                 fontStyle: FontStyle.normal,
                 color: Colors.white,
@@ -556,7 +557,7 @@ class _SHHomePageState extends State<SHHomePage> {
               lang.lang == "en"
                   ? 'Please logout first'
                   : 'من فضلك قم بتسجيل الخروج أولاً',
-              style: TextStyle(fontSize: 15, color: Colors.red),
+              style: TextStyle(fontSize: 15.sp, color: Colors.red),
             ),
             actions: [
               TextButton(

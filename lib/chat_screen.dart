@@ -4,6 +4,7 @@ import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/widgets/style.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -173,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     if (_error != null) {
       return Scaffold(
-        body: Center(child: Text(_error!, style: const TextStyle(color: Colors.red))),
+        body: Center(child: Text(_error!, style: TextStyle(color: Colors.red))),
       );
     }
 
@@ -204,8 +205,8 @@ class _ChatScreenState extends State<ChatScreen> {
         onRefresh: _loadMessages,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          children: const [
-            SizedBox(height: 200),
+          children:  [
+            SizedBox(height: 200.h),
             Center(
               child: Text(
                 'لا توجد رسائل بعد.\nاسحب لأسفل للتحديث.',
@@ -222,9 +223,9 @@ class _ChatScreenState extends State<ChatScreen> {
       onRefresh: _loadMessages,
       child: ListView.separated(
         controller: _scrollController,
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(12.r),
         itemCount: _messages.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 6),
+        separatorBuilder: (_, __) => SizedBox(height: 6.h),
         itemBuilder: (context, index) {
           final message = _messages[index];
           final isMe = message['type']?.toString() == 'supplier';
@@ -239,21 +240,21 @@ class _ChatScreenState extends State<ChatScreen> {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: EdgeInsets.only(bottom: 1.h),
+        padding: EdgeInsets.symmetric(horizontal: 1.h.w, vertical: 1.h),
         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
         decoration: BoxDecoration(
           color: isMe ? Style.darkColor : Colors.grey[700],
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(20),
-            topRight: const Radius.circular(20),
+            topLeft:  Radius.circular(20.r),
+            topRight:  Radius.circular(20.r),
             bottomLeft: Radius.circular(isMe ? 20 : 0),
             bottomRight: Radius.circular(isMe ? 0 : 20),
           ),
         ),
         child: Text(
           message,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(color: Colors.white, fontSize: 16.sp),
         ),
       ),
     );
@@ -261,18 +262,18 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildMessageInput() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      margin: const EdgeInsets.all(10),
+      padding: EdgeInsets.symmetric(horizontal: 1.w, vertical: 8.h),
+      margin: EdgeInsets.all(10.r),
       decoration: BoxDecoration(
         color: Style.darkColor,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r),
       ),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               controller: _messageController,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 hintText: 'اكتب رسالتك...',
                 hintStyle: TextStyle(color: Colors.grey),
@@ -283,12 +284,12 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           IconButton(
             icon: _isSending
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
+                ? SizedBox(
+                    width: 24.w,
+                    height: 24.h,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Icons.send, color: Colors.blueAccent),
+                : Icon(Icons.send, color: Colors.blueAccent),
             onPressed: _isSending ? null : _sendMessage,
           ),
         ],

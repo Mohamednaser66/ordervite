@@ -8,6 +8,7 @@ import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/widgets/style.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ShChatScreen extends StatefulWidget {
   const ShChatScreen({Key? key}) : super(key: key);
@@ -203,7 +204,7 @@ class _ShChatScreenState extends State<ShChatScreen> {
 
                   return ListView.builder(
                     controller: _scrollController,
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final item = messages[index] as Map<String, dynamic>;
@@ -213,15 +214,15 @@ class _ShChatScreenState extends State<ShChatScreen> {
                         return Align(
                           alignment: Alignment.centerRight,
                           child: Container(
-                            width: 150,
-                            padding: EdgeInsets.all(14),
-                            margin: EdgeInsets.only(bottom: 12),
+                            width: 150.w,
+                            padding: EdgeInsets.all(14.r),
+                            margin: EdgeInsets.only(bottom: 1.h),
                             decoration: BoxDecoration(
                               color: Colors.blue,
                               borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(28),
-                                topRight: Radius.circular(28),
-                                bottomLeft: Radius.circular(28),
+                                topLeft: Radius.circular(28.r),
+                                topRight: Radius.circular(28.r),
+                                bottomLeft: Radius.circular(28.r),
                               ),
                             ),
                             child: Text(messageBody),
@@ -231,15 +232,15 @@ class _ShChatScreenState extends State<ShChatScreen> {
                       return Align(
                         alignment: Alignment.centerLeft,
                         child: Container(
-                          width: 150,
-                          padding: EdgeInsets.all(14),
-                          margin: EdgeInsets.only(bottom: 12),
+                          width: 150.w,
+                          padding: EdgeInsets.all(14.r),
+                          margin: EdgeInsets.only(bottom: 1.h),
                           decoration: BoxDecoration(
                             color: Colors.grey,
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(28),
-                              topRight: Radius.circular(28),
-                              bottomRight: Radius.circular(28),
+                              topLeft: Radius.circular(28.r),
+                              topRight: Radius.circular(28.r),
+                              bottomRight: Radius.circular(28.r),
                             ),
                           ),
                           child: Text(messageBody),
@@ -252,16 +253,16 @@ class _ShChatScreenState extends State<ShChatScreen> {
             ),
 
             Container(
-              padding: EdgeInsets.all(12),
-              margin: EdgeInsets.all(12),
+              padding: EdgeInsets.all(12.r),
+              margin: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
                 color: Style.darkColor,
-                borderRadius: BorderRadius.circular(32),
+                borderRadius: BorderRadius.circular(32.r),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  SizedBox(width: 12),
+                  SizedBox(width: 12.w),
                   Expanded(
                     child: TextField(
                       controller: messageTextEditController,
@@ -334,7 +335,7 @@ class _ShChatScreenState extends State<ShChatScreen> {
                       messageTextEditController.clear();
                     },
                     child: Container(
-                      padding: EdgeInsets.all(12),
+                      padding: EdgeInsets.all(12.r),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
 

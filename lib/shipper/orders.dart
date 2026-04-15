@@ -164,7 +164,7 @@ class _ShOrdersState extends State<ShOrders> {
                     lang.lang == "en"
                         ? 'There is $order_num order you  can match'
                         : ' طلبات هناك $order_num يمكنك مشاهدتهم',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
                   ),
                 ),
               );
@@ -195,7 +195,7 @@ class _ShOrdersState extends State<ShOrders> {
           backgroundColor: Colors.redAccent,
           content: Text(
             '$message_show',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
           ),
         ),
       );
@@ -234,9 +234,9 @@ class _ShOrdersState extends State<ShOrders> {
             backgroundColor: Colors.redAccent,
             content: Text(
               stateType,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 18,
+                fontSize: 18.sp,
               ),
             ),
           ),
@@ -326,7 +326,7 @@ class _ShOrdersState extends State<ShOrders> {
           title: Text(
             lang.lang == "en" ? 'Orders' : 'الطلبات',
             style: TextStyle(
-              fontSize: 25,
+              fontSize: 25.sp,
               fontWeight: FontWeight.bold,
               fontStyle: FontStyle.normal,
               color: Colors.white,
@@ -394,7 +394,7 @@ class _ShOrdersState extends State<ShOrders> {
                           leading: CircleAvatar(
                             child: Icon(
                               Icons.card_travel_rounded,
-                              size: 20,
+                              size: 20.sp,
                               color: Colors.white,
                             ),
                           ),
@@ -443,7 +443,7 @@ class NamedIcon extends StatelessWidget {
       },
       child: Container(
         width: 72.w,
-        padding:  REdgeInsets.symmetric(horizontal: 8),
+        padding:  REdgeInsets.symmetric(horizontal: 8.w),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -455,10 +455,10 @@ class NamedIcon extends StatelessWidget {
               ],
             ),
             Positioned(
-              top: 0,
-              right: 0,
+              top: 0.h,
+              right: 0.w,
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.red,

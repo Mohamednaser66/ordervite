@@ -103,7 +103,7 @@ class _OrderState extends State<OrderPage> {
         backgroundColor: backgroundColor,
         content: Text(
           _loc(lang, en, ar),
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
         ),
       ),
     );
@@ -115,7 +115,7 @@ class _OrderState extends State<OrderPage> {
       builder: (c) => AlertDialog(
         title: Text(
           _loc(lang, 'Warning', 'تحذير'),
-          style: const TextStyle(color: Colors.red),
+          style: TextStyle(color: Colors.red),
         ),
         content: Text(
           _loc(
@@ -123,7 +123,7 @@ class _OrderState extends State<OrderPage> {
             'Please check your network',
             'يرجي التحقق من اتصال الشبكة الخاص بك',
           ),
-          style: const TextStyle(fontSize: 15, color: Colors.red),
+          style: TextStyle(fontSize: 15.sp, color: Colors.red),
         ),
       ),
     );
@@ -529,9 +529,9 @@ class _OrderState extends State<OrderPage> {
               ? Colors.blueAccent
               : Colors.grey,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(10.0.r),
           ),
-          padding: REdgeInsets.symmetric(vertical: 4),
+          padding: REdgeInsets.symmetric(vertical: 4.h),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -580,9 +580,9 @@ class _OrderState extends State<OrderPage> {
               ? Colors.blueAccent
               : Colors.grey,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(10.0.r),
           ),
-          padding: REdgeInsets.symmetric(vertical: 4, horizontal: 12),
+          padding: REdgeInsets.symmetric(vertical: 4.h, horizontal: 12.w),
         ),
         child: Text(
           lang.lang == "en" ? txt : (txt == "cash" ? "كاش" : "تحويل"),
@@ -798,7 +798,7 @@ class _OrderState extends State<OrderPage> {
             title: Text(
               lang.lang == "en" ? 'OrderVite' : ' أوردرفيت ',
               style: TextStyle(
-                fontSize: 25,
+                fontSize: 25.sp,
                 fontWeight: FontWeight.bold,
                 fontStyle: FontStyle.normal,
                 color: Colors.white,
@@ -846,12 +846,12 @@ class _OrderState extends State<OrderPage> {
                 ),
               ),
               Positioned(
-                left: 0.0,
-                right: 0.0,
-                bottom: 0.0,
+                left: 0.0.w,
+                right: 0.0.w,
+                bottom: 0.0.h,
                 child: !isConfirm
                     ? Container(
-                        height: 350.0,
+                        height: 350.h,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topRight,
@@ -863,14 +863,14 @@ class _OrderState extends State<OrderPage> {
                           ),
                           color: Color.fromRGBO(7, 15, 33, 0.9),
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(18.0),
-                            topRight: Radius.circular(18.0),
+                            topLeft: Radius.circular(18.0.r),
+                            topRight: Radius.circular(18.0.r),
                           ),
                         ),
                         child: Padding(
                           padding: REdgeInsets.symmetric(
-                            horizontal: 24.0,
-                            vertical: 10.0,
+                            horizontal: 24.0.w,
+                            vertical: 10.0.h,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -892,29 +892,29 @@ class _OrderState extends State<OrderPage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 6.0.h),
+                              SizedBox(height: 6.h),
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.all(
-                                    Radius.circular(18.0),
+                                    Radius.circular(18.0.r),
                                   ),
                                 ),
                                 child: Center(
                                   child: Row(
                                     children: <Widget>[
-                                      SizedBox(width: 10.0),
+                                      SizedBox(width: 10.w),
                                       Expanded(child: customRadio(lst[0], 0)),
-                                      SizedBox(width: 10.0),
+                                      SizedBox(width: 10.w),
                                       Expanded(child: customRadio(lst[1], 1)),
-                                      SizedBox(width: 10.0),
+                                      SizedBox(width: 10.w),
                                       Expanded(child: customRadio(lst[2], 2)),
-                                      SizedBox(width: 10.0),
+                                      SizedBox(width: 10.w),
                                     ],
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 6.0),
+                              SizedBox(height: 6.h),
                               Row(
                                 children: <Widget>[
                                   Expanded(
@@ -932,7 +932,7 @@ class _OrderState extends State<OrderPage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 6.0),
+                              SizedBox(height: 6.h),
 
                               Row(
                                 children: <Widget>[
@@ -952,29 +952,29 @@ class _OrderState extends State<OrderPage> {
                                 ],
                               ),
 
-                              SizedBox(height: 6.0),
+                              SizedBox(height: 6.h),
 
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.all(
-                                    Radius.circular(18.0),
+                                    Radius.circular(18.0.r),
                                   ),
                                 ),
                                 child: Center(
                                   child: Row(
                                     children: [
-                                      SizedBox(width: 10.0),
+                                      SizedBox(width: 10.w),
                                       Expanded(child: customRadio2(lst2[0], 0)),
-                                      SizedBox(width: 10.0),
+                                      SizedBox(width: 10.w),
                                       Expanded(child: customRadio2(lst2[1], 1)),
-                                      SizedBox(width: 10.0),
+                                      SizedBox(width: 10.w),
                                     ],
                                   ),
                                 ),
                               ),
 
-                              SizedBox(height: 6.0),
+                              SizedBox(height: 6.h),
 
                               Row(
                                 children: <Widget>[
@@ -994,7 +994,7 @@ class _OrderState extends State<OrderPage> {
                                 ],
                               ),
 
-                              SizedBox(height: 6.0.h),
+                              SizedBox(height: 6.h),
 
                               Row(
                                 children: <Widget>[
@@ -1007,7 +1007,7 @@ class _OrderState extends State<OrderPage> {
 
                                         keyboardType: TextInputType.number,
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 15.sp,
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -1027,7 +1027,7 @@ class _OrderState extends State<OrderPage> {
                                               ? "Package Price"
                                               : "  سعر الطرد ",
                                           hintStyle: TextStyle(
-                                            fontSize: 14.h,
+                                            fontSize: 14.sp.h,
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -1035,7 +1035,7 @@ class _OrderState extends State<OrderPage> {
                                           fillColor: Colors.white,
                                           filled: true,
                                           prefixIcon: Padding(
-                                            padding: REdgeInsets.only(left: 5),
+                                            padding: REdgeInsets.only(left: 5.w),
                                             child: Icon(
                                               Icons.money,
                                               color: Colors.blue,
@@ -1067,7 +1067,7 @@ class _OrderState extends State<OrderPage> {
 
                               Row(
                                 children: <Widget>[
-                                  SizedBox(width: 10.0),
+                                  SizedBox(width: 10.w),
 
                                   Expanded(
                                     child: ElevatedButton.icon(
@@ -1254,16 +1254,16 @@ class _OrderState extends State<OrderPage> {
                                           }
                                         }
                                       },
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.done_all,
-                                        size: 20,
+                                        size: 20.sp,
                                       ),
                                       label: Text(
                                         lang.lang == "en"
                                             ? "Confirm"
                                             : "تأكيد ",
-                                        style: const TextStyle(
-                                          fontSize: 12.0,
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
                                           color: Colors.white,
                                         ),
                                       ),
@@ -1278,7 +1278,7 @@ class _OrderState extends State<OrderPage> {
                                     ),
                                   ),
 
-                                  SizedBox(width: 40.0),
+                                  SizedBox(width: 40.w),
 
                                   Expanded(
                                     child: ElevatedButton.icon(
@@ -1294,7 +1294,7 @@ class _OrderState extends State<OrderPage> {
                                               lang.lang == "en"
                                                   ? 'Confirm'
                                                   : 'تأكيد',
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 color: Colors.red,
                                               ),
                                             ),
@@ -1302,8 +1302,8 @@ class _OrderState extends State<OrderPage> {
                                               lang.lang == "en"
                                                   ? 'Are you sure you want to cancel?  '
                                                   : 'هل أنت متأكد أنك تريد الإلغاء؟',
-                                              style: const TextStyle(
-                                                fontSize: 15,
+                                              style: TextStyle(
+                                                fontSize: 15.sp,
                                                 color: Colors.red,
                                               ),
                                             ),
@@ -1344,11 +1344,11 @@ class _OrderState extends State<OrderPage> {
                                           ),
                                         );
                                       },
-                                      icon: const Icon(Icons.cancel, size: 20),
+                                      icon: Icon(Icons.cancel, size: 20.sp),
                                       label: Text(
                                         lang.lang == "en" ? "Cancel" : "إلغاء",
-                                        style: const TextStyle(
-                                          fontSize: 12.0,
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
                                           color: Colors.white,
                                         ),
                                       ),
@@ -1369,7 +1369,7 @@ class _OrderState extends State<OrderPage> {
                         ),
                       )
                     : Container(
-                        height: 300.00.h,
+                        height: 300.h,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topRight,
@@ -1382,26 +1382,26 @@ class _OrderState extends State<OrderPage> {
 
                           color: Color.fromRGBO(7, 15, 33, 0.9),
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(18.0),
-                            topRight: Radius.circular(18.0),
+                            topLeft: Radius.circular(18.0.r),
+                            topRight: Radius.circular(18.0.r),
                           ),
                         ),
 
                         child: Padding(
                           padding: REdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                            horizontal: 16.w,
+                            vertical: 12.h,
                           ),
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(18.0),
-                                topRight: Radius.circular(18.0),
+                                topLeft: Radius.circular(18.0.r),
+                                topRight: Radius.circular(18.0.r),
                               ),
                             ),
                             child: Padding(
-                              padding: REdgeInsets.all(12),
+                              padding: REdgeInsets.all(12.r),
 
                               child: SuOrderStatesWidget(
                                 lang: lang,
@@ -1444,7 +1444,7 @@ class _OrderState extends State<OrderPage> {
               lang.lang == "en"
                   ? 'Please you cant exist until order complete  '
                   : 'من فضلك انتظر حتي يتم اكتمال مراحل الطلب ',
-              style: TextStyle(fontSize: 15, color: Colors.red),
+              style: TextStyle(fontSize: 15.sp, color: Colors.red),
             ),
             actions: [],
           ),

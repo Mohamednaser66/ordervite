@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SuOrderStatesIcons extends StatelessWidget {
   const SuOrderStatesIcons({super.key, required this.isConfirm, required this.isShConfirm, required this.isShReceived, required this.isShDelviered});
@@ -15,8 +16,8 @@ class SuOrderStatesIcons extends StatelessWidget {
       children: <Widget>[
         Expanded(
           child: Container(
-            height: 30.0,
-            width: 20.0,
+            height: 30.h,
+            width: 20.w,
 
             decoration:  BoxDecoration(
               borderRadius:
@@ -36,11 +37,11 @@ class SuOrderStatesIcons extends StatelessWidget {
           ),
         ),
 
-        SizedBox(width: 5),
+        SizedBox(width: 5.w),
         Expanded(
           child: Container(
-            height: 30.0,
-            width: 20.0,
+            height: 30.h,
+            width: 20.w,
 
             decoration: BoxDecoration(
               borderRadius:
@@ -60,11 +61,11 @@ class SuOrderStatesIcons extends StatelessWidget {
           ),
         ),
 
-        SizedBox(width: 5),
+        SizedBox(width: 5.w),
         Expanded(
           child: Container(
-            height: 30.0,
-            width: 20.0,
+            height: 30.h,
+            width: 20.w,
             decoration:  BoxDecoration(
               borderRadius:
               BorderRadius.circular(
@@ -82,11 +83,11 @@ class SuOrderStatesIcons extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: 5),
+        SizedBox(width: 5.w),
         Expanded(
           child: Container(
-            height: 30.0,
-            width: 20.0,
+            height: 30.h,
+            width: 20.w,
             decoration:  BoxDecoration(
               borderRadius:
               BorderRadius.circular(
@@ -105,11 +106,11 @@ class SuOrderStatesIcons extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: 5),
+        SizedBox(width: 5.w),
         Expanded(
           child: Container(
-            height: 30.0,
-            width: 20.0,
+            height: 30.h,
+            width: 20.w,
             decoration:  BoxDecoration(
               borderRadius:
               BorderRadius.circular(

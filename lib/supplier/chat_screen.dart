@@ -9,6 +9,7 @@ import 'package:flutter_maps/widgets/cards/friend_message_card.dart';
 import 'package:flutter_maps/widgets/cards/my_message_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_maps/lang.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SuChatScreen extends StatefulWidget {
   const SuChatScreen({Key? key}) : super(key: key);
@@ -174,7 +175,7 @@ class _SuChatScreenState extends State<SuChatScreen> {
 
               Navigator.pushNamed(context, "orderscreen", arguments: orderDist);
             },
-            icon: const Icon(Icons.arrow_back_ios),
+            icon: Icon(Icons.arrow_back_ios),
           ),
           title: Text(
             lang.lang == "en"
@@ -198,7 +199,7 @@ class _SuChatScreenState extends State<SuChatScreen> {
                         lang.lang == "en"
                             ? "Error loading messages"
                             : "خطأ في تحميل الرسائل",
-                        style: const TextStyle(fontSize: 18, color: Colors.red),
+                        style: TextStyle(fontSize: 18.sp, color: Colors.red),
                       ),
                     );
                   } else if (snapshot.hasData && snapshot.data != null) {
@@ -212,9 +213,9 @@ class _SuChatScreenState extends State<SuChatScreen> {
                     });
                     return ListView.builder(
                       controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 6,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 6.h.w,
+                        vertical: 6.h,
                       ),
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
@@ -233,8 +234,8 @@ class _SuChatScreenState extends State<SuChatScreen> {
                     return Center(
                       child: Text(
                         lang.lang == "en" ? "No messages" : "لا توجد رسائل",
-                        style: const TextStyle(
-                          fontSize: 18,
+                        style: TextStyle(
+                          fontSize: 18.sp,
                           color: Colors.white,
                         ),
                       ),
@@ -245,40 +246,40 @@ class _SuChatScreenState extends State<SuChatScreen> {
             ),
 
             Container(
-              padding: const EdgeInsets.all(14),
-              margin: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(14.r),
+              margin: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
                 color: Style.darkColor,
-                borderRadius: BorderRadius.circular(32),
+                borderRadius: BorderRadius.circular(32.r),
               ),
               child: Row(
                 children: [
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.w),
                   Expanded(
                     child: TextField(
                       controller: messageTextEditController,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: lang.lang == "en"
                             ? 'Type your message...'
                             : '....أكتب رسالتك ',
-                        hintStyle: const TextStyle(color: Colors.white),
+                        hintStyle: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
                   InkWell(
                     onTap: _isSending ? null : () => _sendMessage(chat, lang),
                     child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: const BoxDecoration(
+                      padding: EdgeInsets.all(12.r),
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.grey,
                       ),
                       child: _isSending
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
+                          ? SizedBox(
+                              width: 20.w,
+                              height: 20.h,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -286,7 +287,7 @@ class _SuChatScreenState extends State<SuChatScreen> {
                                 ),
                               ),
                             )
-                          : const Icon(Icons.send),
+                          : Icon(Icons.send),
                     ),
                   ),
                 ],

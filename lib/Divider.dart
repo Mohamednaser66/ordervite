@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 
 // class DividerWidget extends StatelessWidget{
@@ -7,9 +8,8 @@ import 'package:flutter/material.dart';
 //   @override
 //      Widget build(BuildContext context){
 //            return Divider(
-//             height:10.0,
+//             height: 10.h,
 //             thickness: 1.0,
 //         );
 //      }
 // }
-

@@ -88,7 +88,7 @@ class _LogInSHState extends State<LogInSH> {
           title: Text(
             lang.lang == "en" ? 'Shipper Login ' : 'دخول مسئول الشحن ',
             style: TextStyle(
-              fontSize: 25,
+              fontSize: 25.sp,
               fontWeight: FontWeight.bold,
               fontStyle: FontStyle.normal,
               color: Colors.white,
@@ -110,25 +110,25 @@ class _LogInSHState extends State<LogInSH> {
                 key: formstatesignin,
 
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(16.0.r),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Padding(padding: EdgeInsets.only(top: 20)),
+                      Padding(padding: EdgeInsets.only(top: 2.h)),
                       Container(
-                        margin: REdgeInsets.symmetric(vertical: 30),
+                        margin: REdgeInsets.symmetric(vertical: 30.h),
                         width: 70.w,
                         height: 70.h,
                         decoration: BoxDecoration(
                           color: Color.fromRGBO(244, 67, 54, 0.9),
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: BorderRadius.circular(100.r),
                           //  boxShadow: [BoxShadow(color: Colors.blue,blurRadius:30,spreadRadius: 5) ],
                         ),
                         child: Icon(
                           Icons.person,
-                          size: 50,
+                          size: 50.sp,
                           color: Colors.white,
                         ),
                       ),
@@ -204,7 +204,7 @@ class _LogInSHState extends State<LogInSH> {
                                         ? 'these cerditional does not match any account please sign up '
                                         : ' هذه البيانات لا توافق اي بيانات حساب لدينا من فضلك قم بتسجيل بياناتك ',
                                     style: TextStyle(
-                                      fontSize: 15,
+                                      fontSize: 15.sp,
                                       color: Colors.red,
                                     ),
                                   ),
@@ -226,7 +226,7 @@ class _LogInSHState extends State<LogInSH> {
                                       ? 'Please check your network  '
                                       : '  يرجي التحقق من اتصال الشبكة الخاص بك   ',
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 15.sp,
                                     color: Colors.red,
                                   ),
                                 ),
@@ -240,7 +240,7 @@ class _LogInSHState extends State<LogInSH> {
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(15.r),
                           ),
                         ),
                       ),

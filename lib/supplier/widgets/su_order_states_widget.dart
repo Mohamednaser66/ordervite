@@ -82,7 +82,7 @@ final Function   _showNetworkErrorDialog;
                     ? "Order ID: $order_id"
                     : "كود الطلب :$order_id",
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.normal,
                   color: Colors.white,
@@ -90,7 +90,7 @@ final Function   _showNetworkErrorDialog;
               ),
             ),
 
-            SizedBox(width: 20.0.w),
+            SizedBox(width: 20.w),
             Expanded(
               child: isShConfirm
                   ? Text(
@@ -98,7 +98,7 @@ final Function   _showNetworkErrorDialog;
                     ? "Shipper ID: $order_shippier_id "
                     : "كود المسئول : $order_shippier_id",
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight:
                   FontWeight.bold,
                   fontStyle:
@@ -111,7 +111,7 @@ final Function   _showNetworkErrorDialog;
                     ? "Shipper ID: Pending "
                     : "كود المسئول : .... ",
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight:
                   FontWeight.bold,
                   fontStyle:
@@ -133,7 +133,7 @@ final Function   _showNetworkErrorDialog;
                     ? "Shipping Cost:"
                     : "تكلفة الشحن ",
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.normal,
                   color: Colors.white,
@@ -141,14 +141,14 @@ final Function   _showNetworkErrorDialog;
               ),
             ),
 
-            SizedBox(width: 20),
+            SizedBox(width: 20.w),
             Expanded(
               child: Text(
                 lang.lang == "en"
                     ? "Package Price:"
                     : "سعر الشحنة ",
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.normal,
                   color: Colors.white,
@@ -167,7 +167,7 @@ final Function   _showNetworkErrorDialog;
                     ? "$order_cost L.E."
                     : "$order_cost جم",
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.normal,
                   color: Colors.white,
@@ -182,7 +182,7 @@ final Function   _showNetworkErrorDialog;
                     ? "$order_price L.E."
                     : "$order_price جم",
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.normal,
                   color: Colors.white,
@@ -191,7 +191,7 @@ final Function   _showNetworkErrorDialog;
             ),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 12.h),
         Row(
           children: <Widget>[
             Expanded(
@@ -203,7 +203,7 @@ final Function   _showNetworkErrorDialog;
                     ? "نظام الدفع  : كاش"
                     : "نظام الدفع  : تحويل"),
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.normal,
                   color: Colors.white,
@@ -213,11 +213,8 @@ final Function   _showNetworkErrorDialog;
           ],
         ),
 
-        SizedBox(height: 10),
-
         Row(
           children: <Widget>[
-            SizedBox(width: 10.0),
 
             Expanded(
               child: ElevatedButton.icon(
@@ -234,7 +231,7 @@ final Function   _showNetworkErrorDialog;
                                       ? 'Confirm'
                                       : 'تحذير ',
                                   style:
-                                  const TextStyle(
+                                  TextStyle(
                                     color:
                                     Colors.red,
                                   ),
@@ -244,8 +241,8 @@ final Function   _showNetworkErrorDialog;
                                       ? 'Please confirm that the order is complete '
                                       : '     يرجي تأكيد عملية اكتمال الطلب ',
                                   style:
-                                  const TextStyle(
-                                    fontSize: 15,
+                                  TextStyle(
+                                    fontSize: 15.sp,
                                     color:
                                     Colors.red,
                                   ),
@@ -364,16 +361,16 @@ final Function   _showNetworkErrorDialog;
                     return;
                   }
                 },
-                icon: const Icon(
+                icon: Icon(
                   Icons.done_all,
-                  size: 20,
+                  size: 20.sp,
                 ),
                 label: Text(
                   lang.lang == "en"
                       ? "Complete "
                       : "اكمال ",
-                  style: const TextStyle(
-                    fontSize: 12.0,
+                  style: TextStyle(
+                    fontSize: 12.sp,
                     color: Colors.white,
                   ),
                 ),
@@ -381,12 +378,12 @@ final Function   _showNetworkErrorDialog;
                   backgroundColor: Colors.green,
                   shape: RoundedRectangleBorder(
                     borderRadius:
-                    BorderRadius.circular(12.0),
+                    BorderRadius.circular(12.0.r),
                   ),
                 ),
               ),
             ),
-            SizedBox(width: 20.0),
+            SizedBox(width: 16.w),
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () async {
@@ -399,7 +396,7 @@ final Function   _showNetworkErrorDialog;
                               lang.lang == "en"
                                   ? 'Confirm'
                                   : "تأكيد ",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.red,
                               ),
                             ),
@@ -407,8 +404,8 @@ final Function   _showNetworkErrorDialog;
                               lang.lang == "en"
                                   ? 'Are you sure you want to cancel the order (a fine may apply) '
                                   : 'هل أنت متأكد لإلغاء الطلب ',
-                              style: const TextStyle(
-                                fontSize: 15,
+                              style: TextStyle(
+                                fontSize: 15.sp,
                                 color: Colors.red,
                               ),
                             ),
@@ -517,16 +514,16 @@ final Function   _showNetworkErrorDialog;
                     return;
                   }
                 },
-                icon: const Icon(
+                icon: Icon(
                   Icons.cancel,
-                  size: 20,
+                  size: 20.sp,
                 ),
                 label: Text(
                   lang.lang == "en"
                       ? "Cancel"
                       : "إلغاء",
-                  style: const TextStyle(
-                    fontSize: 12.0,
+                  style: TextStyle(
+                    fontSize: 12.sp,
                     color: Colors.white,
                   ),
                 ),
@@ -534,7 +531,7 @@ final Function   _showNetworkErrorDialog;
                   backgroundColor: Colors.red,
                   shape: RoundedRectangleBorder(
                     borderRadius:
-                    BorderRadius.circular(12.0),
+                    BorderRadius.circular(12.0.r),
                   ),
                 ),
               ),

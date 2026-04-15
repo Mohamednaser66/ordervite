@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 const String _googleApiKey = "AIzaSyDl8LFLQn24CbaZyQ0F4wnzoF9NY3_gMWY";
 const String _mapsBaseUrl =
@@ -290,7 +291,7 @@ class _OrderState extends State<Order> {
                       'your order  has confirmed please wait',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 18.sp,
                       ),
                     ),
                   ),
@@ -365,7 +366,7 @@ class _OrderState extends State<Order> {
           backgroundColor: Colors.redAccent,
           content: Text(
             'your order  has complete please press confirm order',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
           ),
         ),
       );
@@ -380,7 +381,7 @@ class _OrderState extends State<Order> {
             title: Text(
               'Order $order_id',
               style: TextStyle(
-                fontSize: 25,
+                fontSize: 25.sp,
                 fontWeight: FontWeight.bold,
                 fontStyle: FontStyle.normal,
                 color: Colors.white,
@@ -406,11 +407,11 @@ class _OrderState extends State<Order> {
               ),
 
               Positioned(
-                left: 0.0,
-                right: 0.0,
-                bottom: 0.0,
+                left: 0.0.w,
+                right: 0.0.w,
+                bottom: 0.0.h,
                 child: Container(
-                  height: 300.0,
+                  height: 300.h,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topRight,
@@ -423,27 +424,27 @@ class _OrderState extends State<Order> {
 
                     color: Color.fromRGBO(7, 15, 33, 0.9),
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(18.0),
-                      topRight: Radius.circular(18.0),
+                      topLeft: Radius.circular(18.0.r),
+                      topRight: Radius.circular(18.0.r),
                     ),
                   ),
 
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                      vertical: 18.0,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 18.h,
                     ),
                     child: SingleChildScrollView(
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(18.0),
-                            topRight: Radius.circular(18.0),
+                            topLeft: Radius.circular(18.0.r),
+                            topRight: Radius.circular(18.0.r),
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(15.0),
+                          padding: EdgeInsets.all(15.0.r),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -453,7 +454,7 @@ class _OrderState extends State<Order> {
                                     child: Text(
                                       "Order data id : $order_id  ",
                                       style: TextStyle(
-                                        fontSize: 20,
+                                        fontSize: 20.sp,
                                         fontWeight: FontWeight.bold,
                                         fontStyle: FontStyle.normal,
                                         color: Colors.white,
@@ -463,7 +464,7 @@ class _OrderState extends State<Order> {
                                 ],
                               ),
 
-                              SizedBox(height: 30),
+                              SizedBox(height: 30.h),
 
                               Row(
                                 children: <Widget>[
@@ -471,7 +472,7 @@ class _OrderState extends State<Order> {
                                     child: Text(
                                       "order id:   $order_id ",
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 15.sp,
                                         fontWeight: FontWeight.bold,
                                         fontStyle: FontStyle.normal,
                                         color: Colors.white,
@@ -479,13 +480,13 @@ class _OrderState extends State<Order> {
                                     ),
                                   ),
 
-                                  SizedBox(width: 20),
+                                  SizedBox(width: 20.w),
 
                                   Expanded(
                                     child: Text(
                                       "order cost:   $order_cost ",
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 15.sp,
                                         fontWeight: FontWeight.bold,
                                         fontStyle: FontStyle.normal,
                                         color: Colors.white,
@@ -494,14 +495,14 @@ class _OrderState extends State<Order> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 20.0),
+                              SizedBox(height: 20.h),
                               Row(
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
                                       "order price:   $order_price ",
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 15.sp,
                                         fontWeight: FontWeight.bold,
                                         fontStyle: FontStyle.normal,
                                         color: Colors.white,
@@ -509,13 +510,13 @@ class _OrderState extends State<Order> {
                                     ),
                                   ),
 
-                                  SizedBox(width: 20),
+                                  SizedBox(width: 20.w),
 
                                   Expanded(
                                     child: Text(
                                       "order supplier Id:   $order_supplier_id ",
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 15.sp,
                                         fontWeight: FontWeight.bold,
                                         fontStyle: FontStyle.normal,
                                         color: Colors.white,
@@ -524,7 +525,7 @@ class _OrderState extends State<Order> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 20.0),
+                              SizedBox(height: 20.h),
 
                               Row(
                                 children: <Widget>[
@@ -532,7 +533,7 @@ class _OrderState extends State<Order> {
                                     child: Text(
                                       "order price state:   $order_state",
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 15.sp,
                                         fontWeight: FontWeight.bold,
                                         fontStyle: FontStyle.normal,
                                         color: Colors.white,
@@ -542,7 +543,7 @@ class _OrderState extends State<Order> {
                                 ],
                               ),
 
-                              SizedBox(height: 20.0),
+                              SizedBox(height: 20.h),
 
                               Row(
                                 children: <Widget>[
@@ -550,7 +551,7 @@ class _OrderState extends State<Order> {
                                     child: Text(
                                       "order price check:   $order_pricecheck ",
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 15.sp,
                                         fontWeight: FontWeight.bold,
                                         fontStyle: FontStyle.normal,
                                         color: Colors.white,
@@ -560,12 +561,12 @@ class _OrderState extends State<Order> {
                                 ],
                               ),
 
-                              SizedBox(height: 30),
+                              SizedBox(height: 30.h),
 
                               !isConfirm
                                   ? Row(
                                       children: <Widget>[
-                                        SizedBox(width: 10.0),
+                                        SizedBox(width: 10.w),
 
                                         Expanded(
                                           child: TextButton.icon(
@@ -589,7 +590,7 @@ class _OrderState extends State<Order> {
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 18,
+                                                          fontSize: 18.sp,
                                                         ),
                                                       ),
                                                     ),
@@ -647,7 +648,7 @@ class _OrderState extends State<Order> {
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 18,
+                                                          fontSize: 18.sp,
                                                         ),
                                                       ),
                                                     ),
@@ -659,13 +660,13 @@ class _OrderState extends State<Order> {
                                             },
                                             icon: Icon(
                                               Icons.done_all,
-                                              size: 20,
+                                              size: 20.sp,
                                               color: Colors.white,
                                             ),
                                             label: Text(
                                               "Confirm",
                                               style: TextStyle(
-                                                fontSize: 12.0,
+                                                fontSize: 12.sp,
                                                 color: Colors.white,
                                               ),
                                             ),
@@ -673,13 +674,13 @@ class _OrderState extends State<Order> {
                                               backgroundColor: Colors.green,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0),
+                                                    BorderRadius.circular(30.0.r),
                                               ),
                                             ),
                                           ),
                                         ),
 
-                                        SizedBox(width: 15.0),
+                                        SizedBox(width: 15.w),
 
                                         Expanded(
                                           child: ElevatedButton.icon(
@@ -701,13 +702,13 @@ class _OrderState extends State<Order> {
                                             },
                                             icon: Icon(
                                               Icons.cancel,
-                                              size: 20,
+                                              size: 20.sp,
                                               color: Colors.white,
                                             ),
                                             label: Text(
                                               "Cancel",
                                               style: TextStyle(
-                                                fontSize: 12.0,
+                                                fontSize: 12.sp,
                                                 color: Colors.white,
                                               ),
                                             ),
@@ -717,7 +718,7 @@ class _OrderState extends State<Order> {
                                                   InkRipple.splashFactory,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0),
+                                                    BorderRadius.circular(30.0.r),
                                               ),
                                             ),
                                           ),
@@ -727,7 +728,7 @@ class _OrderState extends State<Order> {
                                   : !isReceived
                                   ? Row(
                                       children: <Widget>[
-                                        SizedBox(width: 10.0),
+                                        SizedBox(width: 10.w),
 
                                         Expanded(
                                           child: TextButton.icon(
@@ -745,7 +746,7 @@ class _OrderState extends State<Order> {
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 18,
+                                                          fontSize: 18.sp,
                                                         ),
                                                       ),
                                                     ),
@@ -795,7 +796,7 @@ class _OrderState extends State<Order> {
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 18,
+                                                          fontSize: 18.sp,
                                                         ),
                                                       ),
                                                     ),
@@ -807,13 +808,13 @@ class _OrderState extends State<Order> {
                                             },
                                             icon: Icon(
                                               Icons.done_all,
-                                              size: 20,
+                                              size: 20.sp,
                                               color: Colors.white,
                                             ),
                                             label: Text(
                                               "Received PK ",
                                               style: TextStyle(
-                                                fontSize: 12.0,
+                                                fontSize: 12.sp,
                                                 color: Colors.white,
                                               ),
                                             ),
@@ -821,13 +822,13 @@ class _OrderState extends State<Order> {
                                               backgroundColor: Colors.green,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0),
+                                                    BorderRadius.circular(30.0.r),
                                               ),
                                             ),
                                           ),
                                         ),
 
-                                        SizedBox(width: 15.0),
+                                        SizedBox(width: 15.w),
 
                                         Expanded(
                                           child: ElevatedButton.icon(
@@ -875,7 +876,7 @@ class _OrderState extends State<Order> {
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontSize: 18,
+                                                        fontSize: 18.sp,
                                                       ),
                                                     ),
                                                   ),
@@ -894,13 +895,13 @@ class _OrderState extends State<Order> {
                                             },
                                             icon: Icon(
                                               Icons.cancel,
-                                              size: 20,
+                                              size: 20.sp,
                                               color: Colors.white,
                                             ),
                                             label: Text(
                                               "Cancel",
                                               style: TextStyle(
-                                                fontSize: 12.0,
+                                                fontSize: 12.sp,
                                                 color: Colors.white,
                                               ),
                                             ),
@@ -908,7 +909,7 @@ class _OrderState extends State<Order> {
                                               backgroundColor: Colors.red,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0),
+                                                    BorderRadius.circular(30.0.r),
                                               ),
                                             ),
                                           ),
@@ -918,7 +919,7 @@ class _OrderState extends State<Order> {
                                   : !isDelviered
                                   ? Row(
                                       children: <Widget>[
-                                        SizedBox(width: 10.0),
+                                        SizedBox(width: 10.w),
 
                                         Expanded(
                                           child: TextButton.icon(
@@ -936,7 +937,7 @@ class _OrderState extends State<Order> {
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 18,
+                                                          fontSize: 18.sp,
                                                         ),
                                                       ),
                                                     ),
@@ -988,7 +989,7 @@ class _OrderState extends State<Order> {
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 18,
+                                                          fontSize: 18.sp,
                                                         ),
                                                       ),
                                                     ),
@@ -1000,13 +1001,13 @@ class _OrderState extends State<Order> {
                                             },
                                             icon: Icon(
                                               Icons.done_all,
-                                              size: 20,
+                                              size: 20.sp,
                                               color: Colors.white,
                                             ),
                                             label: Text(
                                               "Delivered PK ",
                                               style: TextStyle(
-                                                fontSize: 12.0,
+                                                fontSize: 12.sp,
                                                 color: Colors.white,
                                               ),
                                             ),
@@ -1014,13 +1015,13 @@ class _OrderState extends State<Order> {
                                               backgroundColor: Colors.green,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0),
+                                                    BorderRadius.circular(30.0.r),
                                               ),
                                             ),
                                           ),
                                         ),
 
-                                        SizedBox(width: 15.0),
+                                        SizedBox(width: 15.w),
 
                                         Expanded(
                                           child: ElevatedButton.icon(
@@ -1064,7 +1065,7 @@ class _OrderState extends State<Order> {
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontSize: 18,
+                                                        fontSize: 18.sp,
                                                       ),
                                                     ),
                                                   ),
@@ -1083,13 +1084,13 @@ class _OrderState extends State<Order> {
                                             },
                                             icon: Icon(
                                               Icons.cancel,
-                                              size: 20,
+                                              size: 20.sp,
                                               color: Colors.white,
                                             ),
                                             label: Text(
                                               "Cancel",
                                               style: TextStyle(
-                                                fontSize: 12.0,
+                                                fontSize: 12.sp,
                                                 color: Colors.white,
                                               ),
                                             ),
@@ -1097,7 +1098,7 @@ class _OrderState extends State<Order> {
                                               backgroundColor: Colors.red,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0),
+                                                    BorderRadius.circular(30.0.r),
                                               ),
                                             ),
                                           ),
@@ -1108,20 +1109,20 @@ class _OrderState extends State<Order> {
                                       decoration: BoxDecoration(
                                         color: Colors.green,
                                         borderRadius: BorderRadius.all(
-                                          Radius.circular(18.0),
+                                          Radius.circular(18.0.r),
                                         ),
                                       ),
                                       child: Padding(
-                                        padding: EdgeInsets.all(3),
+                                        padding: EdgeInsets.all(3.r),
                                         child: Row(
                                           children: <Widget>[
-                                            SizedBox(width: 10.0),
+                                            SizedBox(width: 10.w),
 
                                             Expanded(
                                               child: Text(
                                                 "you have delivered order but please wait to order confirm from supplier ",
                                                 style: TextStyle(
-                                                  fontSize: 17,
+                                                  fontSize: 17.sp,
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -1150,7 +1151,7 @@ class _OrderState extends State<Order> {
               title: Text('Warning', style: TextStyle(color: Colors.red)),
               content: Text(
                 'Please you cant exist until order complete  ',
-                style: TextStyle(fontSize: 15, color: Colors.red),
+                style: TextStyle(fontSize: 15.sp, color: Colors.red),
               ),
               actions: [],
             ),
@@ -1166,7 +1167,7 @@ class _OrderState extends State<Order> {
             title: Text(
               'OrderVite',
               style: TextStyle(
-                fontSize: 25,
+                fontSize: 25.sp,
                 fontWeight: FontWeight.bold,
                 fontStyle: FontStyle.normal,
                 color: Colors.white,
@@ -1192,12 +1193,12 @@ class _OrderState extends State<Order> {
               ),
 
               Positioned(
-                left: 0.0,
-                right: 0.0,
-                bottom: 0.0,
+                left: 0.0.w,
+                right: 0.0.w,
+                bottom: 0.0.h,
                 child: !isConfirmSupplier
                     ? Container(
-                        height: 350.0,
+                        height: 350.h,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topRight,
@@ -1210,15 +1211,15 @@ class _OrderState extends State<Order> {
 
                           color: Color.fromRGBO(7, 15, 33, 0.9),
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(18.0),
-                            topRight: Radius.circular(18.0),
+                            topLeft: Radius.circular(18.0.r),
+                            topRight: Radius.circular(18.0.r),
                           ),
                         ),
 
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24.0,
-                            vertical: 18.0,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 24.w,
+                            vertical: 18.h,
                           ),
                           child: SingleChildScrollView(
                             child: Column(
@@ -1230,7 +1231,7 @@ class _OrderState extends State<Order> {
                                       child: Text(
                                         'Choose package size ',
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 15.sp,
                                           fontWeight: FontWeight.bold,
                                           fontStyle: FontStyle.normal,
                                           color: Colors.white,
@@ -1240,12 +1241,12 @@ class _OrderState extends State<Order> {
                                   ],
                                 ),
 
-                                SizedBox(height: 6.0),
+                                SizedBox(height: 6.h),
                                 Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.all(
-                                      Radius.circular(18.0),
+                                      Radius.circular(18.0.r),
                                     ),
                                   ),
 
@@ -1253,10 +1254,10 @@ class _OrderState extends State<Order> {
                                     children: <Widget>[
                                       Expanded(
                                         child: ListTile(
-                                          title: const Text(
+                                          title:  Text(
                                             'SM',
                                             style: TextStyle(
-                                              fontSize: 10,
+                                              fontSize: 10.sp,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -1285,10 +1286,10 @@ class _OrderState extends State<Order> {
 
                                       Expanded(
                                         child: ListTile(
-                                          title: const Text(
+                                          title:  Text(
                                             'MD',
                                             style: TextStyle(
-                                              fontSize: 10,
+                                              fontSize: 10.sp,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -1317,10 +1318,10 @@ class _OrderState extends State<Order> {
 
                                       Expanded(
                                         child: ListTile(
-                                          title: const Text(
+                                          title:  Text(
                                             'LG',
                                             style: TextStyle(
-                                              fontSize: 10,
+                                              fontSize: 10.sp,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -1350,7 +1351,7 @@ class _OrderState extends State<Order> {
                                   ),
                                 ),
 
-                                SizedBox(height: 6.0),
+                                SizedBox(height: 6.h),
 
                                 Row(
                                   children: <Widget>[
@@ -1358,7 +1359,7 @@ class _OrderState extends State<Order> {
                                       child: Text(
                                         'Choose package price checker ',
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 15.sp,
                                           fontWeight: FontWeight.bold,
                                           fontStyle: FontStyle.normal,
                                           color: Colors.white,
@@ -1368,23 +1369,23 @@ class _OrderState extends State<Order> {
                                   ],
                                 ),
 
-                                SizedBox(height: 6.0),
+                                SizedBox(height: 6.h),
 
                                 Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.all(
-                                      Radius.circular(18.0),
+                                      Radius.circular(18.0.r),
                                     ),
                                   ),
                                   child: Row(
                                     children: <Widget>[
                                       Expanded(
                                         child: ListTile(
-                                          title: const Text(
+                                          title:  Text(
                                             'TRANSFER',
                                             style: TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 12.sp,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -1413,10 +1414,10 @@ class _OrderState extends State<Order> {
 
                                       Expanded(
                                         child: ListTile(
-                                          title: const Text(
+                                          title:  Text(
                                             'CASH',
                                             style: TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 12.sp,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -1446,7 +1447,7 @@ class _OrderState extends State<Order> {
                                   ),
                                 ),
 
-                                SizedBox(height: 6.0),
+                                SizedBox(height: 6.h),
 
                                 Row(
                                   children: <Widget>[
@@ -1454,7 +1455,7 @@ class _OrderState extends State<Order> {
                                       child: Text(
                                         'Enter package price value ',
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 15.sp,
                                           fontWeight: FontWeight.bold,
                                           fontStyle: FontStyle.normal,
                                           color: Colors.white,
@@ -1464,7 +1465,7 @@ class _OrderState extends State<Order> {
                                   ],
                                 ),
 
-                                SizedBox(height: 6.0),
+                                SizedBox(height: 6.h),
 
                                 Row(
                                   children: <Widget>[
@@ -1475,10 +1476,10 @@ class _OrderState extends State<Order> {
 
                                         keyboardType: TextInputType.number,
 
-                                        scrollPadding: EdgeInsets.only(top: 10),
+                                        scrollPadding: EdgeInsets.only(top: 1.h),
 
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 15.sp,
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -1490,12 +1491,12 @@ class _OrderState extends State<Order> {
 
                                         decoration: InputDecoration(
                                           contentPadding: EdgeInsets.only(
-                                            top: 20,
-                                            bottom: 20,
+                                            top: 2.h,
+                                            bottom: 2.h,
                                           ),
                                           hintText: " PACKADE PRICE",
                                           hintStyle: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 15.sp,
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -1503,20 +1504,20 @@ class _OrderState extends State<Order> {
                                           fillColor: Colors.white,
                                           filled: true,
                                           prefixIcon: Padding(
-                                            padding: EdgeInsets.only(left: 5),
+                                            padding: EdgeInsets.only(left: 5.w),
                                             child: Icon(
                                               Icons.money,
-                                              size: 30,
+                                              size: 30.sp,
                                               color: Colors.blue,
                                             ),
                                           ),
                                           prefixStyle: TextStyle(
-                                            fontSize: 50,
+                                            fontSize: 50.sp,
                                             color: Colors.red,
                                           ),
                                           labelText: "PACKADE PRICE",
                                           labelStyle: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 15.sp,
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -1533,11 +1534,11 @@ class _OrderState extends State<Order> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 5.0),
+                                SizedBox(height: 5.h),
 
                                 Row(
                                   children: <Widget>[
-                                    SizedBox(width: 10.0),
+                                    SizedBox(width: 10.w),
 
                                     Expanded(
                                       child: ElevatedButton.icon(
@@ -1546,14 +1547,14 @@ class _OrderState extends State<Order> {
                                             ScaffoldMessenger.of(
                                               context,
                                             ).showSnackBar(
-                                              const SnackBar(
+                                               SnackBar(
                                                 backgroundColor:
                                                     Colors.redAccent,
                                                 content: Text(
                                                   'Please wait to Response your order have sended ...',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
+                                                    fontSize: 18.sp,
                                                   ),
                                                 ),
                                               ),
@@ -1703,14 +1704,14 @@ class _OrderState extends State<Order> {
                                               ScaffoldMessenger.of(
                                                 context,
                                               ).showSnackBar(
-                                                const SnackBar(
+                                                 SnackBar(
                                                   backgroundColor: Colors.green,
                                                   content: Text(
                                                     'Successfully, please wait for response ...',
                                                     style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      fontSize: 18,
+                                                      fontSize: 18.sp,
                                                     ),
                                                   ),
                                                 ),
@@ -1720,28 +1721,28 @@ class _OrderState extends State<Order> {
                                             ScaffoldMessenger.of(
                                               context,
                                             ).showSnackBar(
-                                              const SnackBar(
+                                               SnackBar(
                                                 backgroundColor:
                                                     Colors.redAccent,
                                                 content: Text(
                                                   'Error must insert all details ...',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
+                                                    fontSize: 18.sp,
                                                   ),
                                                 ),
                                               ),
                                             );
                                           }
                                         },
-                                        icon: const Icon(
+                                        icon: Icon(
                                           Icons.done_all,
-                                          size: 20,
+                                          size: 20.sp,
                                         ),
-                                        label: const Text(
+                                        label:  Text(
                                           "Confirm",
                                           style: TextStyle(
-                                            fontSize: 12.0,
+                                            fontSize: 12.sp,
                                             color: Colors.white,
                                           ),
                                         ),
@@ -1755,7 +1756,7 @@ class _OrderState extends State<Order> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(width: 40.0),
+                                    SizedBox(width: 40.w),
 
                                     Expanded(
                                       child: ElevatedButton.icon(
@@ -1772,14 +1773,14 @@ class _OrderState extends State<Order> {
                                             ),
                                           );
                                         },
-                                        icon: const Icon(
+                                        icon: Icon(
                                           Icons.cancel,
-                                          size: 20,
+                                          size: 20.sp,
                                         ),
-                                        label: const Text(
+                                        label:  Text(
                                           "Cancel",
                                           style: TextStyle(
-                                            fontSize: 12.0,
+                                            fontSize: 12.sp,
                                             color: Colors.white,
                                           ),
                                         ),
@@ -1801,7 +1802,7 @@ class _OrderState extends State<Order> {
                         ),
                       )
                     : Container(
-                        height: 300.00,
+                        height: 300.h,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topRight,
@@ -1814,27 +1815,27 @@ class _OrderState extends State<Order> {
 
                           color: Color.fromRGBO(7, 15, 33, 0.9),
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(18.0),
-                            topRight: Radius.circular(18.0),
+                            topLeft: Radius.circular(18.0.r),
+                            topRight: Radius.circular(18.0.r),
                           ),
                         ),
 
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24.0,
-                            vertical: 18.0,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 24.w,
+                            vertical: 18.h,
                           ),
                           child: SingleChildScrollView(
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(18.0),
-                                  topRight: Radius.circular(18.0),
+                                  topLeft: Radius.circular(18.0.r),
+                                  topRight: Radius.circular(18.0.r),
                                 ),
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(20.0),
+                                padding: EdgeInsets.all(20.0.r),
 
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1847,7 +1848,7 @@ class _OrderState extends State<Order> {
                                               child: Text(
                                                 "Order data id : $order_id  ",
                                                 style: TextStyle(
-                                                  fontSize: 20,
+                                                  fontSize: 20.sp,
                                                   fontWeight: FontWeight.bold,
                                                   fontStyle: FontStyle.normal,
                                                   color: Colors.white,
@@ -1857,7 +1858,7 @@ class _OrderState extends State<Order> {
                                           ],
                                         ),
 
-                                        SizedBox(height: 30),
+                                        SizedBox(height: 30.h),
 
                                         Row(
                                           children: <Widget>[
@@ -1865,7 +1866,7 @@ class _OrderState extends State<Order> {
                                               child: Text(
                                                 "order id:   $order_id ",
                                                 style: TextStyle(
-                                                  fontSize: 15,
+                                                  fontSize: 15.sp,
                                                   fontWeight: FontWeight.bold,
                                                   fontStyle: FontStyle.normal,
                                                   color: Colors.white,
@@ -1873,13 +1874,13 @@ class _OrderState extends State<Order> {
                                               ),
                                             ),
 
-                                            SizedBox(width: 20),
+                                            SizedBox(width: 20.w),
 
                                             Expanded(
                                               child: Text(
                                                 "order cost:   $order_cost ",
                                                 style: TextStyle(
-                                                  fontSize: 15,
+                                                  fontSize: 15.sp,
                                                   fontWeight: FontWeight.bold,
                                                   fontStyle: FontStyle.normal,
                                                   color: Colors.white,
@@ -1888,14 +1889,14 @@ class _OrderState extends State<Order> {
                                             ),
                                           ],
                                         ),
-                                        SizedBox(height: 20.0),
+                                        SizedBox(height: 20.h),
                                         Row(
                                           children: <Widget>[
                                             Expanded(
                                               child: Text(
                                                 "order price:   $order_price ",
                                                 style: TextStyle(
-                                                  fontSize: 15,
+                                                  fontSize: 15.sp,
                                                   fontWeight: FontWeight.bold,
                                                   fontStyle: FontStyle.normal,
                                                   color: Colors.white,
@@ -1903,13 +1904,13 @@ class _OrderState extends State<Order> {
                                               ),
                                             ),
 
-                                            SizedBox(width: 20),
+                                            SizedBox(width: 20.w),
 
                                             Expanded(
                                               child: Text(
                                                 "order Shipper Id:   $order_shippier_id ",
                                                 style: TextStyle(
-                                                  fontSize: 15,
+                                                  fontSize: 15.sp,
                                                   fontWeight: FontWeight.bold,
                                                   fontStyle: FontStyle.normal,
                                                   color: Colors.white,
@@ -1919,7 +1920,7 @@ class _OrderState extends State<Order> {
                                           ],
                                         ),
 
-                                        SizedBox(height: 20.0),
+                                        SizedBox(height: 20.h),
 
                                         Row(
                                           children: <Widget>[
@@ -1927,7 +1928,7 @@ class _OrderState extends State<Order> {
                                               child: Text(
                                                 "order price state:   $order_state",
                                                 style: TextStyle(
-                                                  fontSize: 15,
+                                                  fontSize: 15.sp,
                                                   fontWeight: FontWeight.bold,
                                                   fontStyle: FontStyle.normal,
                                                   color: Colors.white,
@@ -1937,7 +1938,7 @@ class _OrderState extends State<Order> {
                                           ],
                                         ),
 
-                                        SizedBox(height: 20.0),
+                                        SizedBox(height: 20.h),
 
                                         Row(
                                           children: <Widget>[
@@ -1945,7 +1946,7 @@ class _OrderState extends State<Order> {
                                               child: Text(
                                                 "order price check:   $order_pricecheck ",
                                                 style: TextStyle(
-                                                  fontSize: 15,
+                                                  fontSize: 15.sp,
                                                   fontWeight: FontWeight.bold,
                                                   fontStyle: FontStyle.normal,
                                                   color: Colors.white,
@@ -1957,7 +1958,7 @@ class _OrderState extends State<Order> {
                                       ],
                                     ),
 
-                                    SizedBox(height: 30),
+                                    SizedBox(height: 30.h),
 
                                     Expanded(
                                       child: ElevatedButton.icon(
@@ -2007,7 +2008,7 @@ class _OrderState extends State<Order> {
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontSize: 18,
+                                                        fontSize: 18.sp,
                                                       ),
                                                     ),
                                                   ),
@@ -2016,11 +2017,11 @@ class _OrderState extends State<Order> {
                                             }
                                           } catch (e) {}
                                         },
-                                        icon: Icon(Icons.done_all, size: 20),
+                                        icon: Icon(Icons.done_all, size: 20.sp),
                                         label: Text(
                                           "Complete",
                                           style: TextStyle(
-                                            fontSize: 12.0,
+                                            fontSize: 12.sp,
                                             color: Colors.white,
                                           ),
                                         ),
@@ -2054,7 +2055,7 @@ class _OrderState extends State<Order> {
               title: Text('Warning', style: TextStyle(color: Colors.red)),
               content: Text(
                 'Please you can’t exit until order complete',
-                style: TextStyle(fontSize: 15, color: Colors.red),
+                style: TextStyle(fontSize: 15.sp, color: Colors.red),
               ),
               actions: [
                 TextButton(
@@ -2104,7 +2105,7 @@ class _OrderState extends State<Order> {
             backgroundColor: Colors.redAccent,
             content: Text(
               'Distance: $_distance',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
             ),
           ),
         );

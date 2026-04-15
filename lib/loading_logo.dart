@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoadingLogo extends StatelessWidget {
   @override
@@ -18,8 +19,8 @@ class LoadingLogo extends StatelessWidget {
 
 
                  Container(
-                 width: 270,
-            height: 270,
+                 width: 270.w,
+            height: 270.h,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/auth_logo.png'),

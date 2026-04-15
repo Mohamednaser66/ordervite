@@ -25,7 +25,7 @@ class _AuthPagesState extends State<AuthPages> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -41,16 +41,16 @@ class _AuthPagesState extends State<AuthPages> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildLogo(),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Text(
                       isEnglish ? 'JOIN NOW!' : 'أنضم الآن',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 30,
+                      style: TextStyle(
+                        fontSize: 30.sp,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.h),
                     if (!_languageSelected) _buildLanguageSelection(lang),
                     if (_languageSelected) _buildAuthMenu(isEnglish),
                   ],
@@ -81,7 +81,7 @@ class _AuthPagesState extends State<AuthPages> {
           onTap: () {},
           horizontalPadding: 80,
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         Row(
           children: [
             Expanded(
@@ -99,7 +99,7 @@ class _AuthPagesState extends State<AuthPages> {
                 },
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             Expanded(
               child: _buildFullWidthButton(
                 icon: Icons.flag,
@@ -132,7 +132,7 @@ class _AuthPagesState extends State<AuthPages> {
           onTap: () {},
           horizontalPadding: 20,
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         Row(
           children: [
             Expanded(
@@ -143,7 +143,7 @@ class _AuthPagesState extends State<AuthPages> {
                 onTap: () => Navigator.of(context).pushNamed(RoutesManager.login),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             Expanded(
               child: _buildFullWidthButton(
                 icon: Icons.app_registration,
@@ -154,7 +154,7 @@ class _AuthPagesState extends State<AuthPages> {
             ),
           ],
         ),
-        const SizedBox(height: 18),
+        SizedBox(height: 18.h),
         _buildFullWidthButton(
           icon: Icons.pedal_bike,
           label:
@@ -163,7 +163,7 @@ class _AuthPagesState extends State<AuthPages> {
           onTap: () {},
           horizontalPadding: 20.w,
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         Row(
           children: [
             Expanded(
@@ -174,7 +174,7 @@ class _AuthPagesState extends State<AuthPages> {
                 onTap: () => Navigator.of(context).pushNamed(RoutesManager.shLogin),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             Expanded(
               child: _buildFullWidthButton(
                 icon: Icons.app_registration,
@@ -185,7 +185,7 @@ class _AuthPagesState extends State<AuthPages> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
 
       ],
     );
@@ -202,7 +202,7 @@ class _AuthPagesState extends State<AuthPages> {
       padding: EdgeInsets.only(
         left: horizontalPadding,
         right: horizontalPadding,
-        top: 10,
+        top: 1.h,
       ),
       child: GestureDetector(
         onTap: onTap,
@@ -211,20 +211,20 @@ class _AuthPagesState extends State<AuthPages> {
           width: double.infinity,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
           ),
           child: Row(
             children: [
-              const SizedBox(width: 20),
-              Icon(icon, size: 28, color: Colors.white),
-              const SizedBox(width: 10),
+              SizedBox(width: 20.w),
+              Icon(icon, size: 28.sp, color: Colors.white),
+              SizedBox(width: 10.w),
               Expanded(
                 child: Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: TextStyle(
+                    fontSize: 18.sp,
                     color: Colors.white,
                   ),
                 ),

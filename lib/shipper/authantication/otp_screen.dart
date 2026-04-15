@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OtpScreen extends StatefulWidget {
   final String verificationId;
@@ -115,15 +116,15 @@ print(message);
         title: const Text("Enter OTP"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.r),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               "Enter the code sent to your phone",
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16.sp),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             TextField(
               controller: codeController,
@@ -136,7 +137,7 @@ print(message);
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             isLoading
                 ? const CircularProgressIndicator()

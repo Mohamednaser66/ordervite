@@ -68,20 +68,20 @@ arg  = ModalRoute.of(context)?.settings.arguments as String;
         child: Form(
           key:formKey,
           child: Padding(
-            padding:  REdgeInsets.all(16.0),
+            padding:  REdgeInsets.all(16.0.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  margin: REdgeInsets.symmetric(vertical: 30),
-                  width: 70,
-                  height: 70,
+                  margin: REdgeInsets.symmetric(vertical: 30.h),
+                  width: 70.w,
+                  height: 70.h,
                   decoration: BoxDecoration(
                     color: Colors.blue,
-                    borderRadius: BorderRadius.circular(100),
+                    borderRadius: BorderRadius.circular(100.r),
                   ),
-                  child: Icon(Icons.person, size: 50, color: Colors.white),
+                  child: Icon(Icons.person, size: 50.sp, color: Colors.white),
                 ),
                 CustomTextFormField(controller: _controller,
                     icon: Icon(Icons.phone_android_outlined),

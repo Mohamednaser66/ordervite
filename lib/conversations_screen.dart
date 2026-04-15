@@ -40,7 +40,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
           onPressed: () async {
             // ممكن تضيف وظيفة البحث هنا لاحقًا
           },
-          icon: const Icon(Icons.search),
+          icon: Icon(Icons.search),
         ),
       ),
       body: Center(

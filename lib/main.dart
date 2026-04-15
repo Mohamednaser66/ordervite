@@ -36,20 +36,27 @@ Future<void> initNotifications() async {
 }
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // ✅ لازم تتسجل بدري جدًا
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
   final trackingStatus =
   await AppTrackingTransparency.trackingAuthorizationStatus;
+
   if (trackingStatus == TrackingStatus.notDetermined) {
     await AppTrackingTransparency.requestTrackingAuthorization();
   }
+
   await initNotifications();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(const MyApp());
 }

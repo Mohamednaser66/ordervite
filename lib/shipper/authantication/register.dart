@@ -114,7 +114,7 @@ String roles = ConstantManager.shipper;
           title: Text(
             lang.lang == "en" ? 'Shipper Registration ' : 'تسجيل مسئول شحن ',
             style: TextStyle(
-              fontSize: 25,
+              fontSize: 25.sp,
               fontWeight: FontWeight.bold,
               fontStyle: FontStyle.normal,
               color: Colors.white,
@@ -134,22 +134,22 @@ String roles = ConstantManager.shipper;
             key: formstatesignup,
             child: SingleChildScrollView(
               child: Padding(
-                padding: REdgeInsets.all(16.0),
+                padding: REdgeInsets.all(16.0.r),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   //   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
-                    Padding(padding: EdgeInsets.only(top: 20)),
+                    Padding(padding: EdgeInsets.only(top: 2.h)),
                     Container(
-                      margin: REdgeInsets.symmetric(vertical: 30),
-                      width: 70,
-                      height: 70,
+                      margin: REdgeInsets.symmetric(vertical: 30.h),
+                      width: 70.w,
+                      height: 70.h,
                       decoration: BoxDecoration(
                         color: Colors.blue,
-                        borderRadius: BorderRadius.circular(100),
+                        borderRadius: BorderRadius.circular(100.r),
                       ),
-                      child: Icon(Icons.person, size: 50, color: Colors.white),
+                      child: Icon(Icons.person, size: 50.sp, color: Colors.white),
                     ),
                     SizedBox(height: 20.h),
                     CustomTextFormField(
@@ -214,15 +214,15 @@ String roles = ConstantManager.shipper;
                           : 'رقم التليفون 2 ',
                       lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم التليفون 2 ',
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue, // instead of color
                         foregroundColor: Colors.white, // instead of textColor
                         splashFactory: InkRipple.splashFactory,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                          // side: BorderSide(color: Colors.red, width: 2),
+                          borderRadius: BorderRadius.all(Radius.circular(15.r)),
+                          // side: BorderSide(color: Colors.red, width: 2.w),
                         ),
                       ),
                       label: Text(
@@ -298,7 +298,7 @@ String roles = ConstantManager.shipper;
                                   content: Text(
                                     'Invlid data Please Insert Correct Data',
                                     style: TextStyle(
-                                      fontSize: 15,
+                                      fontSize: 15.sp,
                                       color: Colors.red,
                                     ),
                                   ),
@@ -319,7 +319,7 @@ String roles = ConstantManager.shipper;
                                     ? 'Please check your network  '
                                     : '  يرجي التحقق من اتصال الشبكة الخاص بك   ',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   color: Colors.red,
                                 ),
                               ),
@@ -330,7 +330,7 @@ String roles = ConstantManager.shipper;
                     ),
                     SizedBox(height: 10.h,),
                     Container(
-                      margin: EdgeInsets.only(left: 5),
+                      margin: EdgeInsets.only(left: 5.w),
                       child: RichText(
                         text: TextSpan(
                           children: <TextSpan>[
@@ -339,7 +339,7 @@ String roles = ConstantManager.shipper;
                                   ? " If you already have an account please    "
                                   : " اذا يوجد لديك حساب يمكنك الستجيل من هنا ",
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 13.sp,
                                 color: Colors.white,
                               ),
                             ),
@@ -349,7 +349,7 @@ String roles = ConstantManager.shipper;
                                   ? "Sign in"
                                   : "تسجيل دخول ",
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 16.sp,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,

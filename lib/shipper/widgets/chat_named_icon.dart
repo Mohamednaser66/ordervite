@@ -6,6 +6,7 @@ import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ChatNamedIcon extends StatelessWidget {
   final IconData iconData;
@@ -90,8 +91,8 @@ class ChatNamedIcon extends StatelessWidget {
         );
       },
       child: Container(
-        width: 72,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        width: 72.w,
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -105,10 +106,10 @@ class ChatNamedIcon extends StatelessWidget {
 
             if (notificationCount != null && notificationCount! > 0)
               Positioned(
-                top: 0,
-                right: 0,
+                top: 0.h,
+                right: 0.w,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.red,

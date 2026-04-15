@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 
 
@@ -26,8 +27,8 @@ class OrdersNamedIcon extends StatelessWidget {
         }
       },
       child: Container(
-        width: 72,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        width: 72.w,
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -39,18 +40,18 @@ class OrdersNamedIcon extends StatelessWidget {
               ],
             ),
             Positioned(
-              top: 0,
-              right: 0,
+              top: 0.h,
+              right: 0.w,
               child: (notificationCount != null && notificationCount! > 0)
                   ? Container(
-                padding: EdgeInsets.all(4),
+                padding: EdgeInsets.all(4.r),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.red,
                 ),
                 child: Text(
                   '$notificationCount',
-                  style: TextStyle(fontSize: 10, color: Colors.white),
+                  style: TextStyle(fontSize: 10.sp, color: Colors.white),
                 ),
               )
                   : SizedBox(),

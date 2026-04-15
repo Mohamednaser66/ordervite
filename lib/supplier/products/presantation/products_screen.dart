@@ -3,6 +3,7 @@ import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/core/images_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/supplier/products/presantation/widgets/product_item.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProductsScreen extends StatelessWidget {
   ProductsScreen({super.key});
@@ -26,7 +27,7 @@ class ProductsScreen extends StatelessWidget {
           title: Text('Products'),
         ),
         body: Padding(
-          padding: EdgeInsetsGeometry.only(top: 10, left: 10, right: 10),
+          padding: EdgeInsetsGeometry.only(top: 10.h, left: 10.w, right: 10.w),
           child: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,

@@ -5,6 +5,7 @@ import 'package:flutter_maps/classes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RatingsPage extends StatefulWidget {
   const RatingsPage({Key? key}) : super(key: key);
@@ -48,7 +49,7 @@ class _RatingsPage extends State<RatingsPage> {
               );
               Navigator.pushNamed(context, RoutesManager.suHome, arguments: message);
             },
-            icon: const Icon(Icons.arrow_back_ios),
+            icon: Icon(Icons.arrow_back_ios),
           ),
           title: Text(lang.lang == "en" ? "OrderVite Ratings" : "تقييم طلبك"),
         ),
@@ -60,8 +61,8 @@ class _RatingsPage extends State<RatingsPage> {
                 lang.lang == "en"
                     ? "Order is complete! Rate the delivery service"
                     : "تم إتمام الطلب! فلتُقيم خدمة التوصيل",
-                style: const TextStyle(
-                  fontSize: 17,
+                style: TextStyle(
+                  fontSize: 17.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -73,42 +74,42 @@ class _RatingsPage extends State<RatingsPage> {
               }, 5),
 
               SizedBox(
-                height: 44,
+                height: 44.h,
                 child: (_rating != null && _rating != 0)
                     ? Text(
                         lang.lang == "en"
                             ? "You selected $_rating rating"
                             : "تقييمك $_rating نجوم",
-                        style: const TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18.sp),
                       )
                     : const SizedBox.shrink(),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
 
               Container(
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12.r),
+                margin: EdgeInsets.all(12.r),
                 decoration: BoxDecoration(
                   color: Colors.grey,
-                  borderRadius: BorderRadius.circular(32),
+                  borderRadius: BorderRadius.circular(32.r),
                 ),
                 child: TextField(
                   controller: messageTextEditController,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: lang.lang == "en"
                         ? 'Type your Review...'
                         : 'اكتب تعليق',
-                    hintStyle: const TextStyle(color: Colors.white),
+                    hintStyle: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
 
               Row(
                 children: [
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
 
                   Expanded(
                     child: ElevatedButton.icon(
@@ -153,18 +154,18 @@ class _RatingsPage extends State<RatingsPage> {
                           );
                         } catch (e) {}
                       },
-                      icon: const Icon(Icons.done_all, size: 20),
+                      icon: Icon(Icons.done_all, size: 20.sp),
                       label: Text(
                         lang.lang == "en" ? "Submit" : "ارسال",
-                        style: const TextStyle(
-                          fontSize: 22,
+                        style: TextStyle(
+                          fontSize: 22.sp,
                           color: Colors.white,
                         ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
 
                   Expanded(
                     child: ElevatedButton.icon(
@@ -183,18 +184,18 @@ class _RatingsPage extends State<RatingsPage> {
                           arguments: message,
                         );
                       },
-                      icon: const Icon(Icons.cancel, size: 20),
+                      icon: Icon(Icons.cancel, size: 20.sp),
                       label: Text(
                         lang.lang == "en" ? "Skip" : "تخطي",
-                        style: const TextStyle(
-                          fontSize: 22,
+                        style: TextStyle(
+                          fontSize: 22.sp,
                           color: Colors.white,
                         ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                 ],
               ),
             ],

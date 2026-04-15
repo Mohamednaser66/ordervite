@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Style {
   /// Colors
@@ -9,18 +10,18 @@ class Style {
 
   /// Text Style
   static final TextStyle appNameTextStyle =
-      TextStyle(fontSize: 32, fontWeight: FontWeight.w500);
+      TextStyle(fontSize: 32.sp, fontWeight: FontWeight.w500);
 
   /// Decorations
   static InputDecoration inputDecoration(String label) {
     return InputDecoration(
       labelText: '$label',
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         borderSide: BorderSide(color: Colors.white),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         borderSide: BorderSide(color: Colors.white),
       ),
     );

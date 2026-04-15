@@ -162,11 +162,11 @@ class _CreatProfileState extends State<SUProfilePage> {
       showDialog(
         context: context,
         builder: (c) =>
-        const AlertDialog(
+         AlertDialog(
           title: Text('Warning', style: TextStyle(color: Colors.red)),
           content: Text(
             'Please check your network',
-            style: TextStyle(fontSize: 15, color: Colors.red),
+            style: TextStyle(fontSize: 15.sp, color: Colors.red),
           ),
         ),
       );
@@ -185,7 +185,7 @@ class _CreatProfileState extends State<SUProfilePage> {
         body: Form(
           key: _globalkey,
           child: ListView(
-            padding: REdgeInsets.all(20),
+            padding: REdgeInsets.all(20.r),
             children: [
               Center(
                 child: Stack(
@@ -219,7 +219,7 @@ class _CreatProfileState extends State<SUProfilePage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 validation: AppValidators.validateUsername,
                 controller: _username,
@@ -227,7 +227,7 @@ class _CreatProfileState extends State<SUProfilePage> {
                 hintText: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
                 lable: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 validation: AppValidators.validateEmail,
                 controller: _email,
@@ -239,7 +239,7 @@ class _CreatProfileState extends State<SUProfilePage> {
                     ? 'Enter Email'
                     : 'ادخل البريد الالكترونى',
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 controller: _password,
                 icon: Icon(Icons.key, color: Colors.blue,),
@@ -248,7 +248,7 @@ class _CreatProfileState extends State<SUProfilePage> {
                 hintText: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
                 lable: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 controller: _c_password,
                 icon: Icon(Icons.key, color: Colors.blue,),
@@ -265,7 +265,7 @@ class _CreatProfileState extends State<SUProfilePage> {
                       _password.text,
                     ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 controller: _mobile1,
                 icon: Icon(Icons.phone, color: Colors.blue,),
@@ -273,7 +273,7 @@ class _CreatProfileState extends State<SUProfilePage> {
                 hintText: lang.lang == 'en' ? 'Mobile 1' : 'رقم الهاتف 1',
                 lable: lang.lang == 'en' ? 'Mobile 1' : 'رقم الهاتف 1',
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 controller: _mobile2,
                 icon: Icon(Icons.phone, color: Colors.blue,),
@@ -281,7 +281,7 @@ class _CreatProfileState extends State<SUProfilePage> {
                 hintText: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
                 lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: 30.h),
               ElevatedButton(
                 onPressed: updateProfile,
                 child: circular

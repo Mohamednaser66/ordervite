@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // ignore: must_be_immutable
 class CustomTextFormField extends StatelessWidget {
@@ -24,27 +25,27 @@ class CustomTextFormField extends StatelessWidget {
       validator: validation,
       obscureText: secure,
 
-      style: TextStyle(fontSize: 20, color: Colors.black,),
+      style: TextStyle(fontSize: 20.sp, color: Colors.black,),
       maxLength: 50,
       cursorColor: Colors.blue,
 
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.only(top: 10, bottom: 10),
+        contentPadding: EdgeInsets.only(top: 1.h, bottom: 1.h),
         hintText: hintText,
           hoverColor: Colors.blue,
         fillColor: Colors.white,
         filled: true,
-        prefixIcon: Padding(padding: EdgeInsets.only(left: 5), child: icon),
-        prefixStyle: TextStyle(fontSize: 50, color: Colors.blue),
+        prefixIcon: Padding(padding: EdgeInsets.only(left: 5.w), child: icon),
+        prefixStyle: TextStyle(fontSize: 50.sp, color: Colors.blue),
         labelText: lable,
         labelStyle: TextStyle(
-          fontSize: 17,
+          fontSize: 17.sp,
           color: Colors.black,
           fontWeight: FontWeight.bold,
         ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-        errorBorder:  OutlineInputBorder(borderRadius: BorderRadius.circular(20),borderSide: BorderSide(color: Colors.red)),
-        focusedBorder: OutlineInputBorder(borderRadius:BorderRadius.circular(20),borderSide: BorderSide(color: Colors.blue) )
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.r)),
+        errorBorder:  OutlineInputBorder(borderRadius: BorderRadius.circular(20.r),borderSide: BorderSide(color: Colors.red)),
+        focusedBorder: OutlineInputBorder(borderRadius:BorderRadius.circular(20.r),borderSide: BorderSide(color: Colors.blue) )
       ),
     );
   }

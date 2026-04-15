@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PolicyDialog extends StatelessWidget {
   PolicyDialog({
@@ -21,7 +22,7 @@ class PolicyDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
       ),
       child: SizedBox(
-        height: 500,   // الحل هنا
+        height: 500.h,   // الحل هنا
         width: double.maxFinite,
         child: Column(
           children: [
@@ -56,12 +57,12 @@ class PolicyDialog extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
               child: Container(
                 alignment: Alignment.center,
-                height: 50,
+                height: 50.h,
                 width: double.infinity,
                 child: Text(
                   "CLOSE",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context)
                         .colorScheme

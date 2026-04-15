@@ -20,11 +20,11 @@ showdialog(context) {
   return showDialog(
     context: context,
     builder: (context) {
-      return const AlertDialog(
+      return  AlertDialog(
         title: Text('Warning', style: TextStyle(color: Colors.red)),
         content: Text(
           'is there some problem with network app please wait few mintute and retry',
-          style: TextStyle(fontSize: 15, color: Colors.red),
+          style: TextStyle(fontSize: 15.sp, color: Colors.red),
         ),
       );
     },
@@ -130,22 +130,22 @@ class _LogInState extends State<LogIn> {
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0.r),
             child: Form(
               key: formstatesignin,
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Padding(padding: EdgeInsets.only(top: 20)),
+                    Padding(padding: EdgeInsets.only(top: 2.h)),
                     Container(
-                      margin: REdgeInsets.symmetric(vertical: 30),
+                      margin: REdgeInsets.symmetric(vertical: 30.h),
                       width: 70.w,
                       height: 70.h,
                       decoration: BoxDecoration(
                         color: Color.fromRGBO(244, 67, 54, 0.9),
-                        borderRadius: BorderRadius.circular(100),
+                        borderRadius: BorderRadius.circular(100.r),
                       ),
-                      child: Icon(Icons.person, size: 50, color: Colors.white),
+                      child: Icon(Icons.person, size: 50.sp, color: Colors.white),
                     ),
                     CustomTextFormField(
                       validation: validemail,
@@ -166,13 +166,13 @@ class _LogInState extends State<LogIn> {
                       lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
                     ),
                     ElevatedButton.icon(
-                      icon: const Icon(Icons.login),
+                      icon: Icon(Icons.login),
                       label: Text(lang.lang == "en" ? 'Sign In' : ' دخول '),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(15.r),
                         ),
                       ),
                       onPressed: () async {

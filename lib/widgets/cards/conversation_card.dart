@@ -1,6 +1,7 @@
 import 'package:flutter_maps/models/conversation_model.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ConversationCard extends StatelessWidget {
   final ConversationModel conversation;
@@ -29,7 +30,7 @@ class ConversationCard extends StatelessWidget {
             conversation.user?.name ?? "",
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
-              fontSize: 18,
+              fontSize: 18.sp,
             ),
           ),
           Text(
@@ -40,7 +41,7 @@ class ConversationCard extends StatelessWidget {
             ),
             style: TextStyle(
               color: Colors.white.withOpacity(0.7),
-              fontSize: 14,
+              fontSize: 14.sp,
             ),
           ),
         ],

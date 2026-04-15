@@ -9,7 +9,7 @@ class Helper {
         if (snapshot.hasData) {
           return Text(
             snapshot.data ?? '',
-            style: const TextStyle(color: Colors.red),
+            style: TextStyle(color: Colors.red),
           );
         }
         return const Text('');

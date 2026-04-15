@@ -42,6 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Circle? _circle;
   late BitmapDescriptor iconHalte;
   late BitmapDescriptor iconMe;
+  bool _locationPermissionGranted = false;
 
   double bottomPaddingOfMap = 0;
   String? placeAddress;
@@ -188,11 +189,13 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if (permissionGranted != PermissionStatus.granted) {
+      _locationPermissionGranted = false;
       _showLocationDialog();
       _setDefaultLocation();
       return;
     }
 
+    _locationPermissionGranted = true;
     var locationData = await _locationTracker.getLocation();
     if (locationData == null ||
         locationData.latitude == null ||
@@ -246,7 +249,36 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _saveLocationAddress() async {
     try {
+      final serviceEnabled = await _locationTracker.serviceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          setState(() {
+            placeAddress ??= "Cairo, Egypt";
+          });
+        }
+        return;
+      }
+
+      final permissionGranted = await _locationTracker.hasPermission();
+      if (permissionGranted != PermissionStatus.granted &&
+          permissionGranted != PermissionStatus.grantedLimited) {
+        if (mounted) {
+          setState(() {
+            placeAddress ??= "Cairo, Egypt";
+          });
+        }
+        return;
+      }
+
       final locationData = await _locationTracker.getLocation();
+      if (locationData.latitude == null || locationData.longitude == null) {
+        if (mounted) {
+          setState(() {
+            placeAddress ??= "Cairo, Egypt";
+          });
+        }
+        return;
+      }
 
       final url =
           "https://maps.googleapis.com/maps/api/geocode/json?latlng=${locationData.latitude},${locationData.longitude}&key=$_googleGeocodeApiKey";
@@ -272,7 +304,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          placeAddress ??= "Unknown location";
+          placeAddress ??= "Cairo, Egypt";
         });
       }
     }
@@ -286,7 +318,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     getPref();
     getCurrentLocation();
-    _saveLocationAddress();
 
     Future.wait([
       BitmapDescriptor.fromAssetImage(
@@ -326,7 +357,7 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Colors.redAccent,
           content: Text(
             messageShow,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
           ),
         ),
       );
@@ -369,7 +400,7 @@ class _MyHomePageState extends State<MyHomePage> {
       title: Text(
         lang.lang == "en" ? "OrderVite" : "أوردرفيت",
         style: TextStyle(
-          fontSize: 25,
+          fontSize: 25.sp,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -384,7 +415,7 @@ class _MyHomePageState extends State<MyHomePage> {
           : Stack(
               children: [
                 GoogleMap(
-                  padding: EdgeInsets.only(bottom: 300.h),
+                  padding: EdgeInsets.only(bottom: 3.h),
                   mapType: MapType.normal,
                   markers: _markers,
                   circles: _circle != null ? {_circle!} : {},
@@ -392,7 +423,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     target: _initialLocation!,
                     zoom: 16,
                   ),
-                  myLocationEnabled: true,
+                  myLocationEnabled: _locationPermissionGranted,
                   myLocationButtonEnabled: false,
                   onMapCreated: (GoogleMapController controller) {
                     _controller = controller;
@@ -413,14 +444,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           color: Colors.black,
                           blurRadius: 16.0.r,
                           spreadRadius: 0.5.r,
-                          offset: Offset(0.7, 0.7),
+                          offset: Offset(0.7.w, 0.7.h),
                         ),
                       ],
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 18,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 2.w,
+                        vertical: 1.h,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -429,32 +460,35 @@ class _MyHomePageState extends State<MyHomePage> {
                             lang.lang == "en"
                                 ? "Hi  ${username ?? ''}"
                                 : "مرحبًا   ${username ?? ''}",
-                            style: TextStyle(fontSize: 12, color: Colors.white),
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: Colors.white,
+                            ),
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 10.h),
                           Text(
                             lang.lang == "en"
                                 ? "Create a shipping order "
                                 : " قم بإنشاء امر الشحن ",
                             style: TextStyle(
-                              fontSize: 25,
+                              fontSize: 25.sp,
                               fontFamily: "Brand-bold",
                               color: Colors.white,
                             ),
                           ),
-                          SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.all(
-                                Radius.circular(18),
+                                Radius.circular(18.r),
                               ),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black54,
-                                  blurRadius: 6,
-                                  spreadRadius: 0.5,
-                                  offset: Offset(0.7, 0.7),
+                                  blurRadius: 6.r,
+                                  spreadRadius: 0.5.r,
+                                  offset: Offset(0.7.w, 0.7.h),
                                 ),
                               ],
                             ),
@@ -470,19 +504,23 @@ class _MyHomePageState extends State<MyHomePage> {
                                     ? "Search your destination  "
                                     : " ابحث عن وجهتك ",
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   color: Colors.red,
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(height: 10),
-                          Divider(height: 10.0, thickness: 1.0),
-                          SizedBox(height: 10),
+                          SizedBox(height: 10.h),
+                          Divider(height: 10.h, thickness: 1.w),
+                          SizedBox(height: 10.h),
                           Row(
                             children: [
-                              Icon(Icons.work, color: Colors.white, size: 30),
-                              SizedBox(width: 12),
+                              Icon(
+                                Icons.work,
+                                color: Colors.white,
+                                size: 30.sp,
+                              ),
+                              SizedBox(width: 12.w),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -492,16 +530,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                           ? "Your Address "
                                           : " عناوينك ",
                                       style: TextStyle(
-                                        fontSize: 17,
+                                        fontSize: 17.sp,
                                         color: Colors.white,
                                       ),
                                     ),
-                                    SizedBox(height: 4),
+                                    SizedBox(height: 4.h),
                                     placeAddress != null
                                         ? Text(
                                             placeAddress!,
                                             style: TextStyle(
-                                              fontSize: 15,
+                                              fontSize: 15.sp,
                                               color: Colors.white,
                                             ),
                                           )

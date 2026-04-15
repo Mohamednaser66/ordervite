@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_maps/lang.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Terms extends StatefulWidget {
   const Terms({Key? key}) : super(key: key);
@@ -70,8 +71,8 @@ class _TermsState extends State<Terms> {
         appBar: AppBar(
           title: Text(
             lang.lang == "en" ? 'Terms and policy ' : ' الشروط والأحكام ',
-            style: const TextStyle(
-              fontSize: 25,
+            style: TextStyle(
+              fontSize: 25.sp,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -86,10 +87,10 @@ class _TermsState extends State<Terms> {
         ),
 
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           child: Column(
             children: [
-              const SizedBox(height: 40),
+              SizedBox(height: 40.h),
 
               FutureBuilder(
                 future: rootBundle.loadString(
@@ -106,7 +107,7 @@ class _TermsState extends State<Terms> {
                 },
               ),
 
-              const SizedBox(height: 30),
+              SizedBox(height: 30.h),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -116,7 +117,7 @@ class _TermsState extends State<Terms> {
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.green,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
                       ),
                       onPressed: () async {
@@ -127,8 +128,8 @@ class _TermsState extends State<Terms> {
                       },
                       child: Text(
                         lang.lang == "en" ? "Make an Order" : " طلب شحن ",
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: 12.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -136,21 +137,21 @@ class _TermsState extends State<Terms> {
                     ),
                   ),
 
-                  const SizedBox(width: 20),
+                  SizedBox(width: 20.w),
 
                   Expanded(
                     child: ElevatedButton(
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.red,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
                       ),
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text(
                         lang.lang == "en" ? "Cancel" : "إلغاء",
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: 12.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),

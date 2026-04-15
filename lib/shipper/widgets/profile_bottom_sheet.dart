@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/lang.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileBottomSheet extends StatelessWidget {
   const ProfileBottomSheet({super.key, required this.onCameraClick, required this.onGalleryClick, required this.title});
@@ -11,21 +12,21 @@ final String title;
     Lang lang=Lang.of(context);
 
     return Container(
-      height: 100.0,
+      height: 100.h,
       width: MediaQuery
           .of(context)
           .size
           .width,
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      margin: EdgeInsets.symmetric(horizontal: 2.h.w, vertical: 2.h),
       child: Column(
         children: <Widget>[
           Expanded(
             child: Text(
             title,
-              style: TextStyle(fontSize: 20.0),
+              style: TextStyle(fontSize: 20.sp),
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 20.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -39,8 +40,8 @@ final String title;
                 label: Text(lang.lang == "en" ? "Gallery" : "معرض الصور "),
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  textStyle: TextStyle(fontSize: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 1.w, vertical: 8.h),
+                  textStyle: TextStyle(fontSize: 16.sp),
                 ),
                 onPressed:onGalleryClick,
               ),

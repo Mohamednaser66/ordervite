@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../size_Config.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PrimaryButton extends StatelessWidget {
   final Widget? child;
@@ -25,7 +26,7 @@ class PrimaryButton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: Colors.grey,
-          borderRadius: BorderRadius.circular(25),
+          borderRadius: BorderRadius.circular(25.r),
         ),
         child: child,
       ),

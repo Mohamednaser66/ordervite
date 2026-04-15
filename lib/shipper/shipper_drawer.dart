@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // ignore: must_be_immutable
 class ShipperDrawer extends StatefulWidget {
@@ -31,8 +32,8 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
         decoration: BoxDecoration(
           color: Color.fromRGBO(7, 15, 33, 0.9),
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(18.0),
-            topRight: Radius.circular(18.0),
+            topLeft: Radius.circular(18.0.r),
+            topRight: Radius.circular(18.0.r),
           ),
         ),
 
@@ -40,36 +41,32 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(color: Colors.blue),
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(10.r),
 
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
 
                 children: <Widget>[
-                  Container(
-                    width: 70,
-                    height: 100,
-
-                    child: Center(
-                      child: CircleAvatar(
-                        backgroundImage:
-                            (widget.logo_src == null ||
-                                widget.logo_src == "null")
-                            ? const AssetImage("assets/app_face.png")
-                            : NetworkImage(
-                                    'https://www.ordervite.com/${widget.logo_src}',
-                                  )
-                                  as ImageProvider,
-                      ),
+                  Center(
+                    child: CircleAvatar(
+                      backgroundImage:
+                          (widget.logo_src == null ||
+                              widget.logo_src == "null")
+                          ? const AssetImage("assets/app_face.png")
+                          : NetworkImage(
+                                  'https://www.ordervite.com/${widget.logo_src}',
+                                )
+                                as ImageProvider,
                     ),
                   ),
+                  SizedBox(height: 20.h,),
 
                   widget.isSignIn
                       ? Text(
                           widget.username,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -80,7 +77,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
                       ? Text(
                           widget.email,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -96,7 +93,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               title: Text(
                 widget.lang.lang == "en" ? 'Home ' : 'الرئيسية ',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -112,7 +109,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               title: Text(
                 widget.lang.lang == "en" ? 'Orders ' : ' الطلبات  ',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -128,7 +125,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               title: Text(
                 widget.lang.lang == "en" ? 'Profile ' : ' الملف الشخصي ',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -145,7 +142,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               title: Text(
                 widget.lang.lang == "en" ? 'Log out ' : ' تسجيل خروج ',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -167,7 +164,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               title: Text(
                 widget.lang.lang == "en" ? ' عربي' : ' English ',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),

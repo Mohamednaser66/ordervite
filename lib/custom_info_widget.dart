@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class _InfoWidgetRouteLayout<T> extends SingleChildLayoutDelegate {
   final Rect mapsWidgetSize;
@@ -123,7 +124,7 @@ class _InfoWidgetPopUpState extends State<InfoWidgetPopUp> {
           clipper: _InfoWidgetClipper(),
           child: Container(
             color: Colors.white,
-            padding: EdgeInsets.only(bottom: 10),
+            padding: EdgeInsets.only(bottom: 1.h),
             child: Center(child: widget.infoWidgetRoute.child),
           ),
         ),

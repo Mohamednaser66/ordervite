@@ -11,6 +11,7 @@ import 'package:flutter_maps/shipper/widgets/profile_bottom_sheet.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SHProfilePage extends StatefulWidget {
   SHProfilePage({Key? key}) : super(key: key);
@@ -179,7 +180,7 @@ class _CreatProfileState extends State<SHProfilePage> {
           title: Text(
             username ?? '',
             style: TextStyle(
-              fontSize: 25,
+              fontSize: 25.sp,
               fontWeight: FontWeight.bold,
               fontStyle: FontStyle.normal,
               color: Colors.white,
@@ -190,7 +191,7 @@ class _CreatProfileState extends State<SHProfilePage> {
         body: Form(
           key: _globalkey,
           child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+            padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 3.h),
             children: <Widget>[
               this.verified.toString() == "0"
                   ? Row(
@@ -203,7 +204,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                             style: TextStyle(
                               color: Colors.green,
                               fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              fontSize: 20.sp,
                             ),
                           ),
                         ),
@@ -217,7 +218,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                             style: TextStyle(
                               color: Colors.green,
                               fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              fontSize: 20.sp,
                             ),
                           ),
                         ),
@@ -235,7 +236,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                             style: TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              fontSize: 20.sp,
                             ),
                           ),
                         ),
@@ -249,13 +250,13 @@ class _CreatProfileState extends State<SHProfilePage> {
                             style: TextStyle(
                               color: Colors.green,
                               fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              fontSize: 20.sp,
                             ),
                           ),
                         ),
                       ],
                     ),
-              SizedBox(height: 10),
+              SizedBox(height: 10.h),
 
               Center(
                 child: Stack(
@@ -267,8 +268,8 @@ class _CreatProfileState extends State<SHProfilePage> {
                           : NetworkImage('https://www.ordervite.com/$logo_src'),
                     ),
                     Positioned(
-                      bottom: 20.0,
-                      right: 20.0,
+                      bottom: 20.0.h,
+                      right: 20.0.w,
                       child: InkWell(
                         onTap: () {
                           showModalBottomSheet(
@@ -287,14 +288,14 @@ class _CreatProfileState extends State<SHProfilePage> {
                         child: Icon(
                           Icons.camera_alt,
                           color: Colors.teal,
-                          size: 28.0,
+                          size: 28.sp,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 validation: AppValidators.validateFullName,
                 controller: _username,
@@ -302,7 +303,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                 hintText: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
                 lable: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 validation: AppValidators.validateEmail,
                 controller: _email,
@@ -310,7 +311,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                 hintText: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',
                 lable: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Text(
                 lang.lang == "en"
                     ? "If you do not change password please password must be empty "
@@ -318,10 +319,10 @@ class _CreatProfileState extends State<SHProfilePage> {
                 style: TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.bold,
-                  fontSize: 12,
+                  fontSize: 12.sp,
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 validation: AppValidators.validateChangePassword,
                 controller: _password,
@@ -332,7 +333,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                 lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
                 secure: true,
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 validation: (val) =>
                     AppValidators.validateConfirmChangePassword(val, _password.text),
@@ -347,7 +348,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                     ? 'Confirm Password'
                     : 'تاكيد كلمة السر',
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 validation: AppValidators.validatePhoneNumber,
                 controller: _mobile1,
@@ -357,7 +358,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                     : 'ادخل رقم التليفون 1',
                 lable: lang.lang == 'en' ? ' Mobile 1' : ' رقم التليفون 1',
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.h),
               CustomTextFormField(
                 validation: AppValidators.validatePhoneNumber,
                 controller: _mobile2,
@@ -367,7 +368,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                     : 'ادخل رقم التليفون 2',
                 lable: lang.lang == 'en' ? ' Mobile 2' : ' رقم التليفون 2',
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Row(
                 children: <Widget>[
                   Expanded(
@@ -378,7 +379,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                       style: TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: 20.sp,
                       ),
                     ),
                   ),
@@ -386,11 +387,11 @@ class _CreatProfileState extends State<SHProfilePage> {
                     child: Stack(
                       children: <Widget>[
                         Container(
-                          height: 100.0,
-                          width: 100.0,
+                          height: 100.h,
+                          width: 100.w,
 
                           decoration: new BoxDecoration(
-                            borderRadius: new BorderRadius.circular(15.0),
+                            borderRadius: new BorderRadius.circular(15.0.r),
 
                             image: DecorationImage(
                               image: id_image_src == null
@@ -404,8 +405,8 @@ class _CreatProfileState extends State<SHProfilePage> {
                         ),
 
                         Positioned(
-                          bottom: 20.0,
-                          right: 20.0,
+                          bottom: 20.0.h,
+                          right: 20.0.w,
                           child: InkWell(
                             onTap: () {
                               showModalBottomSheet(
@@ -424,7 +425,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                             child: Icon(
                               Icons.camera_alt,
                               color: Colors.teal,
-                              size: 28.0,
+                              size: 28.sp,
                             ),
                           ),
                         ),
@@ -434,7 +435,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                 ],
               ),
 
-              SizedBox(height: 20),
+              SizedBox(height: 20.h),
               InkWell(
                 onTap: () async {
                   if(!_globalkey.currentState!.validate())return;
@@ -514,7 +515,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                           lang.lang == "en"
                               ? 'Please check your network  '
                               : '  يرجي التحقق من اتصال الشبكة الخاص بك   ',
-                          style: TextStyle(fontSize: 15, color: Colors.red),
+                          style: TextStyle(fontSize: 15.sp, color: Colors.red),
                         ),
                       ),
                     );
@@ -522,11 +523,11 @@ class _CreatProfileState extends State<SHProfilePage> {
                 },
                 child: Center(
                   child: Container(
-                    width: 200,
-                    height: 50,
+                    width: 200.w,
+                    height: 50.h,
                     decoration: BoxDecoration(
                       color: Colors.teal,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Center(
                       child: circular
@@ -535,7 +536,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                               lang.lang == "en" ? "Submit" : "حفظ",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 18,
+                                fontSize: 18.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
