@@ -20,8 +20,11 @@ import AdSupport
     super.applicationDidBecomeActive(application)
 
     if #available(iOS 14, *) {
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-        ATTrackingManager.requestTrackingAuthorization { status in
+      if ATTrackingManager.trackingAuthorizationStatus == .notDetermined {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+          ATTrackingManager.requestTrackingAuthorization { status in
+            // optional: handle status
+          }
         }
       }
     }

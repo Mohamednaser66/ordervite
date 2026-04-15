@@ -16,7 +16,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> initNotifications() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
     badge: true,
@@ -26,7 +25,6 @@ Future<void> initNotifications() async {
     criticalAlert: false,
     provisional: false,
   );
-
   print('Notification permission granted: ${settings.authorizationStatus}');
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Received a message in foreground: ${message.data}');
@@ -36,14 +34,12 @@ Future<void> initNotifications() async {
     }
   });
 }
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -52,13 +48,11 @@ void main() async {
   if (trackingStatus == TrackingStatus.notDetermined) {
     await AppTrackingTransparency.requestTrackingAuthorization();
   }
-
   await initNotifications();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(const MyApp());
 }
-
 class PointObject {
   final Widget? child;
   final LatLng? location;

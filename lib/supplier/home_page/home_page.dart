@@ -194,10 +194,16 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     var locationData = await _locationTracker.getLocation();
+    if (locationData == null ||
+        locationData.latitude == null ||
+        locationData.longitude == null) {
+      _setDefaultLocation();
+      return;
+    }
 
     LatLng currentLatLng = LatLng(
-      locationData.latitude ?? 0,
-      locationData.longitude ?? 0,
+      locationData.latitude!,
+      locationData.longitude!,
     );
 
     if (mounted) {
@@ -233,7 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (mounted) {
       setState(() {
         _initialLocation = LatLng(30.0444, 31.2357);
-        placeAddress = "Cairo, Egypt"; // 🔥 مهم
+        placeAddress = "Cairo, Egypt";
       });
     }
   }
@@ -295,7 +301,6 @@ class _MyHomePageState extends State<MyHomePage> {
       iconHalte = icons[0];
       iconMe = icons[1];
 
-      // 🔥 هنا فقط نبدأ تحميل الشippers
       loadShipper();
     });
   }

@@ -278,12 +278,9 @@ class _SHHomePageState extends State<SHHomePage> {
     }
 
     final location = await _getCurrentLocation();
-    if (location == null) return;
-
-    final currentLocation = LatLng(
-      location.latitude ?? 0,
-      location.longitude ?? 0,
-    );
+    final currentLocation = location != null
+        ? LatLng(location.latitude ?? 0, location.longitude ?? 0)
+        : const LatLng(30.0444, 31.2357);
 
     if (!mounted) return;
     setState(() {
@@ -298,7 +295,9 @@ class _SHHomePageState extends State<SHHomePage> {
       );
     });
 
-    await _updateLocationOnServer(location);
+    if (location != null) {
+      await _updateLocationOnServer(location);
+    }
   }
 
   void handleMessage(RemoteMessage message) {
