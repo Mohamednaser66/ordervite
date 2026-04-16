@@ -450,8 +450,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                        horizontal: 2.w,
-                        vertical: 1.h,
+                        horizontal: 10.w,
+                        vertical: 10.h,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

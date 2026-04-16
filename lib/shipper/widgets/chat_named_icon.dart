@@ -54,7 +54,10 @@ class ChatNamedIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        if (!permission) return;
+        if (!permission) {
+          print("permission false ❌");
+          return;
+        };
 
         SharedPreferences preferences = await SharedPreferences.getInstance();
 

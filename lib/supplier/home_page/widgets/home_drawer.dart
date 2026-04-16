@@ -36,44 +36,47 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
             topRight: Radius.circular(18.0.r),
           ),
         ),
-        child: ListView(
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Center(
-                    child: CircleAvatar(
-                      backgroundImage: widget.logo_src == null
-                          ? AssetImage("assets/app_face.png")
-                          : NetworkImage(
-                                  'https://www.ordervite.com/${widget.logo_src}',
-                                )
-                                as ImageProvider,
-                    ),
-                  ),
-                  SizedBox(height: 20.h,),
-                  if (widget.isSignIn)
-                    Text(
-                      widget.username,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+        child: Column(
+          children: [
+            SizedBox(
+            height:   180.h,
+              child: DrawerHeader(
+                decoration: BoxDecoration(color: Colors.blue),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: CircleAvatar(
+                        backgroundImage: widget.logo_src == null
+                            ? AssetImage("assets/app_face.png")
+                            : NetworkImage(
+                                    'https://www.ordervite.com/${widget.logo_src}',
+                                  )
+                                  as ImageProvider,
                       ),
                     ),
-                  if (widget.isSignIn)
-                    Text(
-                      widget.email,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    SizedBox(height: 16,),
+                    if (widget.isSignIn)
+                      Text(
+                        widget.username,
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                ],
+                    if (widget.isSignIn)
+                      Text(
+                        widget.email,
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
             ListTile(
@@ -149,23 +152,6 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
                 });
               },
             ),
-            // ListTile(
-            //   leading: Icon(
-            //     Icons.production_quantity_limits_outlined,
-            //     color: Colors.blue,
-            //   ),
-            //   title: Text(
-            //     widget.lang.lang == "en" ? ' Products' : ' المنتجات ',
-            //     style: TextStyle(
-            //       fontSize: 15.sp,
-            //       fontWeight: FontWeight.bold,
-            //       color: Colors.white,
-            //     ),
-            //   ),
-            //   onTap: () {
-            //     Navigator.of(context).pushNamed('/productsScreen');
-            //   },
-            // ),
           ],
         ),
       ),

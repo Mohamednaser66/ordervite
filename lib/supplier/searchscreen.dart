@@ -335,6 +335,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             child: Padding(
                               padding: EdgeInsets.all(3.0.r),
                               child: TextField(
+                                cursorColor: Colors.white,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -385,6 +386,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             child: Padding(
                               padding: EdgeInsets.all(3.0.r),
                               child: TextField(
+                                cursorColor: Colors.white,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,

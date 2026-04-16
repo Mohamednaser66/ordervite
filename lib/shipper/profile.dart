@@ -260,6 +260,7 @@ class _CreatProfileState extends State<SHProfilePage> {
 
               Center(
                 child: Stack(
+                  alignment: Alignment.bottomCenter,
                   children: <Widget>[
                     CircleAvatar(
                       radius: 80.0,
@@ -268,8 +269,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                           : NetworkImage('https://www.ordervite.com/$logo_src'),
                     ),
                     Positioned(
-                      bottom: 20.0.h,
-                      right: 20.0.w,
+                      bottom: 10.0.h,
                       child: InkWell(
                         onTap: () {
                           showModalBottomSheet(
@@ -390,8 +390,8 @@ class _CreatProfileState extends State<SHProfilePage> {
                           height: 100.h,
                           width: 100.w,
 
-                          decoration: new BoxDecoration(
-                            borderRadius: new BorderRadius.circular(15.0.r),
+                          decoration:  BoxDecoration(
+                            borderRadius:  BorderRadius.circular(15.0.r),
 
                             image: DecorationImage(
                               image: id_image_src == null

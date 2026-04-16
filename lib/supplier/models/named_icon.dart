@@ -86,7 +86,6 @@ class NamedIcon extends StatelessWidget {
       },
       child: Container(
         width: 72.w,
-        padding: EdgeInsets.symmetric(horizontal: 8.w),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -97,7 +96,7 @@ class NamedIcon extends StatelessWidget {
                 Text(
                   text,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 12.sp),
+                  style: TextStyle(fontSize: 8.sp),
                 ),
               ],
             ),

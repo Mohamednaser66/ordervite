@@ -39,51 +39,54 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
 
         child: ListView(
           children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              padding: EdgeInsets.all(10.r),
+            SizedBox(
+              height: 130.h,
+              child: DrawerHeader(
+                decoration: BoxDecoration(color: Colors.blue),
+                padding: EdgeInsets.all(10.r),
 
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
 
-                children: <Widget>[
-                  Center(
-                    child: CircleAvatar(
-                      backgroundImage:
-                          (widget.logo_src == null ||
-                              widget.logo_src == "null")
-                          ? const AssetImage("assets/app_face.png")
-                          : NetworkImage(
-                                  'https://www.ordervite.com/${widget.logo_src}',
-                                )
-                                as ImageProvider,
+                  children: <Widget>[
+                    Center(
+                      child: CircleAvatar(
+                        backgroundImage:
+                            (widget.logo_src == null ||
+                                widget.logo_src == "null")
+                            ? const AssetImage("assets/app_face.png")
+                            : NetworkImage(
+                                    'https://www.ordervite.com/${widget.logo_src}',
+                                  )
+                                  as ImageProvider,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 20.h,),
+                    SizedBox(height: 10.h,),
 
-                  widget.isSignIn
-                      ? Text(
-                          widget.username,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(""),
+                    widget.isSignIn
+                        ? Text(
+                            widget.username,
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(""),
 
-                  widget.isSignIn
-                      ? Text(
-                          widget.email,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(""),
-                ],
+                    widget.isSignIn
+                        ? Text(
+                            widget.email,
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(""),
+                  ],
+                ),
               ),
             ),
 

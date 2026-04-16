@@ -547,7 +547,6 @@ class _OrderState extends State<OrderPage> {
                 fontSize: 12.sp,
               ),
             ),
-            SizedBox(height: 2.h),
             Text(
               (index == 0 ? ' 1-5 ' : (index == 1 ? ' 5-10 ' : ' 10+ ')) +
                   (lang.lang == "en" ? 'KG' : 'كجم'),
@@ -816,7 +815,7 @@ class _OrderState extends State<OrderPage> {
                 disLong: this.disLong.toString(),
                 sorLat: this.sorLat.toString(),
                 sorlong: this.sorlong.toString(),
-                isConfirm: true,
+                isConfirm: this.isConfirm,
                 order_cost: this.order_cost.toString(),
                 order_price: this.order_price.toString(),
                 order_pricecheck: this.order_pricecheck.toString(),
@@ -1079,9 +1078,7 @@ class _OrderState extends State<OrderPage> {
                                             ar: 'الرجاء الانتظار للرد على طلبك الذي تم إرساله...',
                                           );
                                         } else {
-                                          double distance = double.parse(
-                                            this.distance ?? '',
-                                          );
+                                          double distance = double.tryParse(this.distance ?? '') ?? 0.0;
                                           double cost = 0.0;
 
                                           late double PPKS,
@@ -1401,7 +1398,7 @@ class _OrderState extends State<OrderPage> {
                               ),
                             ),
                             child: Padding(
-                              padding: REdgeInsets.all(12.r),
+                              padding: REdgeInsets.all(8.r),
 
                               child: SuOrderStatesWidget(
                                 lang: lang,

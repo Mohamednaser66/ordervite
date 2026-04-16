@@ -8,6 +8,7 @@ import 'package:flutter_maps/core/app_validators.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/shipper/widgets/profile_bottom_sheet.dart';
+import 'package:flutter_maps/supplier/home_page/widgets/home_drawer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -180,6 +181,7 @@ class _CreatProfileState extends State<SUProfilePage> {
     return Directionality(
       textDirection: lang.lang == "en" ? TextDirection.ltr : TextDirection.rtl,
       child: Scaffold(
+        drawer: SupplierDrawer(username: username??'', email: email??'', lang: lang, isSignIn: isSignIn),
         key: _scaffoldkey,
         appBar: AppBar(title: Text(username ?? "")),
         body: Form(

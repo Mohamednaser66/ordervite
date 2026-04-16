@@ -78,9 +78,9 @@ class _ShOrderState extends State<ShOrder> {
   int order_messges_count = 0;
   GlobalKey<FormState> formstatesorder = new GlobalKey<FormState>();
 
-  late TextEditingController size;
+   TextEditingController? size;
 
-  late TextEditingController price;
+   TextEditingController? price;
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   late BuildContext mainContext;
@@ -326,14 +326,19 @@ class _ShOrderState extends State<ShOrder> {
   @override
   void dispose() {
     timer?.cancel();
-    size.dispose();
-    price.dispose();
+    size?.dispose();
+    price?.dispose();
     _orderController.close();
     super.dispose();
   }
-
-  void initState() {
+@override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
     getPref();
+
+}
+  void initState() {
 
     loadcurrentOrder();
     listenToLocationChanges();
@@ -349,7 +354,7 @@ class _ShOrderState extends State<ShOrder> {
         Uri.parse(Url),
         body: {"api_token": token.toString()},
 
-        headers: {'Authorization': 'Bearer  ' + this.token!},
+        headers: {'Authorization': 'Bearer ${this.token}',},
       );
 
       if (this.order_id != null) {
@@ -392,7 +397,7 @@ class _ShOrderState extends State<ShOrder> {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': 'Bearer  ' + this.token!,
+            'Authorization': 'Bearer ${this.token}',
           },
         );
 

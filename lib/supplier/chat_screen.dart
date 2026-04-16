@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/models/message_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_maps/classes.dart';
@@ -164,7 +165,7 @@ class _SuChatScreenState extends State<SuChatScreen> {
                 chat.sorLat.toString(),
                 chat.disLong.toString(),
                 chat.sorlong.toString(),
-                true,
+                chat.isConfirm,
                 chat.conservistion_id.toString(),
                 chat.order_cost.toString(),
                 chat.order_price.toString(),
@@ -173,7 +174,7 @@ class _SuChatScreenState extends State<SuChatScreen> {
                 chat.order_shippier_id.toString(),
               );
 
-              Navigator.pushNamed(context, "orderscreen", arguments: orderDist);
+              Navigator.pushNamed(context, RoutesManager.orderPage, arguments: orderDist);
             },
             icon: Icon(Icons.arrow_back_ios),
           ),

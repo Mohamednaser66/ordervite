@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemeManager {
   static final ThemeData light = ThemeData(
+    iconTheme: IconThemeData(color: Colors.blue),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,

@@ -186,7 +186,7 @@ class _ShOrderStatesWidgetState extends State<ShOrderStatesWidget> {
             ),
           ],
         ),
-
+        SizedBox(height: 6.h,),
         Row(
           children: [
             Expanded(

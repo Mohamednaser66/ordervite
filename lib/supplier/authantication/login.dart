@@ -166,6 +166,7 @@ class _LogInState extends State<LogIn> {
                       lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
                     ),
                     ElevatedButton.icon(
+
                       icon: Icon(Icons.login),
                       label: Text(lang.lang == "en" ? 'Sign In' : ' دخول '),
                       style: ElevatedButton.styleFrom(
