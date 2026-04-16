@@ -266,7 +266,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                       radius: 80.0,
                       backgroundImage: logo_src == null
                           ? AssetImage("assets/app_face.png")
-                          : NetworkImage('https://www.ordervite.com/$logo_src'),
+                          : AssetImage("assets/app_face.png"),
                     ),
                     Positioned(
                       bottom: 10.0.h,
@@ -396,9 +396,8 @@ class _CreatProfileState extends State<SHProfilePage> {
                             image: DecorationImage(
                               image: id_image_src == null
                                   ? AssetImage("assets/app_face.png")
-                                  : NetworkImage(
-                                      'https://www.ordervite.com/$id_image_src',
-                                    ),
+                                  : AssetImage("assets/app_face.png"),
+
                               fit: BoxFit.fill,
                             ),
                           ),

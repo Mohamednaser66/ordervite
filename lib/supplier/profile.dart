@@ -199,24 +199,25 @@ class _CreatProfileState extends State<SUProfilePage> {
                           ? FileImage(File(_imageFile!.path))
                           : (logo_src == null
                           ? const AssetImage("assets/app_face.png")
-                      as ImageProvider
-                          : NetworkImage(
-                        'https://www.ordervite.com/$logo_src',
-                      )),
+                      as ImageProvider :  AssetImage("assets/app_face.png")
+                      ),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                            context: context, builder:(_)=> ProfileBottomSheet(
-                          onCameraClick: () => takePhoto(ImageSource.camera),
-                          onGalleryClick: () => takePhoto(ImageSource.gallery),
-                          title: lang.lang == 'en'
-                              ? 'Choose Profile Photo'
-                              : 'اختار الصوره الشخصيه',
-                        )
-                        );
-                      },
-                      icon: Icon(Icons.camera_alt, color: Colors.blue,),
+                    Padding(
+                      padding:  REdgeInsets.all(8.0),
+                      child: IconButton(
+                        onPressed: () {
+                          showModalBottomSheet(
+                              context: context, builder:(_)=> ProfileBottomSheet(
+                            onCameraClick: () => takePhoto(ImageSource.camera),
+                            onGalleryClick: () => takePhoto(ImageSource.gallery),
+                            title: lang.lang == 'en'
+                                ? 'Choose Profile Photo'
+                                : 'اختار الصوره الشخصيه',
+                          )
+                          );
+                        },
+                        icon: Icon(Icons.camera_alt, color: Colors.blue,),
+                      ),
                     ),
                   ],
                 ),
