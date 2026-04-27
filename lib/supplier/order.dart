@@ -338,7 +338,7 @@ class _OrderPageState extends State<OrderPage> {
                 shipperApiToken: _shipperApiToken ?? '',
                 lang: lang,
               );
-              _navigateToRating();
+             Navigator.pushReplacementNamed(context, RoutesManager.suHome);
             }
           ),
           TextButton(

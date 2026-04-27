@@ -92,7 +92,7 @@ class _LandingPageState extends State<LandingPage> {
     final orderState = data['order_state']?.toString();
     final orderCancel = data['order_cancel'];
     if (orderState != null &&
-        orderState != 'order complete' &&
+        orderState != 'order delivered' &&
         orderCancel == null) {
       final orderDist = OrderDist(
         data['dist_latitude']?.toString() ?? '',
