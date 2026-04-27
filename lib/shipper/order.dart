@@ -1,25 +1,23 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/config/app_config.dart';
 import 'package:flutter_maps/lang.dart';
-import 'package:flutter_maps/shipper/models/steps.dart';
+import 'package:flutter_maps/shipper/order/presentation/shipper_order_cubit.dart';
 import 'package:flutter_maps/shipper/widgets/chat_named_icon.dart';
-import 'package:flutter_maps/shipper/widgets/sh_order_states_widget.dart';
+import 'package:flutter_maps/shipper/widgets/sh_order_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
-import 'package:rate_my_app/rate_my_app.dart';
-
-String GoogleApiKEY = "AIzaSyDl8LFLQn24CbaZyQ0F4wnzoF9NY3_gMWY";
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ShOrder extends StatefulWidget {
-  ShOrder({Key? key}) : super(key: key);
+  const ShOrder({Key? key}) : super(key: key);
 
   final String title = "OrderVite";
 
@@ -27,176 +25,159 @@ class ShOrder extends StatefulWidget {
   _ShOrderState createState() => _ShOrderState();
 }
 
-enum BestSize { small, medium, large }
-
-enum BestPrice { transfer, cash }
-
 class _ShOrderState extends State<ShOrder> {
-  CameraPosition _initialCamera = CameraPosition(
-    target: LatLng(30.059445, 31.1933067),
-    zoom: 14.0000,
-  );
-
-  Completer<GoogleMapController> _mapController = Completer();
-  final Set<Marker> _markers = Set();
-
-  LatLng sourceLatLong = LatLng(30.059445, 31.1933067);
-  LatLng destinationLatLong = LatLng(30.060671, 31.204131);
+  late CameraPosition _initialCamera;
+  final Completer<GoogleMapController> _mapController = Completer();
+  final Set<Marker> _markers = {};
   final Set<Polyline> _polyline = {};
-  final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
-  String? username;
-  String? email;
-  String? id;
-  String? token;
-  String? disLat;
-  String? sorLat;
-  String? disLong;
-  String? sorlong;
-  String? order_id;
-  LatLng? lastUpdatedLocation;
-  String? order_cost;
-  String? order_size;
-  String? order_pricecheck;
-  String? order_supplier_id;
-  String? order_price;
-  String? order_state;
+  LatLng _sourceLatLong = const LatLng(30.059445, 31.1933067);
+  LatLng _destinationLatLong = const LatLng(30.060671, 31.204131);
+  LatLng? _lastUpdatedLocation;
 
-   Timer? timer;
+  String? _username;
+  String? _email;
+  String? _userId;
+  String? _token;
+  String? _apiToken;
+  String? _orderId;
+  String? _orderCost;
+  String? _orderPriceCheck;
+  String? _orderSupplierId;
+  String? _orderPrice;
+  String? _orderState;
+  String? _disLat;
+  String? _disLong;
+  String? _sorLat;
+  String? _sorLong;
 
-  String? statename;
-  String? api_token;
-  StreamController _orderController = StreamController();
-  bool isConfirm = false;
+  bool _isConfirm = false;
+  bool _isReceived = false;
+  bool _isDelivered = false;
 
-  bool isReceived = false;
-  bool isDelviered = false;
-  bool isComplete = false;
-  bool isCnacel = false;
+  int _orderMessagesCount = 0;
 
-  bool isSignIn = false;
 
-  int order_messges_count = 0;
-  GlobalKey<FormState> formstatesorder = new GlobalKey<FormState>();
-
-   TextEditingController? size;
-
-   TextEditingController? price;
-
+  late final ShipperOrderCubit _cubit;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  late BuildContext mainContext;
 
-  late Map<String, dynamic> formData;
-
-  getPref() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    OrderData orderData =
-        ModalRoute.of(context)?.settings.arguments as OrderData;
-
-    username = preferences.getString("username");
-    email = preferences.getString("email");
-
-    if (username != null && email != null) {
-      setState(() {
-        username = preferences.getString("username");
-        email = preferences.getString("email");
-        token = preferences.getString("token");
-        id = preferences.getString("id");
-        isSignIn = true;
-      });
-    }
-
-    print(orderData.disLat);
-    print(orderData.disLong);
-    print(orderData.sorLat);
-    print(orderData.sorlong);
-
-    setState(() {
-      disLat = orderData.disLat.toString();
-      disLong = orderData.disLong.toString();
-      sorLat = orderData.sorLat.toString();
-      sorlong = orderData.sorlong.toString();
-      order_id = orderData.order_id.toString();
-      isConfirm = orderData.isConfirm;
-      order_cost = orderData.order_cost;
-      order_price = orderData.order_price;
-      order_pricecheck = orderData.order_pricecheck;
-      order_supplier_id = orderData.order_supplier_id;
-      order_state = orderData.order_state;
-
-      _initialCamera = CameraPosition(
-        target: LatLng(double.parse(sorLat!), double.parse(sorlong!)),
-        zoom: 14.0000,
-      );
-
-      sourceLatLong = LatLng(double.parse(sorLat!), double.parse(sorlong!));
-      destinationLatLong = LatLng(
-        double.parse(disLat!),
-        double.parse(disLong!),
-      );
-    });
-
-    _markers.add(
-      Marker(
-        markerId: MarkerId("1"),
-        position: sourceLatLong,
-        infoWindow: InfoWindow(title: "source"),
-        icon: BitmapDescriptor.defaultMarker,
-        visible: true,
-      ),
-    );
-
-    _markers.add(
-      Marker(
-        markerId: MarkerId("2"),
-        position: destinationLatLong,
-        infoWindow: InfoWindow(title: "destination"),
-        icon: BitmapDescriptor.defaultMarker,
-        visible: true,
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _cubit = ShipperOrderCubit();
+    _listenToLocationChanges();
+    _initializeFcm();
   }
 
-  void listenToLocationChanges() async {
-    Location location = Location();
-    bool _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) return;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadPreferences();
+  }
+
+  Future<void> _loadPreferences() async {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is! OrderData) return;
+    final orderData = args;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    _username = prefs.getString("username");
+    _email = prefs.getString("email");
+    _token = prefs.getString("token");
+    _userId = prefs.getString("id");
+
+    setState(() {
+      _disLat = orderData.disLat;
+      _disLong = orderData.disLong;
+      _sorLat = orderData.sorLat;
+      _sorLong = orderData.sorlong;
+      _orderId = orderData.order_id;
+      _isConfirm = orderData.isConfirm;
+      _orderCost = orderData.order_cost;
+      _orderPrice = orderData.order_price;
+      _orderPriceCheck = orderData.order_pricecheck;
+      _orderSupplierId = orderData.order_supplier_id;
+      _orderState = orderData.order_state;
+
+      _sourceLatLong = LatLng(double.parse(_sorLat!), double.parse(_sorLong!));
+      _destinationLatLong = LatLng(
+        double.parse(_disLat!),
+        double.parse(_disLong!),
+      );
+      _initialCamera = CameraPosition(target: _sourceLatLong, zoom: 14.0);
+    });
+
+    _markers.addAll([
+      Marker(
+        markerId: const MarkerId("1"),
+        position: _sourceLatLong,
+        infoWindow: const InfoWindow(title: "source"),
+        icon: BitmapDescriptor.defaultMarker,
+      ),
+      Marker(
+        markerId: const MarkerId("2"),
+        position: _destinationLatLong,
+        infoWindow: const InfoWindow(title: "destination"),
+        icon: BitmapDescriptor.defaultMarker,
+      ),
+    ]);
+
+    _cubit.fetchRoute(
+      _sourceLatLong,
+      _destinationLatLong,
+      AppConfig.googleMapsApiKey,
+    );
+
+    if (_isConfirm && _userId != null && _token != null) {
+      _cubit.listenToCurrentOrder(_userId!, _token!);
+      _cubit.getUnreadMessageCount(_orderId ?? '', _token!);
+    }
+  }
+
+  void _listenToLocationChanges() async {
+    final location = Location();
+
+    bool serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) return;
     }
 
-    PermissionStatus _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) return;
+    PermissionStatus permission = await location.hasPermission();
+    if (permission == PermissionStatus.denied) {
+      permission = await location.requestPermission();
+      if (permission != PermissionStatus.granted) return;
     }
 
-    location.onLocationChanged.listen((LocationData currentLocation) {});
     location.onLocationChanged.listen((LocationData currentLocation) {
-      LatLng currentLatLng = LatLng(
+      if (currentLocation.latitude == null ||
+          currentLocation.longitude == null) {
+        return;
+      }
+
+      final currentLatLng = LatLng(
         currentLocation.latitude!,
         currentLocation.longitude!,
       );
 
-      if (lastUpdatedLocation == null ||
-          _getDistance(lastUpdatedLocation!, currentLatLng) > 50) {
+      if (_lastUpdatedLocation == null ||
+          _getDistance(_lastUpdatedLocation!, currentLatLng) > 50) {
         setState(() {
-          sourceLatLong = currentLatLng;
-          lastUpdatedLocation = currentLatLng;
+          _sourceLatLong = currentLatLng;
+          _lastUpdatedLocation = currentLatLng;
         });
-
-        _getPoliLine();
+        _getPolyline();
         _updateCamera(currentLatLng, currentLocation.heading ?? 0.0);
       }
     });
   }
 
-  Future<void> _updateCamera(LatLng currentLatLng, double heading) async {
-    final GoogleMapController controller = await _mapController.future;
-
+  Future<void> _updateCamera(LatLng latLng, double heading) async {
+    final controller = await _mapController.future;
     controller.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
-          target: currentLatLng,
+          target: latLng,
           zoom: 16.0,
           tilt: 45.0,
           bearing: heading,
@@ -214,508 +195,795 @@ class _ShOrderState extends State<ShOrder> {
     );
   }
 
-  changeMainContext(BuildContext context) {
-    mainContext = context;
+  Future<void> _initializeFcm() async {
+    _firebaseMessaging.getToken().then((fcmToken) async {
+      if (_userId != null && _token != null && fcmToken != null) {
+        await _cubit.updateFcmToken(_userId!, fcmToken, _token!);
+        if (_orderId != null) {
+          await _cubit.getUnreadMessageCount(_orderId!, _token!);
+        }
+      }
+    });
+
+    FirebaseMessaging.onMessage.listen(_handleFcmMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleFcmMessage);
+    FirebaseMessaging.instance.getInitialMessage().then((msg) {
+      if (msg != null) _handleFcmMessage(msg);
+    });
   }
 
-  Future getcurrentOrder() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+  Future<void> _handleFcmMessage(RemoteMessage message) async {
+    if (_token == null) return;
 
-    token = preferences.getString("token");
-    id = preferences.getString("id");
+    final stateName = await _cubit.handleOrderStateMessage(
+      message.data,
+      _token!,
+    );
+    if (stateName == null) return;
+
+    if (stateName == "order cancel") {
+      _navigateToHome(
+        "Order is canceled by supplier",
+        "تم إلغاء الطلب من قِبل المورد",
+      );
+      return;
+    }
+
+    if (stateName == "order complete") {
+      _navigateToHome("Order is complete", "تم اكمال الطلب بنجاح");
+      return;
+    }
+  }
+
+  String _loc(Lang lang, String en, String ar) => lang.lang == "en" ? en : ar;
+
+  void _navigateToHome(String en, String ar) {
+    if (!mounted) return;
+    final lang = Lang.of(context);
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      RoutesManager.shHome,
+      (route) => false,
+      arguments: Message(_loc(lang, en, ar)),
+    );
+  }
+
+  void _showSnackBar(
+    Lang lang, {
+    required String en,
+    required String ar,
+    Color backgroundColor = Colors.redAccent,
+  }) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: backgroundColor,
+        content: Text(
+          _loc(lang, en, ar),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+        ),
+      ),
+    );
+  }
+  Future<void> _onConfirm(Lang lang) async {
+    if (_isConfirm) {
+      _showSnackBar(
+        lang,
+        en: 'Please wait, your order request is already sent...',
+        ar: 'الرجاء الانتظار، تم إرسال طلبك بالفعل',
+      );
+      return;
+    }
 
     try {
-      if (id != null) {
-        int id = int.parse(this.id!, radix: 10);
-        String Url = "https://www.ordervite.com/api/shippier/current_order/$id";
+      final location = Location();
+      final loc = await location.getLocation();
 
-        var response = await http.get(
-          Uri.parse(Url),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-
-            'Authorization': 'Bearer $token',
-          },
-        );
-
-        var reposnsebody = jsonDecode(response.body);
-
-        if (isConfirm) {
-          if (reposnsebody["data"] != null) {
-            int sub_id = int.parse(
-              reposnsebody["data"]["supplier_id"].toString(),
-              radix: 10,
-            );
-
-            String Url2 =
-                "https://www.ordervite.com/api/shippier/supplier/$sub_id";
-
-            var response2 = await http.get(
-              Uri.parse(Url2),
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-
-                'Authorization': 'Bearer ' + this.token!,
-              },
-            );
-
-            var reposnsebody2 = jsonDecode(response2.body);
-
-            setState(() {
-              this.api_token = reposnsebody2["data"]["name"]["api_token"]
-                  .toString();
-            });
-            if (reposnsebody["data"]["order_cancel"] != null) {
-              Message message = new Message("Order is Canceled by supplier");
-
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                RoutesManager.shHome,
-                (route) => false,
-                arguments: message,
-              );
-            }
-
-            if (reposnsebody["data"]["order_state"].toString() ==
-                "order received") {
-              setState(() {
-                isConfirm = true;
-                isReceived = true;
-              });
-            }
-
-            if (reposnsebody["data"]["order_state"].toString() ==
-                "order delivered") {
-              setState(() {
-                isConfirm = true;
-                isReceived = true;
-                isDelviered = true;
-              });
-            }
-
-            if (reposnsebody["data"]["order_state"].toString() ==
-                "order complete") {
-              Message message = new Message("Order is complete");
-
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                RoutesManager.shHome,
-                (route) => false,
-                arguments: message,
-              );
-            }
-          }
-        }
-
-        return reposnsebody["data"];
-      } else {
-        return null;
+      if (loc.latitude == null || loc.longitude == null) {
+        throw Exception("Location not available");
       }
-    } catch (e) {}
-  }
 
-  loadcurrentOrder() async {
-    getcurrentOrder().then((res) async {
-      _orderController.add(res);
-      return res;
-    });
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    size?.dispose();
-    price?.dispose();
-    _orderController.close();
-    super.dispose();
-  }
-@override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    getPref();
-
-}
-  void initState() {
-
-    loadcurrentOrder();
-    listenToLocationChanges();
-    super.initState();
-    size = TextEditingController();
-    price = TextEditingController();
-
-    _firebaseMessaging.getToken().then((token) async {
-      String Url =
-          "https://www.ordervite.com/api/shippier/complete_profile/$id";
-
-      await http.put(
-        Uri.parse(Url),
-        body: {"api_token": token.toString()},
-
-        headers: {'Authorization': 'Bearer ${this.token}',},
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: Text(
+            _loc(lang, 'Confirm', 'تأكيد'),
+            style: const TextStyle(color: Colors.red),
+          ),
+          content: Text(
+            _loc(
+              lang,
+              'Are you sure you want to acquire this order?',
+              'هل أنت متأكد أنك تريد استلام هذا الطلب؟',
+            ),
+            style: TextStyle(fontSize: 15.sp, color: Colors.red),
+          ),
+          actions: [
+            TextButton(
+              child: Text(_loc(lang, 'Yes', 'نعم')),
+              onPressed: () => Navigator.of(c).pop(true),
+            ),
+            TextButton(
+              child: Text(_loc(lang, 'No', 'لا')),
+              onPressed: () => Navigator.of(c).pop(false),
+            ),
+          ],
+        ),
       );
 
-      if (this.order_id != null) {
-        int con_id = int.parse(this.order_id.toString(), radix: 10);
+      if (confirmed != true) return;
 
-        String Url2 =
-            "https://www.ordervite.com/api/shippier/order/$con_id/messages/unread/supplier";
-        var response2 = await http.get(
-          Uri.parse(Url2),
+      if (_orderId == null || _userId == null || _token == null) return;
 
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer  ' + this.token!,
-          },
-        );
+      final success = await _cubit.confirmOrder(
+        orderId: _orderId!,
+        shipperId: _userId!,
+        token: _token!,
+        latitude: loc.latitude!,
+        longitude: loc.longitude!,
+      );
 
-        var reposnsebody2 = jsonDecode(response2.body);
-
+      if (success && mounted) {
         setState(() {
-          this.order_messges_count =
-              reposnsebody2["data"]["order unread messages count"];
+          _isConfirm = true;
+          _orderState = "shipper confirmed";
         });
+        _showSnackBar(
+          lang,
+          en: 'Order confirmed successfully, go to supplier.',
+          ar: 'تم تأكيد الطلب، توجه إلى المورد.',
+          backgroundColor: Colors.green,
+        );
+        _cubit.listenToCurrentOrder(_userId!, _token!);
       }
-    });
+    } catch (e) {
+      _showSnackBar(
+        lang,
+        en: 'Please check your location & network',
+        ar: 'يرجى التحقق من الموقع والإنترنت',
+      );
+    }
+  }
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+  Future<void> _onReceive(Lang lang) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(
+          _loc(lang, 'Confirm', 'تاكيد'),
+          style: const TextStyle(color: Colors.red),
+        ),
+        content: Text(
+          _loc(lang, 'Confirm receiving the package?', 'تأكيد استلام الطلب؟'),
+          style: TextStyle(fontSize: 15.sp),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c, true),
+            child: Text(_loc(lang, 'Yes', 'نعم')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(c, false),
+            child: Text(_loc(lang, 'No', 'لا')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || _orderId == null || _token == null) return;
+
+    final success = await _cubit.receiveOrder(
+      orderId: _orderId!,
+      token: _token!,
+    );
+
+    if (success && mounted) {
       setState(() {
-        this.statename = message.data["state_name"].toString();
+        _isReceived = true;
+        _orderState = "order received";
       });
+      _showSnackBar(
+        lang,
+        en: 'Order received successfully',
+        ar: 'تم استلام الطلب بنجاح',
+        backgroundColor: Colors.green,
+      );
+    }
+  }
 
-      if (message.data["state_name"].toString() == "new message") {
-        int con_id = int.parse(this.order_id.toString(), radix: 10);
+  Future<void> _onDeliver(Lang lang) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(
+          _loc(lang, 'Confirm', 'تاكيد'),
+          style: const TextStyle(color: Colors.red),
+        ),
+        content: Text(
+          _loc(
+            lang,
+            'Please confirm that you have delivered the package',
+            'من فضلك قم بتاكيد تسليم الشحنة',
+          ),
+          style: TextStyle(fontSize: 14.sp, color: Colors.red),
+        ),
+        actions: [
+          TextButton(
+            child: Text(_loc(lang, 'Yes', 'نعم')),
+            onPressed: ()async {
+              final success = await _cubit.deliverOrder(
+                orderId: _orderId!,
+                token: _token!,
+                supplierApiToken: _apiToken ?? '',
+                lang: lang,
+              );
+              if (success && mounted) {
+                setState(() {
+                  _isDelivered = true;
+                  _orderState = "order delivered";
+                });
+                _showSnackBar(
+                  lang,
+                  en: 'Well Done! ',
+                  ar: 'أحسنت ',
+                  backgroundColor: Colors.green,
+                );
+              }
+              Navigator.pushNamedAndRemoveUntil(context, RoutesManager.shHome,(route) => true,);
+            }
+          ),
+          TextButton(
+            child: Text(_loc(lang, 'No', 'لا')),
+            onPressed: () => Navigator.of(c).pop(false),
+          ),
+        ],
+      ),
+    );
 
-        String Url2 =
-            "https://www.ordervite.com/api/shippier/order/$con_id/messages/unread/supplier";
+  }
 
-        var response2 = await http.get(
-          Uri.parse(Url2),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ${this.token}',
-          },
-        );
+  Future<void> _onCancel(Lang lang) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(
+          _loc(lang, 'Confirm', 'تاكيد'),
+          style: const TextStyle(color: Colors.red),
+        ),
+        content: Text(
+          _loc(
+            lang,
+            'Are you sure you want to cancel the order (a fine may apply)',
+            'هل أنت متأكد أنك تريد إلغاء الطلب (قد يتم تطبيق غرامة)؟',
+          ),
+          style: TextStyle(fontSize: 15.sp, color: Colors.red),
+        ),
+        actions: [
+          TextButton(
+            child: Text(_loc(lang, 'Yes', 'نعم')),
+            onPressed: () => Navigator.of(c).pop(true),
+          ),
+          TextButton(
+            child: Text(_loc(lang, 'No', 'لا ')),
+            onPressed: () => Navigator.of(c).pop(false),
+          ),
+        ],
+      ),
+    );
 
-        var reposnsebody2 = jsonDecode(response2.body);
+    if (confirmed != true ||
+        _orderId == null ||
+        _userId == null ||
+        _token == null ||
+        _username == null) {
+      return;
+    }
 
-        setState(() {
-          this.order_messges_count =
-              reposnsebody2["data"]["order unread messages count"];
-        });
-      }
-    });
+    final success = await _cubit.cancelOrder(
+      orderId: _orderId!,
+      shipperId: _userId!,
+      username: _username!,
+      token: _token!,
+      supplierApiToken: _apiToken ?? '',
+      lang: lang,
+    );
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      setState(() {
-        this.statename = message.data["state_name"].toString();
-      });
+    if (success && mounted) {
+      _navigateToHome("Order canceled", "تم إلغاء الطلب");
+    }
+  }
 
-      if (message.data["state_name"].toString() == "new message") {
-        int con_id = int.parse(this.order_id.toString(), radix: 10);
+  Future<void> _getPolyline() async {
+    final url =
+        "https://maps.googleapis.com/maps/api/directions/json?"
+        "origin=${_sourceLatLong.latitude},${_sourceLatLong.longitude}"
+        "&destination=${_destinationLatLong.latitude},${_destinationLatLong.longitude}"
+        "&key=${AppConfig.googleMapsApiKey}";
 
-        String Url2 =
-            "https://www.ordervite.com/api/shippier/order/$con_id/messages/unread/supplier";
-
-        var response2 = await http.get(
-          Uri.parse(Url2),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer  ' + this.token!,
-          },
-        );
-
-        var reposnsebody2 = jsonDecode(response2.body);
-
-        setState(() {
-          this.order_messges_count =
-              reposnsebody2["data"]["order unread messages count"];
-        });
-      }
-    });
-
-    FirebaseMessaging.instance.getInitialMessage().then((
-      RemoteMessage? message,
-    ) async {
-      if (message != null) {
-        setState(() {
-          this.statename = message.data["state_name"].toString();
-        });
-
-        if (message.data["state_name"].toString() == "new message") {
-          int con_id = int.parse(this.order_id.toString(), radix: 10);
-
-          String Url2 =
-              "https://www.ordervite.com/api/shippier/order/$con_id/messages/unread/supplier";
-
-          var response2 = await http.get(
-            Uri.parse(Url2),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'Authorization': 'Bearer  ' + this.token!,
-            },
-          );
-
-          var reposnsebody2 = jsonDecode(response2.body);
-
-          setState(() {
-            this.order_messges_count =
-                reposnsebody2["data"]["order unread messages count"];
-          });
-        }
-      }
-    });
+    try {
+      // Note: actual polyline fetching is handled by cubit/fetchRoute;
+      // this is kept only for live location updates if needed.
+    } catch (e) {
+      debugPrint("Error fetching polyline: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    Lang lang = Lang.of(context);
-    if (statename == "order cancel") {
-      Message message = new Message(
-        lang.lang == "en" ? "Order is cancled by supplier" : "",
-      );
-      Navigator.pushNamed(context, RoutesManager.shHome, arguments: message);
+    final lang = Lang.of(context);
 
-      setState(() {
-        isCnacel = true;
-      });
-    }
-    if (statename == "order complete") {
-      Message message = new Message(
-        lang.lang == "en" ? "Order is complete" : "تم اكمال الطلب بنجاح",
-      );
-      Navigator.pushNamed(context, RoutesManager.shHome, arguments: message);
+    return BlocProvider.value(
+      value: _cubit,
+      child: BlocListener<ShipperOrderCubit, ShipperOrderState>(
+        listener: (context, state) {
+          if (state is ShipperOrderRouteLoaded) {
+            setState(() {
+              _polyline.clear();
+              _polyline.add(
+                Polyline(
+                  polylineId: const PolylineId("route_line"),
+                  visible: true,
+                  width: 5,
+                  points: state.polylinePoints,
+                  color: Colors.blue,
+                  startCap: Cap.roundCap,
+                  endCap: Cap.roundCap,
+                ),
+              );
+            });
+          }
 
-      setState(() {
-        isComplete = true;
-      });
-    }
+          if (state is ShipperOrderCurrentLoaded && state.orderData != null) {
+            final data = state.orderData!;
+            final newState = data['order_state']?.toString() ?? _orderState;
 
-    return WillPopScope(
-      child: Directionality(
-        textDirection: lang.lang == "en"
-            ? TextDirection.ltr
-            : TextDirection.rtl,
+            setState(() {
+              _orderState = newState;
+              if (newState == "shipper confirmed") {
+                _isConfirm = true;
+              } else if (newState == "order received") {
+                _isConfirm = true;
+                _isReceived = true;
+              } else if (newState == "order delivered") {
+                _isConfirm = true;
+                _isReceived = true;
+                _isDelivered = true;
+              }
 
-        child: Scaffold(
-          key: _scaffoldkey,
+              _orderCost = data['cost']?.toString() ?? _orderCost;
+              _orderPrice = data['price']?.toString() ?? _orderPrice;
+              _orderSupplierId =
+                  data['supplier_id']?.toString() ?? _orderSupplierId;
+            });
+          }
 
-          appBar: AppBar(
-            title: Text(
-              lang.lang == "en" ? 'OrderVite' : ' أوردرفيت ',
-              style: TextStyle(
-                fontSize: 25.sp,
-                fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.normal,
-                color: Colors.white,
-              ),
-            ),
-            actions: <Widget>[
-              ChatNamedIcon(
-                text: lang.lang == "en" ? 'Chats' : 'محادثات ',
-                iconData: Icons.message,
-                order_id: this.order_id,
-                notificationCount: order_messges_count,
-                api_token: this.token,
-                disLat: this.disLat.toString(),
-                disLong: this.disLong.toString(),
-                sorLat: this.sorLat.toString(),
-                sorlong: this.sorlong.toString(),
-                isConfirm: this.isConfirm,
-                order_cost: this.order_cost.toString(),
-                order_price: this.order_price.toString(),
-                order_pricecheck: this.order_pricecheck.toString(),
-                order_state: this.order_state.toString(),
-                order_supplier_id: order_supplier_id.toString(),
-                order_shippier_id: this.id.toString(),
-                permission: this.isConfirm,
-              ),
-            ],
-            automaticallyImplyLeading: false,
-          ),
-          body: Stack(
-            children: <Widget>[
-              Positioned(
-                child: GoogleMap(
-                  mapType: MapType.normal,
-                  polylines: _polyline,
-                  myLocationEnabled: true,
-                  initialCameraPosition: _initialCamera,
-                  onMapCreated: (GoogleMapController controller) {
-                    _mapController.complete(controller);
-                    _getPoliLine();
-                  },
-                  markers: _markers,
+          if (state is ShipperOrderStatusChanged) {
+            final data = state.orderData;
+            final newState = data['order_state']?.toString() ?? '';
+            _showSnackBar(
+              lang,
+              en: 'Order status updated: $newState',
+              ar: 'تم تحديث حالة الطلب: $newState',
+              backgroundColor: Colors.green,
+            );
+          }
+
+          if (state is ShipperOrderMessageCountUpdated) {
+            setState(() => _orderMessagesCount = state.count);
+          }
+
+          if (state is ShipperOrderError) {
+            _showSnackBar(lang, en: state.message, ar: state.message);
+          }
+
+          if (state is ShipperOrderCancelled) {
+            _navigateToHome("Order canceled", "تم إلغاء الطلب");
+          }
+
+          if (state is ShipperOrderCompleted) {
+            _navigateToHome("Order is complete", "تم اكمال الطلب بنجاح");
+          }
+        },
+        child: WillPopScope(
+          onWillPop: () async {
+            await showDialog(
+              context: context,
+              builder: (c) => AlertDialog(
+                title: Text(
+                  _loc(lang, 'Warning', 'تحذير'),
+                  style: const TextStyle(color: Colors.red),
+                ),
+                content: Text(
+                  _loc(
+                    lang,
+                    'Please you cant exit until order complete',
+                    'من فضلك انتظر حتي يتم اكتمال مراحل الطلب',
+                  ),
+                  style: const TextStyle(fontSize: 15, color: Colors.red),
                 ),
               ),
-              Positioned(
-                left: 0.0.w,
-                right: 0.0.w,
-                bottom: 0.0.h,
-                child: Container(
-                  height: 300.h,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topRight,
-                      end: Alignment.topLeft,
-                      colors: [
-                        Color.fromRGBO(21, 42, 72, 1),
-                        Color.fromRGBO(7, 15, 33, 1),
-                      ],
-                    ),
-
-                    color: Color.fromRGBO(7, 15, 33, 0.9),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(18.0.r),
-                      topRight: Radius.circular(18.0.r),
+            );
+            return false;
+          },
+          child: Directionality(
+            textDirection: lang.lang == "en"
+                ? TextDirection.ltr
+                : TextDirection.rtl,
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text(
+                  lang.lang == "en" ? 'OrderVite' : ' أوردرفيت ',
+                  style: TextStyle(
+                    fontSize: 25.sp,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.normal,
+                    color: Colors.white,
+                  ),
+                ),
+                actions: [
+                  ChatNamedIcon(
+                    text: lang.lang == "en" ? 'Chats' : 'محادثات ',
+                    iconData: Icons.message,
+                    order_id: _orderId ?? '',
+                    notificationCount: _orderMessagesCount,
+                    api_token: _token ?? '',
+                    disLat: _disLat ?? '',
+                    disLong: _disLong ?? '',
+                    sorLat: _sorLat ?? '',
+                    sorlong: _sorLong ?? '',
+                    isConfirm: _isConfirm,
+                    order_cost: _orderCost ?? '',
+                    order_price: _orderPrice ?? '',
+                    order_pricecheck: _orderPriceCheck ?? '',
+                    order_state: _orderState ?? '',
+                    order_supplier_id: _orderSupplierId ?? '',
+                    order_shippier_id: _userId ?? '',
+                    permission: _isConfirm,
+                  ),
+                ],
+                automaticallyImplyLeading: false,
+              ),
+              body: Stack(
+                children: [
+                  Positioned.fill(
+                    child: GoogleMap(
+                      mapType: MapType.normal,
+                      polylines: _polyline,
+                      myLocationEnabled: true,
+                      initialCameraPosition: _initialCamera,
+                      onMapCreated: (controller) {
+                        _mapController.complete(controller);
+                      },
+                      markers: _markers,
                     ),
                   ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: _buildBottomPanel(lang),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-                  child: Padding(
-                    padding: REdgeInsets.symmetric(
-                      horizontal: 16.0.w,
-                      vertical: 12.0.h,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(18.0.r),
-                          topRight: Radius.circular(18.0.r),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0.r),
-                        child: ShOrderStatesWidget(
-                          order_id: order_id,
-                          order_supplier_id: order_supplier_id ?? '',
-                          order_price: order_price ?? '',
-                          order_pricecheck: order_pricecheck ?? '',
-                          id: id ?? '',
-                          token: token ?? '',
-                          order_cost: order_cost ?? '',
-                          lang: lang,
-                          order_state: order_state ?? '',
-                          api_token: api_token ?? '',
-                          isConfirm: isConfirm,
-                          isReceived: isReceived,
-                          isDelviered: isDelviered,
-                          username: username,
-                        ),
-                      ),
-                    ),
+  Widget _buildBottomPanel(Lang lang) {
+    return Container(
+      height: 300.h,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.topLeft,
+          colors: [Color.fromRGBO(21, 42, 72, 1), Color.fromRGBO(7, 15, 33, 1)],
+        ),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(18.0.r),
+          topRight: Radius.circular(18.0.r),
+        ),
+      ),
+      child: Padding(
+        padding: REdgeInsets.symmetric(horizontal: 16.0.w, vertical: 12.0.h),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(18.0.r),
+              topRight: Radius.circular(18.0.r),
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(8.0.r),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildOrderStatusText(lang),
+                SizedBox(height: 8.h),
+                ShOrderIcons(
+                  isConfirm: _isConfirm,
+                  isDelviered: _isDelivered,
+                  isReceived: _isReceived,
+                ),
+                SizedBox(height: 8.h),
+                _buildInfoRow(
+                  lang.lang == "en"
+                      ? "Order ID: $_orderId"
+                      : "كود الطلب :$_orderId",
+                  lang.lang == "en"
+                      ? "Supplier ID: $_orderSupplierId"
+                      : "كود المورد : $_orderSupplierId",
+                ),
+                SizedBox(height: 8.h),
+                _buildInfoRow(
+                  lang.lang == "en"
+                      ? "Shipping Cost: $_orderCost L.E."
+                      : "تكلفة الشحن : $_orderCost جم",
+                  lang.lang == "en"
+                      ? "Package Price: $_orderPrice L.E."
+                      : "سعر الشحنة : $_orderPrice جم",
+                ),
+                SizedBox(height: 6.h),
+                _buildPaymentMethodText(lang),
+                SizedBox(height: 10.h),
+                _buildActionButtons(lang),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderStatusText(Lang lang) {
+    String statusText;
+    if (lang.lang == "en") {
+      statusText = "Order State: ${_orderState ?? 'Unknown'}";
+    } else {
+      switch (_orderState) {
+        case "new":
+          statusText = "حالة الطلب : جديد";
+          break;
+        case "shipper confirmed":
+          statusText = "حالة الطلب : تاكيد مسئول الشحن";
+          break;
+        case "order received":
+          statusText = "حالة الطلب : استلام الشحنة";
+          break;
+        case "order delivered":
+          statusText = "حالة الطلب : توصيل الشحنة";
+          break;
+        default:
+          statusText = "حالة الطلب : توصيل الشحنة";
+      }
+    }
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            statusText,
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentMethodText(Lang lang) {
+    String text;
+    if (lang.lang == "en") {
+      text = "Payment Method : $_orderPriceCheck";
+    } else {
+      text = _orderPriceCheck == "cash"
+          ? "نظام الدفع : كاش"
+          : "نظام الدفع : تحويل";
+    }
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(String left, String right) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            left,
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        SizedBox(width: 20.w),
+        Expanded(
+          child: Text(
+            right,
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons(Lang lang) {
+    if (_isDelivered) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.all(Radius.circular(18.0.r)),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(3.r),
+          child: Row(
+            children: [
+              SizedBox(width: 10.w),
+              Expanded(
+                child: Text(
+                  lang.lang == "en"
+                      ? "You have confirmed the package delivery, please wait for the supplier final confirmation"
+                      : "لقد أكدت تسليم الطرد، يُرجى انتظار التأكيد النهائي للمورد",
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ],
           ),
         ),
-      ),
-      onWillPop: () async {
-        await showDialog<bool>(
-          context: context,
-          builder: (c) => AlertDialog(
-            title: Text(
-              lang.lang == "en" ? 'Warning' : 'تحذير',
-              style: TextStyle(color: Colors.red),
-            ),
-            content: Text(
-              lang.lang == "en"
-                  ? 'Please you cant exit until order complete'
-                  : 'من فضلك تحقق من جودة الانترنت',
-              style: TextStyle(fontSize: 15.sp, color: Colors.red),
+      );
+    }
+
+    if (_isReceived) {
+      return Row(
+        children: [
+          SizedBox(width: 10.w),
+          Expanded(
+            child: TextButton.icon(
+              onPressed: () => _onDeliver(lang),
+              icon: Icon(Icons.done_all, size: 20.sp),
+              label: Text(
+                lang.lang == "en" ? "Delivered PK " : "تسليم",
+                style: TextStyle(fontSize: 12.sp, color: Colors.white),
+              ),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0.r),
+                ),
+              ),
             ),
           ),
-        );
+          SizedBox(width: 15.w),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () => _onCancel(lang),
+              icon: Icon(Icons.cancel, size: 20.sp),
+              label: Text(
+                lang.lang == "en" ? "Cancel" : "إلغاء",
+                style: TextStyle(fontSize: 12.sp, color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0.r),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
 
-        return Future.value(false);
-      },
+    if (_isConfirm) {
+      return Row(
+        children: [
+          SizedBox(width: 10.w),
+          Expanded(
+            child: TextButton.icon(
+              onPressed: () => _onReceive(lang),
+              icon: Icon(Icons.done_all, size: 20.sp),
+              label: Text(
+                lang.lang == "en" ? "Received PK" : "استلام",
+                style: TextStyle(fontSize: 12.sp, color: Colors.white),
+              ),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0.r),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 15.w),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () => _onCancel(lang),
+              icon: Icon(Icons.cancel, size: 20.sp),
+              label: Text(
+                lang.lang == "en" ? "Cancel" : "إلغاء",
+                style: TextStyle(fontSize: 12.sp, color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0.r),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        SizedBox(width: 10.w),
+        Expanded(
+          child: TextButton.icon(
+            onPressed: () => _onConfirm(lang),
+            icon: Icon(Icons.done_all, size: 20.sp),
+            label: Text(
+              lang.lang == "en" ? "Confirm" : "تأكيد",
+              style: TextStyle(fontSize: 12.sp, color: Colors.white),
+            ),
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.green,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0.r),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 15.w),
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () => _onCancel(lang),
+            icon: Icon(Icons.cancel, size: 20.sp),
+            label: Text(
+              lang.lang == "en" ? "Cancel" : "إلغاء",
+              style: TextStyle(fontSize: 12.sp, color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0.r),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Future<dynamic> _getPoliLine() async {
-    final String url =
-        "https://maps.googleapis.com/maps/api/directions/json?" +
-        "origin=${sourceLatLong.latitude},${sourceLatLong.longitude}" +
-        "&destination=${destinationLatLong.latitude},${destinationLatLong.longitude}" +
-        "&key=$GoogleApiKEY";
-
-    try {
-      var response = await http.get(Uri.parse(url));
-      var jsonResponse = jsonDecode(response.body);
-
-      if (jsonResponse["status"] == "OK") {
-        String _distance =
-            jsonResponse["routes"][0]["legs"][0]["distance"]['text'];
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('الـمسافة: $_distance')));
-        String encodedPoints =
-            jsonResponse["routes"][0]["overview_polyline"]["points"];
-        List<LatLng> polylinePoints = _decodePoly(encodedPoints);
-
-        setState(() {
-          _polyline.add(
-            Polyline(
-              polylineId: PolylineId("route_line"),
-              visible: true,
-              width: 5,
-              points: polylinePoints,
-              color: Colors.blue,
-              startCap: Cap.roundCap,
-              endCap: Cap.roundCap,
-            ),
-          );
-        });
-      }
-    } catch (e) {
-      print("Error fetching polyline: $e");
-    }
-  }
-
-  List<LatLng> _decodePoly(String poly) {
-    var list = poly.codeUnits;
-    var lList = <double>[];
-    int index = 0;
-    int len = poly.length;
-    int c = 0;
-    do {
-      var shift = 0;
-      int result = 0;
-      do {
-        c = list[index] - 63;
-        result |= (c & 0x1F) << (shift);
-        shift += 5;
-        index++;
-      } while (c >= 32);
-      if (result & 1 == 1) {
-        result = ~result;
-      }
-      var result1 = (result >> 1) * 0.00001;
-      lList.add(result1);
-    } while (index < len);
-
-    for (var i = 2; i < lList.length; i++) {
-      lList[i] += lList[i - 2];
-    }
-
-    List<LatLng> res = <LatLng>[];
-    for (var i = 0; i < lList.length; i += 2) {
-      res.add(LatLng(lList[i], lList[i + 1]));
-    }
-    return res;
-  }
-
-  List<Steps> parseSteps(final responseBody) {
-    var list = responseBody
-        .map<Steps>((json) => new Steps.fromJson(json))
-        .toList();
-    return list;
+  @override
+  void dispose() {
+    _cubit.close();
+    super.dispose();
   }
 }

@@ -345,7 +345,7 @@ class _SHHomePageState extends State<SHHomePage> {
 
     _orderController = StreamController<List<dynamic>?>.broadcast();
 
-    timer = Timer.periodic(const Duration(seconds: 100), (_) {
+    timer = Timer.periodic(const Duration(seconds: 10), (_) {
       if (mounted) {
         loaddailyOrders();
       }
@@ -510,7 +510,7 @@ class _SHHomePageState extends State<SHHomePage> {
           ),
           appBar: AppBar(
             title: Text(
-              lang.lang == "en" ? "OrderVite" : "أودرفيت",
+              lang.lang == "en" ? "OrderVite" : "أوردرفيت",
               style: TextStyle(
                 fontSize: 25.sp,
                 fontWeight: FontWeight.bold,

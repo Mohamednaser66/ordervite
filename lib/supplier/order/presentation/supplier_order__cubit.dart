@@ -329,21 +329,18 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
     } catch (_) {}
   }
 
-  Future<void> handleOrderStateMessage(
-    Map<String, dynamic> data,
-    String token,
-  ) async {
+  Future<String?> handleOrderStateMessage(
+      Map<String, dynamic> data,
+      String token,
+      ) async {
     final stateName = data["state_name"]?.toString();
-    if (stateName == null) return;
+    if (stateName == null) return null;
 
     if (stateName == "shipper confirmed") {
       final shipperId = data["state_type"]?.toString() ?? '';
       if (shipperId.isNotEmpty) {
-        final apiToken = await _orderRepository.getShipperApiToken(
-          shipperId,
-          token,
-        );
-
+        await _orderRepository.getShipperApiToken(shipperId, token);
+        return shipperId;
       }
     }
 
@@ -353,8 +350,9 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
         await getUnreadMessageCount(orderId, token);
       }
     }
-  }
 
+    return null;
+  }
   String _mapError(Object e) {
     return e.toString();
   }

@@ -7,25 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/core/routes_manager.dart';
 import 'package:flutter_maps/lang.dart';
+import 'package:flutter_maps/services/realtime_service.dart';
 import 'package:flutter_maps/shipper/shipper_drawer.dart';
-import 'package:flutter_maps/supplier/order.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../core/map_utils.dart';
-
-String GoogleApiKEY = "AIzaSyDl8LFLQn24CbaZyQ0F4wnzoF9NY3_gMWY";
-
-const oneSec = const Duration(seconds: 1);
-const interval = const Duration(minutes: 1);
-const iconCancel = Icons.cancel;
-const iconStart = Icons.alarm;
-
 class ShOrders extends StatefulWidget {
-  ShOrders({Key? key}) : super(key: key);
+  const ShOrders({Key? key}) : super(key: key);
 
   final String title = "OrderVite";
 
@@ -33,203 +24,77 @@ class ShOrders extends StatefulWidget {
   _ShOrdersState createState() => _ShOrdersState();
 }
 
-enum BestSize { small, medium, large }
-
-enum BestPrice { transfer, cash }
-
 class _ShOrdersState extends State<ShOrders> {
-  final Set<Marker> _markers = Set();
+  final Set<Marker> _markers = {};
+  final RealtimeService _realtimeService = RealtimeService();
 
-  LatLng sourceLatLong = LatLng(30.059445, 31.1933067);
-  LatLng destinationLatLong = LatLng(30.060671, 31.204131);
-  final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
-  String? username;
-  String? email;
-  String? id;
-  String? token;
-  String? logo_src;
-  String? disLat;
-  String? sorLat;
-  String? disLong;
-  String? sorlong;
-  String? order_id;
-  int order_num = 0;
+  LatLng _sourceLatLong = const LatLng(30.059445, 31.1933067);
 
-  bool isOrderDate = false;
+  String? _username;
+  String? _email;
+  String? _id;
+  String? _token;
+  String? _logoSrc;
 
-  bool isConfirm = false;
+  bool _isSignIn = false;
+  bool _isMessage = true;
 
-  bool isSignIn = false;
-  bool isMessage = true;
-
-  GlobalKey<FormState> formstatesorder = new GlobalKey<FormState>();
-
-  late StreamController _orderController;
-
-  TextEditingController size = new TextEditingController();
-  TextEditingController price = new TextEditingController();
-  late BuildContext mainContext;
-  dynamic order_id_session;
-  dynamic order_data_session;
-
-  Map<String, dynamic>? formData;
-  Timer? timer;
-  String data = "";
-  String? statename;
+  int _orderNum = 0;
+  String? _statename;
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
-  String? validprice(String val) {
-    if (val.trim().isEmpty) {
-      return 'package price  Is Required';
+  Future<void> _getPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    _username = prefs.getString("username");
+    _email = prefs.getString("email");
+    _token = prefs.getString("token");
+    _logoSrc = prefs.getString("logo_src");
+    _id = prefs.getString("id");
+
+    if (_username != null && _email != null) {
+      setState(() => _isSignIn = true);
     }
 
-    return null;
-  }
-
-  getPref() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    order_id_session = await preferences.get("order_id_session");
-    order_data_session = await preferences.get('order_data $order_id_session');
-
-    username = preferences.getString("username")!;
-    email = preferences.getString("email")!;
-
-    if (username != null && email != null) {
-      setState(() {
-        username = preferences.getString("username")!;
-        email = preferences.getString("email")!;
-
-        token = preferences.getString("token")!;
-        logo_src = preferences.getString("logo_src")!;
-        id = preferences.getString("id")!;
-
-        isSignIn = true;
-      });
-    }
-    Location _locationTracker = Location();
-    var location = await _locationTracker.getLocation();
+    final location = Location();
+    final loc = await location.getLocation();
 
     setState(() {
-      sourceLatLong = LatLng(location.latitude ?? 0, location.longitude ?? 0);
+      _sourceLatLong = LatLng(loc.latitude ?? 0, loc.longitude ?? 0);
     });
 
     _markers.add(
       Marker(
-        markerId: MarkerId("1"),
-        position: sourceLatLong,
-        infoWindow: InfoWindow(title: this.username),
+        markerId: const MarkerId("1"),
+        position: _sourceLatLong,
+        infoWindow: InfoWindow(title: _username ?? ''),
         icon: BitmapDescriptor.defaultMarker,
         visible: true,
       ),
     );
   }
 
-  changeMainContext(BuildContext context) {
-    mainContext = context;
-  }
+  void _handleFcmMessage(RemoteMessage message) {
+    if (!mounted) return;
 
-  Future getdailyOrders() async {
-    Lang lang = Lang.of(context);
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final stateName = message.data["state_name"] ?? "";
+    final stateType = message.data["state_type"] ?? "";
 
-    token = preferences.getString("token")!;
+    setState(() => _statename = stateName);
 
-    try {
-      String Url = "https://www.ordervite.com/api/shippier/daily/orders";
-
-      var response = await http.get(
-        Uri.parse(Url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      var reposnsebody = jsonDecode(response.body);
-
-      if (reposnsebody["data"] != null) {
-        if (reposnsebody["data"].length > order_num) {
-          setState(() {
-            data = reposnsebody.toString();
-            isOrderDate = true;
-
-            order_num = reposnsebody["data"].length;
-            if (order_num >= 1) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: Colors.redAccent,
-                  content: Text(
-                    lang.lang == "en"
-                        ? 'There is $order_num order you  can match'
-                        : ' طلبات هناك $order_num يمكنك مشاهدتهم',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.sp,
-                    ),
-                  ),
-                ),
-              );
-            }
-          });
-        }
-      }
-
-      return reposnsebody["data"];
-    } catch (e) {}
-  }
-
-  loaddailyOrders() async {
-    getdailyOrders().then((res) async {
-      _orderController.add(res);
-      return res;
-    });
-  }
-
-  showMessage(Message args) {
-    Message message = ModalRoute.of(context)?.settings.arguments as Message;
-
-    if (isMessage) {
-      String message_show = message.message.toString();
-
+    if (stateName == "new order" || stateName == "order cancel") {
+      // Stream will auto-update, but we can show a snackbar
+      final lang = Lang.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: Colors.redAccent,
+          backgroundColor: Colors.green,
           content: Text(
-            '$message_show',
+            lang.lang == "en" ? 'New orders available' : 'طلبات جديدة متاحة',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
           ),
         ),
       );
-
-      setState(() {
-        isMessage = false;
-      });
-
-      timer?.cancel();
-    }
-  }
-
-  void _handleMessage(RemoteMessage message) {
-    if (!mounted) return;
-
-    String stateName = message.data["state_name"] ?? "";
-    String stateType = message.data["state_type"] ?? "";
-
-    setState(() {
-      statename = stateName;
-    });
-
-    if (stateName == "new order" || stateName == "order cancel") {
-      loaddailyOrders();
-    }
-    if (stateName == "order confirmed") {
-      setState(() {
-        isConfirm = true;
-      });
     }
 
     if (stateName == "order review") {
@@ -247,24 +112,52 @@ class _ShOrdersState extends State<ShOrders> {
     }
   }
 
-  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  Future<void> _firebaseMessagingBackgroundHandler(
+    RemoteMessage message,
+  ) async {
     await Firebase.initializeApp();
-    print('Handling background message: ${message.messageId}');
+    debugPrint('Handling background message: ${message.messageId}');
   }
 
-  void showMessageSafe() {
+  void _showInitialMessage() {
     final args = ModalRoute.of(context)?.settings.arguments;
+    if (args == null || args is! Message) return;
 
-    if (args != null && args is Message) {
-      showMessage(args);
+    if (_isMessage) {
+      final messageShow = args.message;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text(
+            messageShow,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
+          ),
+        ),
+      );
+      setState(() => _isMessage = false);
     }
   }
 
   @override
-  void dispose() {
-    timer?.cancel();
+  void initState() {
+    super.initState();
+    _getPreferences();
 
-    super.dispose();
+    _firebaseMessaging.getToken().then((fcmToken) async {
+      if (_id != null && _token != null && fcmToken != null) {
+        final url =
+            "https://www.ordervite.com/api/shippier/complete_profile/$_id";
+        await http.put(
+          Uri.parse(url),
+          body: {"api_token": fcmToken},
+          headers: {'Authorization': 'Bearer $_token'},
+        );
+      }
+    });
+
+    FirebaseMessaging.onMessage.listen(_handleFcmMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleFcmMessage);
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
   bool _isInit = true;
@@ -272,62 +165,27 @@ class _ShOrdersState extends State<ShOrders> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     if (_isInit) {
-      loaddailyOrders();
-
       Future.delayed(const Duration(seconds: 5), () {
         if (!mounted) return;
-        showMessageSafe();
+        _showInitialMessage();
       });
-
       _isInit = false;
     }
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    getPref();
-
-    _orderController = StreamController();
-
-    timer = Timer.periodic(const Duration(seconds: 100), (timer) {
-      if (!mounted) return;
-      loaddailyOrders();
-    });
-    _firebaseMessaging.getToken().then((fcmToken) async {
-      String url =
-          "https://www.ordervite.com/api/shippier/complete_profile/$id";
-
-      await http.put(
-        Uri.parse(url),
-        body: {"api_token": fcmToken.toString()},
-        headers: {'Authorization': 'Bearer $token'},
-      );
-    });
-
-    FirebaseMessaging.onMessage.listen(_handleMessage);
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
-
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    Lang lang = Lang.of(context);
+    final lang = Lang.of(context);
 
     return Directionality(
       textDirection: lang.lang == "en" ? TextDirection.ltr : TextDirection.rtl,
-
       child: Scaffold(
-        key: _scaffoldkey,
         drawer: ShipperDrawer(
-          username: username ?? '',
-          email: email ?? '',
+          username: _username ?? '',
+          email: _email ?? '',
           lang: lang,
-          isSignIn: isSignIn,
+          isSignIn: _isSignIn,
         ),
         appBar: AppBar(
           title: Text(
@@ -340,93 +198,127 @@ class _ShOrdersState extends State<ShOrders> {
             ),
           ),
         ),
-        body: Stack(
-          children: <Widget>[
-            Positioned(
-              child: FutureBuilder(
-                future: getdailyOrders(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(
-                            (lang.lang == "en" ? "id : " : "الكود:") +
-                                snapshot.data[index]["id"].toString() +
-                                (lang.lang == "en"
-                                    ? ("Size : " +
-                                          snapshot.data[index]["size"]
-                                              .toString())
-                                    : ("Size: " +
-                                                  snapshot.data[index]["size"]
-                                                      .toString() ==
-                                              "small"
-                                          ? " الحجم : صغير"
-                                          : ("Size: " +
-                                                        snapshot
-                                                            .data[index]["size"]
-                                                            .toString() ==
-                                                    "medium"
-                                                ? " الحجم :   كبير  "
-                                                : " الحجم :   متوسط "))) +
-                                "      " +
-                                "      ",
-                          ),
-                          subtitle: Text(
-                            (lang.lang == "en" ? "cost " : "التكلفة ") +
-                                snapshot.data[index]["cost"].toString() +
-                                (lang.lang == "en" ? " EGP " : " جم "),
-                          ),
-                          onTap: () {
-                            OrderData orderData = OrderData(
-                              snapshot.data[index]["dist_latitude"].toString(),
-                              snapshot.data[index]["so_latitude"].toString(),
-                              snapshot.data[index]["dist_longitude"].toString(),
-                              snapshot.data[index]["so_longitude"].toString(),
-                              snapshot.data[index]["id"].toString(),
-                              false,
-                              snapshot.data[index]["cost"].toString(),
-                              snapshot.data[index]["price"].toString(),
-                              snapshot.data[index]["pricecheck"].toString(),
-                              snapshot.data[index]["order_state"].toString(),
-                              snapshot.data[index]["supplier_id"].toString(),
-                            );
-                            Navigator.pushNamed(
-                              context,
-                              RoutesManager.shOrder,
-                              arguments: orderData,
-                            );
-                          },
-                          leading: CircleAvatar(
-                            child: Icon(
-                              Icons.card_travel_rounded,
-                              size: 20.sp,
-                              color: Colors.white,
-                            ),
-                          ),
-                        );
-                      },
+        body: StreamBuilder<List<dynamic>?>(
+          stream: _realtimeService.getShipperDailyOrdersStream(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting &&
+                !snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.blue),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  lang.lang == "en"
+                      ? 'Error loading orders'
+                      : 'خطأ في تحميل الطلبات',
+                ),
+              );
+            }
+
+            final orders = snapshot.data ?? [];
+
+            if (orders.isEmpty) {
+              return Center(
+                child: Text(
+                  lang.lang == "en"
+                      ? 'No orders available'
+                      : 'لا توجد طلبات متاحة',
+                  style: TextStyle(fontSize: 18.sp),
+                ),
+              );
+            }
+
+            // Show snackbar when new orders arrive
+            if (orders.length > _orderNum && _orderNum > 0) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: Colors.redAccent,
+                    content: Text(
+                      lang.lang == "en"
+                          ? 'There are ${orders.length} orders you can match'
+                          : ' هناك ${orders.length} طلبات يمكنك مشاهدتهم',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.sp,
+                      ),
+                    ),
+                  ),
+                );
+              });
+            }
+            _orderNum = orders.length;
+
+            return ListView.builder(
+              itemCount: orders.length,
+              itemBuilder: (context, index) {
+                final order = orders[index];
+                final id = order["id"]?.toString() ?? '';
+                final size = order["size"]?.toString() ?? '';
+                final cost = order["cost"]?.toString() ?? '';
+
+                String sizeLabel;
+                if (lang.lang == "en") {
+                  sizeLabel = "Size: $size";
+                } else {
+                  sizeLabel = size == "small"
+                      ? " الحجم : صغير"
+                      : size == "medium"
+                      ? " الحجم : وسط"
+                      : " الحجم : كبير";
+                }
+
+                return ListTile(
+                  title: Text(
+                    "${lang.lang == "en" ? "id : " : "الكود:"}$id    $sizeLabel",
+                  ),
+                  subtitle: Text(
+                    "${lang.lang == "en" ? "cost " : "التكلفة "}$cost${lang.lang == "en" ? " EGP " : " جم "}",
+                  ),
+                  onTap: () {
+                    final orderData = OrderData(
+                      order["dist_latitude"]?.toString() ?? '',
+                      order["so_latitude"]?.toString() ?? '',
+                      order["dist_longitude"]?.toString() ?? '',
+                      order["so_longitude"]?.toString() ?? '',
+                      id,
+                      false,
+                      order["cost"]?.toString() ?? '',
+                      order["price"]?.toString() ?? '',
+                      order["pricecheck"]?.toString() ?? '',
+                      order["order_state"]?.toString() ?? '',
+                      order["supplier_id"]?.toString() ?? '',
                     );
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(color: Colors.blue),
+                    Navigator.pushNamed(
+                      context,
+                      RoutesManager.shOrder,
+                      arguments: orderData,
                     );
-                  }
-                },
-              ),
-            ),
-          ],
+                  },
+                  leading: CircleAvatar(
+                    child: Icon(
+                      Icons.card_travel_rounded,
+                      size: 20.sp,
+                      color: Colors.white,
+                    ),
+                  ),
+                );
+              },
+            );
+          },
         ),
       ),
     );
   }
 
-  List<Steps> parseSteps(final responseBody) {
-    var list = responseBody
-        .map<Steps>((json) => new Steps.fromJson(json))
-        .toList();
-    return list;
+  @override
+  void dispose() {
+    _realtimeService.dispose();
+    super.dispose();
   }
 }
 
@@ -447,9 +339,7 @@ class NamedIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, RoutesManager.shOrders);
-      },
+      onTap: onTap,
       child: Container(
         width: 72.w,
         padding: REdgeInsets.symmetric(horizontal: 8.w),
@@ -458,7 +348,7 @@ class NamedIcon extends StatelessWidget {
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
+              children: [
                 Icon(iconData),
                 Text(text, overflow: TextOverflow.ellipsis),
               ],
@@ -468,7 +358,7 @@ class NamedIcon extends StatelessWidget {
               right: 0.w,
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.red,
                 ),

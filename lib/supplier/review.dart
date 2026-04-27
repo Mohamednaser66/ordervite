@@ -147,12 +147,14 @@ class _RatingsPage extends State<RatingsPage> {
                                 : "$_rating تم إتمام الطلب، ونشكرك على تقييم الخدمة",
                           );
 
-                          Navigator.pushNamed(
+                          Navigator.pushReplacementNamed(
                             context,
                             RoutesManager.suHome,
                             arguments: message,
                           );
-                        } catch (e) {}
+                        } catch (e) {
+                          showDialog(context: context, builder: (context) => Text("Failed Operation ",style: TextStyle(color: Colors.redAccent,fontSize: 14.sp),),);
+                        }
                       },
                       icon: Icon(Icons.done_all, size: 20.sp),
                       label: Text(
@@ -178,7 +180,7 @@ class _RatingsPage extends State<RatingsPage> {
                               ? "Order is complete"
                               : "تم ااكتمال طلبك",
                         );
-                        Navigator.pushNamed(
+                        Navigator.pushReplacementNamed(
                           context,
                           RoutesManager.suHome,
                           arguments: message,

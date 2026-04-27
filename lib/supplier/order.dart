@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,6 +16,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -36,22 +36,19 @@ class _OrderPageState extends State<OrderPage> {
   final Location _locationTracker = Location();
 
   late LatLng _sourceLatLng;
-  late LatLng _destinationLatLng;
-
+   LatLng? _destinationLatLng;
   String? _username;
   String? _userId;
   String? _token;
-
   bool _isConfirm = false;
   String? _orderId;
   String? _orderCost;
   String? _orderPrice;
   String? _orderPriceCheck;
-  String _orderShipperId = "pending";
+  String _orderShipperId = "....";
   String? _orderState;
   String? _shipperApiToken;
   int _unreadMessageCount = 0;
-
   bool _isShipperConfirmed = false;
   bool _isShipperReceived = false;
   bool _isShipperDelivered = false;
@@ -137,7 +134,7 @@ class _OrderPageState extends State<OrderPage> {
       ),
       Marker(
         markerId: const MarkerId("2"),
-        position: _destinationLatLng,
+        position: _destinationLatLng!,
         infoWindow: const InfoWindow(title: "destination"),
         icon: BitmapDescriptor.defaultMarker,
       ),
@@ -145,7 +142,7 @@ class _OrderPageState extends State<OrderPage> {
 
     await _cubit.fetchRoute(
       _sourceLatLng,
-      _destinationLatLng,
+      _destinationLatLng!,
       AppConfig.googleMapsApiKey,
     );
 
@@ -225,7 +222,6 @@ class _OrderPageState extends State<OrderPage> {
       );
     }
   }
-
   void _navigateToHome(String en, String ar) {
     if (!mounted) return;
     final lang = Lang.of(context);
@@ -238,8 +234,7 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   void _navigateToRating() {
-    if (!mounted) return;
-    Navigator.pushNamed(
+    Navigator.pushReplacementNamed(
       context,
       RoutesManager.rating,
       arguments: OrderView(_orderId ?? '', _shipperApiToken ?? ''),
@@ -263,11 +258,10 @@ class _OrderPageState extends State<OrderPage> {
       price: _priceController.text.trim(),
       priceCheck: _paymentMethod,
       source: _sourceLatLng,
-      destination: _destinationLatLng,
+      destination: _destinationLatLng!,
       distance: _distance ?? '0.0',
     );
   }
-
   Future<void> _cancelOrder(Lang lang) async {
     if (_orderId == null || _userId == null || _token == null) return;
     final confirmed = await showDialog<bool>(
@@ -332,12 +326,20 @@ class _OrderPageState extends State<OrderPage> {
             'Please confirm that the order is complete',
             '     يرجي تأكيد عملية اكتمال الطلب ',
           ),
-          style: const TextStyle(fontSize: 15, color: Colors.red),
+          style:  TextStyle(fontSize: 15.sp, color: Colors.red),
         ),
         actions: [
           TextButton(
             child: Text(_loc(lang, 'Yes', 'نعم')),
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () async{
+              await _cubit.completeOrder(
+                orderId: _orderId!,
+                token: _token!,
+                shipperApiToken: _shipperApiToken ?? '',
+                lang: lang,
+              );
+              _navigateToRating();
+            }
           ),
           TextButton(
             child: Text(_loc(lang, 'No', 'لا')),
@@ -346,21 +348,14 @@ class _OrderPageState extends State<OrderPage> {
         ],
       ),
     );
-    if (confirmed != true) return;
-    await _cubit.completeOrder(
-      orderId: _orderId!,
-      token: _token!,
-      shipperApiToken: _shipperApiToken ?? '',
-      lang: lang,
-    );
-    _navigateToRating();
+
   }
 
   void _animateCamera() async {
     final controller = await _mapController.future;
     controller.animateCamera(
       CameraUpdate.newLatLngBounds(
-        getBounds(_sourceLatLng, _destinationLatLng),
+        getBounds(_sourceLatLng, _destinationLatLng!),
         70,
       ),
     );
@@ -416,6 +411,7 @@ class _OrderPageState extends State<OrderPage> {
               _orderPrice = order.price;
               _orderPriceCheck = order.priceCheck;
               _orderState = order.state;
+              _orderShipperId=order.shipperId;
               print("CREATED COST:================================== ${order.cost}");
             });
             _showSnackBar(
@@ -482,8 +478,8 @@ class _OrderPageState extends State<OrderPage> {
                     order_id: _orderId ?? '',
                     api_token: _shipperApiToken ?? '',
                     notificationCount: _unreadMessageCount,
-                    disLat: _destinationLatLng.latitude.toString(),
-                    disLong: _destinationLatLng.longitude.toString(),
+                    disLat: _destinationLatLng?.latitude.toString(),
+                    disLong: _destinationLatLng?.longitude.toString(),
                     sorLat: _sourceLatLng.latitude.toString(),
                     sorlong: _sourceLatLng.longitude.toString(),
                     isConfirm: _isConfirm,
@@ -606,18 +602,18 @@ class _OrderPageState extends State<OrderPage> {
                   labelText: lang.lang == "en"
                       ? "click here to set the price"
                       : "اضغط هنا لتحديد السعر",
-                  labelStyle: const TextStyle(
-                    fontSize: 15,
+                  labelStyle:  TextStyle(
+                    fontSize: 15.sp,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20.r),
                     borderSide: const BorderSide(color: Colors.black),
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
+               SizedBox(height: 5.h),
               Row(
                 children: [
                   Expanded(
@@ -626,8 +622,8 @@ class _OrderPageState extends State<OrderPage> {
                       icon:  Icon(Icons.done_all, size: 20.sp),
                       label: Text(
                         lang.lang == "en" ? "Confirm" : "تأكيد ",
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style:  TextStyle(
+                          fontSize: 12.sp,
                           color: Colors.white,
                         ),
                       ),
@@ -743,7 +739,7 @@ class _OrderPageState extends State<OrderPage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
         children: payments.map((payment) {

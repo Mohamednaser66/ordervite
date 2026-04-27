@@ -76,7 +76,7 @@ class OrderRepository {
     _pollTimer = null;
   }
 
-  /// Fetch current order from API
+
   Future<Order?> _fetchCurrentOrder(String userId, String token) async {
     try {
       final int parsedId = int.parse(userId);
@@ -217,7 +217,7 @@ class OrderRepository {
     }
   }
 
-  /// Cancel order
+
   Future<bool> cancelOrder(
     String orderId,
     String cancelMessage,
@@ -268,7 +268,6 @@ class OrderRepository {
     }
   }
 
-  /// Update FCM token for a supplier
   Future<bool> updateFcmToken(
     String supplierId,
     String fcmToken,
@@ -317,7 +316,6 @@ class OrderRepository {
     }
   }
 
-  /// Send notification to shipper
   Future<bool> sendNotification(
     String text,
     String shipperApiToken,
