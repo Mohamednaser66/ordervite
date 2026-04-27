@@ -430,7 +430,6 @@ class _SHHomePageState extends State<SHHomePage> {
           );
         }
       }
-
       return orders;
     } catch (error) {
       debugPrint('Daily orders request failed: $error');
