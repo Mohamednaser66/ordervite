@@ -15,6 +15,8 @@ import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/map_utils.dart';
+
 String GoogleApiKEY = "AIzaSyDl8LFLQn24CbaZyQ0F4wnzoF9NY3_gMWY";
 
 const oneSec = const Duration(seconds: 1);
@@ -164,7 +166,10 @@ class _ShOrdersState extends State<ShOrders> {
                     lang.lang == "en"
                         ? 'There is $order_num order you  can match'
                         : ' طلبات هناك $order_num يمكنك مشاهدتهم',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18.sp,
+                    ),
                   ),
                 ),
               );
@@ -207,6 +212,7 @@ class _ShOrdersState extends State<ShOrders> {
       timer?.cancel();
     }
   }
+
   void _handleMessage(RemoteMessage message) {
     if (!mounted) return;
 
@@ -226,7 +232,6 @@ class _ShOrdersState extends State<ShOrders> {
       });
     }
 
-
     if (stateName == "order review") {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -234,20 +239,19 @@ class _ShOrdersState extends State<ShOrders> {
             backgroundColor: Colors.redAccent,
             content: Text(
               stateType,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18.sp,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
             ),
           ),
         );
       });
     }
   }
+
   Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await Firebase.initializeApp();
     print('Handling background message: ${message.messageId}');
   }
+
   void showMessageSafe() {
     final args = ModalRoute.of(context)?.settings.arguments;
 
@@ -255,6 +259,7 @@ class _ShOrdersState extends State<ShOrders> {
       showMessage(args);
     }
   }
+
   @override
   void dispose() {
     timer?.cancel();
@@ -279,6 +284,7 @@ class _ShOrdersState extends State<ShOrders> {
       _isInit = false;
     }
   }
+
   @override
   void initState() {
     super.initState();
@@ -307,6 +313,7 @@ class _ShOrdersState extends State<ShOrders> {
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
+
   @override
   Widget build(BuildContext context) {
     Lang lang = Lang.of(context);
@@ -372,7 +379,7 @@ class _ShOrdersState extends State<ShOrders> {
                                 (lang.lang == "en" ? " EGP " : " جم "),
                           ),
                           onTap: () {
-                            OrderData orderData = new OrderData(
+                            OrderData orderData = OrderData(
                               snapshot.data[index]["dist_latitude"].toString(),
                               snapshot.data[index]["so_latitude"].toString(),
                               snapshot.data[index]["dist_longitude"].toString(),
@@ -402,7 +409,9 @@ class _ShOrdersState extends State<ShOrders> {
                       },
                     );
                   } else {
-                    return Center(child: CircularProgressIndicator(color: Colors.blue,));
+                    return Center(
+                      child: CircularProgressIndicator(color: Colors.blue),
+                    );
                   }
                 },
               ),
@@ -443,7 +452,7 @@ class NamedIcon extends StatelessWidget {
       },
       child: Container(
         width: 72.w,
-        padding:  REdgeInsets.symmetric(horizontal: 8.w),
+        padding: REdgeInsets.symmetric(horizontal: 8.w),
         child: Stack(
           alignment: Alignment.center,
           children: [

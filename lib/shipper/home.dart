@@ -6,12 +6,14 @@ import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/shipper/shipper_drawer.dart';
 import 'package:flutter_maps/shipper/widgets/order_named_icon.dart';
-import 'package:flutter_maps/supplier/order.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../core/map_utils.dart';
 
 String GoogleApiKEY = "AIzaSyDl8LFLQn24CbaZyQ0F4wnzoF9NY3_gMWY";
 

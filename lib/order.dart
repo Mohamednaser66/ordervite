@@ -206,7 +206,14 @@ class _OrderState extends State<Order> {
           if (isConfirm) {
             if (reposnsebody["data"] != null) {
               setState(() {
-                order_state = reposnsebody["data"]["order_state"].toString();
+                order_state =
+                    reposnsebody["data"]["order_state"]?.toString() ?? '';
+                order_cost = reposnsebody["data"]["cost"]?.toString() ?? '';
+                order_price = reposnsebody["data"]["price"]?.toString() ?? '';
+                order_pricecheck =
+                    reposnsebody["data"]["pricecheck"]?.toString() ?? '';
+                order_supplier_id =
+                    reposnsebody["data"]["supplier_id"]?.toString() ?? '';
               });
 
               if (reposnsebody["data"]["order_cancel"] != null) {
@@ -266,9 +273,14 @@ class _OrderState extends State<Order> {
           if (isConfirmSupplier) {
             if (reposnsebody["data"] != null) {
               setState(() {
-                order_state = reposnsebody["data"]["order_state"].toString();
-                order_shippier_id = reposnsebody["data"]["shippier_id"]
-                    .toString();
+                order_state =
+                    reposnsebody["data"]["order_state"]?.toString() ?? '';
+                order_shippier_id =
+                    reposnsebody["data"]["shippier_id"]?.toString() ?? '';
+                order_cost = reposnsebody["data"]["cost"]?.toString() ?? '';
+                order_price = reposnsebody["data"]["price"]?.toString() ?? '';
+                order_pricecheck =
+                    reposnsebody["data"]["pricecheck"]?.toString() ?? '';
               });
 
               if (reposnsebody["data"]["order_cancel"] != null) {
@@ -674,7 +686,9 @@ class _OrderState extends State<Order> {
                                               backgroundColor: Colors.green,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0.r),
+                                                    BorderRadius.circular(
+                                                      30.0.r,
+                                                    ),
                                               ),
                                             ),
                                           ),
@@ -718,7 +732,9 @@ class _OrderState extends State<Order> {
                                                   InkRipple.splashFactory,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0.r),
+                                                    BorderRadius.circular(
+                                                      30.0.r,
+                                                    ),
                                               ),
                                             ),
                                           ),
@@ -822,7 +838,9 @@ class _OrderState extends State<Order> {
                                               backgroundColor: Colors.green,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0.r),
+                                                    BorderRadius.circular(
+                                                      30.0.r,
+                                                    ),
                                               ),
                                             ),
                                           ),
@@ -909,7 +927,9 @@ class _OrderState extends State<Order> {
                                               backgroundColor: Colors.red,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0.r),
+                                                    BorderRadius.circular(
+                                                      30.0.r,
+                                                    ),
                                               ),
                                             ),
                                           ),
@@ -1015,7 +1035,9 @@ class _OrderState extends State<Order> {
                                               backgroundColor: Colors.green,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0.r),
+                                                    BorderRadius.circular(
+                                                      30.0.r,
+                                                    ),
                                               ),
                                             ),
                                           ),
@@ -1098,7 +1120,9 @@ class _OrderState extends State<Order> {
                                               backgroundColor: Colors.red,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0.r),
+                                                    BorderRadius.circular(
+                                                      30.0.r,
+                                                    ),
                                               ),
                                             ),
                                           ),
@@ -1254,7 +1278,7 @@ class _OrderState extends State<Order> {
                                     children: <Widget>[
                                       Expanded(
                                         child: ListTile(
-                                          title:  Text(
+                                          title: Text(
                                             'SM',
                                             style: TextStyle(
                                               fontSize: 10.sp,
@@ -1286,7 +1310,7 @@ class _OrderState extends State<Order> {
 
                                       Expanded(
                                         child: ListTile(
-                                          title:  Text(
+                                          title: Text(
                                             'MD',
                                             style: TextStyle(
                                               fontSize: 10.sp,
@@ -1318,7 +1342,7 @@ class _OrderState extends State<Order> {
 
                                       Expanded(
                                         child: ListTile(
-                                          title:  Text(
+                                          title: Text(
                                             'LG',
                                             style: TextStyle(
                                               fontSize: 10.sp,
@@ -1382,7 +1406,7 @@ class _OrderState extends State<Order> {
                                     children: <Widget>[
                                       Expanded(
                                         child: ListTile(
-                                          title:  Text(
+                                          title: Text(
                                             'TRANSFER',
                                             style: TextStyle(
                                               fontSize: 12.sp,
@@ -1414,7 +1438,7 @@ class _OrderState extends State<Order> {
 
                                       Expanded(
                                         child: ListTile(
-                                          title:  Text(
+                                          title: Text(
                                             'CASH',
                                             style: TextStyle(
                                               fontSize: 12.sp,
@@ -1476,7 +1500,9 @@ class _OrderState extends State<Order> {
 
                                         keyboardType: TextInputType.number,
 
-                                        scrollPadding: EdgeInsets.only(top: 1.h),
+                                        scrollPadding: EdgeInsets.only(
+                                          top: 1.h,
+                                        ),
 
                                         style: TextStyle(
                                           fontSize: 15.sp,
@@ -1547,7 +1573,7 @@ class _OrderState extends State<Order> {
                                             ScaffoldMessenger.of(
                                               context,
                                             ).showSnackBar(
-                                               SnackBar(
+                                              SnackBar(
                                                 backgroundColor:
                                                     Colors.redAccent,
                                                 content: Text(
@@ -1694,17 +1720,32 @@ class _OrderState extends State<Order> {
 
                                               setState(() {
                                                 isConfirmSupplier = true;
-                                                order_id = body["data"]["id"]
-                                                    .toString();
+                                                order_id =
+                                                    body["data"]["id"]
+                                                        ?.toString() ??
+                                                    '';
                                                 order_state =
                                                     body["data"]["order_state"]
-                                                        .toString();
+                                                        ?.toString() ??
+                                                    '';
+                                                order_cost =
+                                                    body["data"]["cost"]
+                                                        ?.toString() ??
+                                                    '';
+                                                order_price =
+                                                    body["data"]["price"]
+                                                        ?.toString() ??
+                                                    '';
+                                                order_pricecheck =
+                                                    body["data"]["pricecheck"]
+                                                        ?.toString() ??
+                                                    '';
                                               });
 
                                               ScaffoldMessenger.of(
                                                 context,
                                               ).showSnackBar(
-                                                 SnackBar(
+                                                SnackBar(
                                                   backgroundColor: Colors.green,
                                                   content: Text(
                                                     'Successfully, please wait for response ...',
@@ -1721,7 +1762,7 @@ class _OrderState extends State<Order> {
                                             ScaffoldMessenger.of(
                                               context,
                                             ).showSnackBar(
-                                               SnackBar(
+                                              SnackBar(
                                                 backgroundColor:
                                                     Colors.redAccent,
                                                 content: Text(
@@ -1735,11 +1776,8 @@ class _OrderState extends State<Order> {
                                             );
                                           }
                                         },
-                                        icon: Icon(
-                                          Icons.done_all,
-                                          size: 20.sp,
-                                        ),
-                                        label:  Text(
+                                        icon: Icon(Icons.done_all, size: 20.sp),
+                                        label: Text(
                                           "Confirm",
                                           style: TextStyle(
                                             fontSize: 12.sp,
@@ -1773,11 +1811,8 @@ class _OrderState extends State<Order> {
                                             ),
                                           );
                                         },
-                                        icon: Icon(
-                                          Icons.cancel,
-                                          size: 20.sp,
-                                        ),
-                                        label:  Text(
+                                        icon: Icon(Icons.cancel, size: 20.sp),
+                                        label: Text(
                                           "Cancel",
                                           style: TextStyle(
                                             fontSize: 12.sp,
