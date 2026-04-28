@@ -18,6 +18,7 @@ import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
+
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
   final String title = "OrderVite";
@@ -28,13 +29,11 @@ class OrderPage extends StatefulWidget {
 class _OrderPageState extends State<OrderPage> {
   final OrderRepository _orderRepository = OrderRepository();
   late final SupplierOrderCubit _cubit;
-
   late CameraPosition _initialCamera;
   final Completer<GoogleMapController> _mapController = Completer();
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
   final Location _locationTracker = Location();
-
   late LatLng _sourceLatLng;
    LatLng? _destinationLatLng;
   String? _username;

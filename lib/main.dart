@@ -41,7 +41,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // ✅ لازم تتسجل بدري جدًا
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   SystemChrome.setPreferredOrientations([
