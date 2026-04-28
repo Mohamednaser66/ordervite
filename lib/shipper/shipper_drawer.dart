@@ -28,6 +28,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      width: 220.w,
       child: Container(
         decoration: BoxDecoration(
           color: Color.fromRGBO(7, 15, 33, 0.9),
@@ -40,7 +41,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
         child: ListView(
           children: <Widget>[
             SizedBox(
-              height: 130.h,
+              height: 150.h,
               child: DrawerHeader(
                 decoration: BoxDecoration(color: Colors.blue),
                 padding: EdgeInsets.all(10.r),
@@ -65,25 +66,29 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
                     SizedBox(height: 10.h,),
 
                     widget.isSignIn
-                        ? Text(
-                            widget.username,
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                        ? Expanded(
+                          child: Text(
+                              widget.username,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
-                          )
+                        )
                         : Text(""),
 
                     widget.isSignIn
-                        ? Text(
-                            widget.email,
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                        ? Expanded(
+                          child: Text(
+                              widget.email,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
-                          )
+                        )
                         : Text(""),
                   ],
                 ),

@@ -11,10 +11,11 @@ class ThemeManager {
       ),
     ),
     appBarTheme: AppBarTheme(
+
       centerTitle: true,
-      iconTheme: IconThemeData(color: Colors.white),
+      iconTheme: IconThemeData(color: Colors.white,size: 26.sp),
       titleTextStyle: TextStyle(
-        fontSize: 25.sp,
+        fontSize: 18.sp,
         fontWeight: FontWeight.bold,
         color: Colors.white,
       ),

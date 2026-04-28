@@ -28,6 +28,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      width: 200.w,
       child: Container(
         decoration: BoxDecoration(
           color: Color.fromRGBO(7, 15, 33, 0.9),
@@ -39,7 +40,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
         child: Column(
           children: [
             SizedBox(
-            height:   180.h,
+            height:   150.h,
               child: DrawerHeader(
                 decoration: BoxDecoration(color: Colors.blue),
                 child: Column(
@@ -56,23 +57,27 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
                                   as ImageProvider,
                       ),
                     ),
-                    SizedBox(height: 16,),
+                    SizedBox(height: 16.h,),
                     if (widget.isSignIn)
-                      Text(
-                        widget.username,
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      Expanded(
+                        child: Text(
+                          widget.username,
+                          style: TextStyle(
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     if (widget.isSignIn)
-                      Text(
-                        widget.email,
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      Expanded(
+                        child: Text(
+                          widget.email,
+                          style: TextStyle(
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                   ],

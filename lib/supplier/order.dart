@@ -351,7 +351,6 @@ class _OrderPageState extends State<OrderPage> {
       ),
     );
 
-    // Real-time data sync: Refresh order data when dialog is dismissed (even if user clicked 'No')
     if (confirmed == false && mounted && _userId != null && _token != null) {
       _cubit.refreshCurrentOrder(_userId!, _token!);
       return;

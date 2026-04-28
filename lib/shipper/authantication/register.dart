@@ -215,118 +215,122 @@ String roles = ConstantManager.shipper;
                       lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم التليفون 2 ',
                     ),
                     SizedBox(height: 20.h),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue, // instead of color
-                        foregroundColor: Colors.white, // instead of textColor
-                        splashFactory: InkRipple.splashFactory,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15.r)),
-                          // side: BorderSide(color: Colors.red, width: 2.w),
+                    SizedBox(
+                      height: 40.h,
+                      width: 140.w,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue, // instead of color
+                          foregroundColor: Colors.white, // instead of textColor
+                          splashFactory: InkRipple.splashFactory,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(15.r)),
+                            // side: BorderSide(color: Colors.red, width: 2.w),
+                          ),
                         ),
-                      ),
-                      label: Text(
-                        lang.lang == "en" ? 'Sign UP' : 'تسجيل كمسئول شحن ',
-                      ),
+                        label: Text(
+                          lang.lang == "en" ? 'Sign UP' : 'تسجيل كمسئول شحن ',
+                        ),
 
-                      onPressed: () async {
-                        formstatesignup.currentState!.save();
+                        onPressed: () async {
+                          formstatesignup.currentState!.save();
 
-                        setState(() {
-                          isLoading = true;
-                        });
-
-                        try {
-                          String? api_token;
-
-                          _firebaseMessaging.getToken().then((token) async {
-                            setState(() {
-                              api_token = token.toString();
-                            });
+                          setState(() {
+                            isLoading = true;
                           });
 
-                          var location = await _locationTracker.getLocation();
+                          try {
+                            String? api_token;
 
-                          var data = {
-                            "name": username.text,
-                            "email": email.text,
-                            "password": password.text,
-                            "c_password": cpassword.text,
-                            "mobile1": mobile1.text,
-                            "mobile2": mobile2.text,
-                            "reg_longitude": location.longitude.toString(),
-                            "reg_latitude": location.latitude.toString(),
-                            "cur_longitude": location.longitude.toString(),
-                            "cur_latitude": location.latitude.toString(),
-                            "api_token": api_token.toString(),
-                          };
-                          var url =
-                              "https://www.ordervite.com/api/shippier/register";
-                          var response = await http.post(
-                            Uri.parse(url),
-                            body: data,
-                          );
-                          var reposnsebody = jsonDecode(response.body);
-
-                          if (formstatesignup.currentState!.validate()) {
-                            if (reposnsebody["success"] == true) {
+                            _firebaseMessaging.getToken().then((token) async {
                               setState(() {
-                                isLoading = false;
+                                api_token = token.toString();
                               });
-                              savePref(
-                                reposnsebody["data"]["name"]["name"],
-                                reposnsebody["data"]["name"]["email"],
-                                reposnsebody["data"]["token"],
-                                reposnsebody["data"]["name"]["id"].toString(),
-                                "shipper",
-                              );
+                            });
 
-                              AuthService.setToken(
-                                reposnsebody["data"]["token"],
-                                reposnsebody["data"]["token"],
-                                "shipper",
-                              );
-                              Navigator.of(
-                                context,
-                              ).pushNamed(RoutesManager.shProfile);
-                            } else {
-                              setState(() {
-                                isLoading = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Invlid data Please Insert Correct Data',
-                                    style: TextStyle(
-                                      fontSize: 15.sp,
-                                      color: Colors.red,
+                            var location = await _locationTracker.getLocation();
+
+                            var data = {
+                              "name": username.text,
+                              "email": email.text,
+                              "password": password.text,
+                              "c_password": cpassword.text,
+                              "mobile1": mobile1.text,
+                              "mobile2": mobile2.text,
+                              "reg_longitude": location.longitude.toString(),
+                              "reg_latitude": location.latitude.toString(),
+                              "cur_longitude": location.longitude.toString(),
+                              "cur_latitude": location.latitude.toString(),
+                              "api_token": api_token.toString(),
+                            };
+                            var url =
+                                "https://www.ordervite.com/api/shippier/register";
+                            var response = await http.post(
+                              Uri.parse(url),
+                              body: data,
+                            );
+                            var reposnsebody = jsonDecode(response.body);
+
+                            if (formstatesignup.currentState!.validate()) {
+                              if (reposnsebody["success"] == true) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                                savePref(
+                                  reposnsebody["data"]["name"]["name"],
+                                  reposnsebody["data"]["name"]["email"],
+                                  reposnsebody["data"]["token"],
+                                  reposnsebody["data"]["name"]["id"].toString(),
+                                  "shipper",
+                                );
+
+                                AuthService.setToken(
+                                  reposnsebody["data"]["token"],
+                                  reposnsebody["data"]["token"],
+                                  "shipper",
+                                );
+                                Navigator.of(
+                                  context,
+                                ).pushNamed(RoutesManager.shProfile);
+                              } else {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Invlid data Please Insert Correct Data',
+                                      style: TextStyle(
+                                        fontSize: 15.sp,
+                                        color: Colors.red,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
+                                );
+                              }
                             }
-                          }
-                        } catch (e) {
-                          showDialog<bool>(
-                            context: context,
-                            builder: (c) => AlertDialog(
-                              title: Text(
-                                lang.lang == "en" ? 'Warning' : 'تحذير',
-                                style: TextStyle(color: Colors.red),
-                              ),
-                              content: Text(
-                                lang.lang == "en"
-                                    ? 'Please check your network  '
-                                    : '  يرجي التحقق من اتصال الشبكة الخاص بك   ',
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  color: Colors.red,
+                          } catch (e) {
+                            showDialog<bool>(
+                              context: context,
+                              builder: (c) => AlertDialog(
+                                title: Text(
+                                  lang.lang == "en" ? 'Warning' : 'تحذير',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                                content: Text(
+                                  lang.lang == "en"
+                                      ? 'Please check your network  '
+                                      : '  يرجي التحقق من اتصال الشبكة الخاص بك   ',
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    color: Colors.red,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }
-                      },
+                            );
+                          }
+                        },
+                      ),
                     ),
                     SizedBox(height: 10.h,),
                     Container(

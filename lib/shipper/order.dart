@@ -890,34 +890,40 @@ class _ShOrderState extends State<ShOrder> {
         children: [
           SizedBox(width: 10.w),
           Expanded(
-            child: TextButton.icon(
-              onPressed: () => _onDeliver(lang),
-              icon: Icon(Icons.done_all, size: 20.sp),
-              label: Text(
-                lang.lang == "en" ? "Delivered PK " : "تسليم",
-                style: TextStyle(fontSize: 12.sp, color: Colors.white),
-              ),
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0.r),
+            child: SizedBox(
+              height: 40.h,
+              child: TextButton.icon(
+                onPressed: () => _onDeliver(lang),
+                icon: Icon(Icons.done_all, size: 20.sp),
+                label: Text(
+                  lang.lang == "en" ? "Delivered PK " : "تسليم",
+                  style: TextStyle(fontSize: 12.sp, color: Colors.white),
+                ),
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0.r),
+                  ),
                 ),
               ),
             ),
           ),
           SizedBox(width: 15.w),
           Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () => _onCancel(lang),
-              icon: Icon(Icons.cancel, size: 20.sp),
-              label: Text(
-                lang.lang == "en" ? "Cancel" : "إلغاء",
-                style: TextStyle(fontSize: 12.sp, color: Colors.white),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0.r),
+            child: SizedBox(
+              height: 40.h,
+              child: ElevatedButton.icon(
+                onPressed: () => _onCancel(lang),
+                icon: Icon(Icons.cancel, size: 20.sp),
+                label: Text(
+                  lang.lang == "en" ? "Cancel" : "إلغاء",
+                  style: TextStyle(fontSize: 12.sp, color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0.r),
+                  ),
                 ),
               ),
             ),
@@ -931,34 +937,40 @@ class _ShOrderState extends State<ShOrder> {
         children: [
           SizedBox(width: 10.w),
           Expanded(
-            child: TextButton.icon(
-              onPressed: () => _onReceive(lang),
-              icon: Icon(Icons.done_all, size: 20.sp),
-              label: Text(
-                lang.lang == "en" ? "Received PK" : "استلام",
-                style: TextStyle(fontSize: 12.sp, color: Colors.white),
-              ),
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0.r),
+            child: SizedBox(
+              height: 40.h,
+              child: TextButton.icon(
+                onPressed: () => _onReceive(lang),
+                icon: Icon(Icons.done_all, size: 20.sp),
+                label: Text(
+                  lang.lang == "en" ? "Received PK" : "استلام",
+                  style: TextStyle(fontSize: 12.sp, color: Colors.white),
+                ),
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0.r),
+                  ),
                 ),
               ),
             ),
           ),
           SizedBox(width: 15.w),
           Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () => _onCancel(lang),
-              icon: Icon(Icons.cancel, size: 20.sp),
-              label: Text(
-                lang.lang == "en" ? "Cancel" : "إلغاء",
-                style: TextStyle(fontSize: 12.sp, color: Colors.white),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0.r),
+            child: SizedBox(
+              height: 40.h,
+              child: ElevatedButton.icon(
+                onPressed: () => _onCancel(lang),
+                icon: Icon(Icons.cancel, size: 20.sp),
+                label: Text(
+                  lang.lang == "en" ? "Cancel" : "إلغاء",
+                  style: TextStyle(fontSize: 12.sp, color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0.r),
+                  ),
                 ),
               ),
             ),
@@ -971,34 +983,40 @@ class _ShOrderState extends State<ShOrder> {
       children: [
         SizedBox(width: 10.w),
         Expanded(
-          child: TextButton.icon(
-            onPressed: () => _onConfirm(lang),
-            icon: Icon(Icons.done_all, size: 20.sp),
-            label: Text(
-              lang.lang == "en" ? "Confirm" : "تأكيد",
-              style: TextStyle(fontSize: 12.sp, color: Colors.white),
-            ),
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0.r),
+          child: SizedBox(
+            height: 40.h,
+            child: TextButton.icon(
+              onPressed: () => _onConfirm(lang),
+              icon: Icon(Icons.done_all, size: 20.sp),
+              label: Text(
+                lang.lang == "en" ? "Confirm" : "تأكيد",
+                style: TextStyle(fontSize: 12.sp, color: Colors.white),
+              ),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0.r),
+                ),
               ),
             ),
           ),
         ),
         SizedBox(width: 15.w),
         Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () => _onCancel(lang),
-            icon: Icon(Icons.cancel, size: 20.sp),
-            label: Text(
-              lang.lang == "en" ? "Cancel" : "إلغاء",
-              style: TextStyle(fontSize: 12.sp, color: Colors.white),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0.r),
+          child: SizedBox(
+            height: 40.h,
+            child: ElevatedButton.icon(
+              onPressed: () => _onCancel(lang),
+              icon: Icon(Icons.cancel, size: 20.sp),
+              label: Text(
+                lang.lang == "en" ? "Cancel" : "إلغاء",
+                style: TextStyle(fontSize: 12.sp, color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0.r),
+                ),
               ),
             ),
           ),

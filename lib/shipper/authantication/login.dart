@@ -153,56 +153,81 @@ class _LogInSHState extends State<LogInSH> {
                         lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
                       ),
 
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          formstatesignin.currentState?.save();
-                          setState(() {
-                            isLoading = true;
-                          });
-                          try {
-                            var data = {
-                              "email": email.text,
-                              "password": password.text,
-                            };
-                            var url =
-                                "https://www.ordervite.com/api/shippier/login";
-                            var response = await http.post(
-                              Uri.parse(url),
-                              body: data,
-                            );
-                            var reposnsebody = jsonDecode(response.body);
-
-                            if (reposnsebody["success"] == true) {
-                              setState(() {
-                                isLoading = false;
-                              });
-                              savePref(
-                                reposnsebody["data"]["name"]["name"],
-                                reposnsebody["data"]["name"]["email"],
-                                reposnsebody["data"]["token"],
-                                reposnsebody["data"]["name"]["id"].toString(),
-                                "shipper",
-                                reposnsebody["data"]["logo"].toString(),
+                      SizedBox(
+                        height: 40.h,
+                        width: 140.w,
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            formstatesignin.currentState?.save();
+                            setState(() {
+                              isLoading = true;
+                            });
+                            try {
+                              var data = {
+                                "email": email.text,
+                                "password": password.text,
+                              };
+                              var url =
+                                  "https://www.ordervite.com/api/shippier/login";
+                              var response = await http.post(
+                                Uri.parse(url),
+                                body: data,
                               );
-                              AuthService.setToken(
-                                reposnsebody["data"]["token"],
-                                reposnsebody["data"]["token"],
-                                "shipper",
-                              );
-                              Navigator.of(
-                                context,
-                              ).pushNamed(RoutesManager.shHome);
+                              var reposnsebody = jsonDecode(response.body);
 
-                            } else {
-                              setState(() {
-                                isLoading = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                              if (reposnsebody["success"] == true) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                                savePref(
+                                  reposnsebody["data"]["name"]["name"],
+                                  reposnsebody["data"]["name"]["email"],
+                                  reposnsebody["data"]["token"],
+                                  reposnsebody["data"]["name"]["id"].toString(),
+                                  "shipper",
+                                  reposnsebody["data"]["logo"].toString(),
+                                );
+                                AuthService.setToken(
+                                  reposnsebody["data"]["token"],
+                                  reposnsebody["data"]["token"],
+                                  "shipper",
+                                );
+                                Navigator.of(
+                                  context,
+                                ).pushNamed(RoutesManager.shHome);
+
+                              } else {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      lang.lang == 'en'
+                                          ? 'these cerditional does not match any account please sign up '
+                                          : ' هذه البيانات لا توافق اي بيانات حساب لدينا من فضلك قم بتسجيل بياناتك ',
+                                      style: TextStyle(
+                                        fontSize: 15.sp,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              print(e.toString());
+
+                              showDialog<bool>(
+                                context: context,
+                                builder: (c) => AlertDialog(
+                                  title: Text(
+                                    lang.lang == "en" ? 'Warning' : 'تحذير',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                   content: Text(
-                                    lang.lang == 'en'
-                                        ? 'these cerditional does not match any account please sign up '
-                                        : ' هذه البيانات لا توافق اي بيانات حساب لدينا من فضلك قم بتسجيل بياناتك ',
+                                    lang.lang == "en"
+                                        ? 'Please check your network  '
+                                        : '  يرجي التحقق من اتصال الشبكة الخاص بك   ',
                                     style: TextStyle(
                                       fontSize: 15.sp,
                                       color: Colors.red,
@@ -211,36 +236,15 @@ class _LogInSHState extends State<LogInSH> {
                                 ),
                               );
                             }
-                          } catch (e) {
-                            print(e.toString());
-
-                            showDialog<bool>(
-                              context: context,
-                              builder: (c) => AlertDialog(
-                                title: Text(
-                                  lang.lang == "en" ? 'Warning' : 'تحذير',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                                content: Text(
-                                  lang.lang == "en"
-                                      ? 'Please check your network  '
-                                      : '  يرجي التحقق من اتصال الشبكة الخاص بك   ',
-                                  style: TextStyle(
-                                    fontSize: 15.sp,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        icon: Icon(Icons.login),
-                        label: Text(lang.lang == "en" ? 'Sign In' : 'دخول'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.r),
+                          },
+                          icon: Icon(Icons.login),
+                          label: Text(lang.lang == "en" ? 'Sign In' : 'دخول'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.r),
+                            ),
                           ),
                         ),
                       ),
