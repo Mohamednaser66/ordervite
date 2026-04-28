@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/blocs/order_cubit.dart';
 import 'package:flutter_maps/models/order.dart';
-import 'package:flutter_maps/lang.dart';
 
 /// Mixin that provides automatic order status update functionality
 /// Use this in any StatefulWidget that needs to react to order changes
