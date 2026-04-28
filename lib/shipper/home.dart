@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/lang.dart';
+import 'package:flutter_maps/main.dart';
 import 'package:flutter_maps/shipper/shipper_drawer.dart';
 import 'package:flutter_maps/shipper/widgets/order_named_icon.dart';
 
@@ -342,7 +344,7 @@ class _SHHomePageState extends State<SHHomePage> {
   @override
   void initState() {
     super.initState();
-
+     _init();
     _orderController = StreamController<List<dynamic>?>.broadcast();
 
     timer = Timer.periodic(const Duration(seconds: 10), (_) {
@@ -356,7 +358,18 @@ class _SHHomePageState extends State<SHHomePage> {
 
     _initialize();
   }
+  Future<void> _init() async {
+    await initNotifications();
 
+    await Future.delayed(Duration(milliseconds: 500));
+
+    final trackingStatus =
+    await AppTrackingTransparency.trackingAuthorizationStatus;
+
+    if (trackingStatus == TrackingStatus.notDetermined) {
+      await AppTrackingTransparency.requestTrackingAuthorization();
+    }
+  }
   Future<void> _initialize() async {
     await getPref();
     await _registerFcmToken();

@@ -29,17 +29,17 @@ class OrderPage extends StatefulWidget {
 class _OrderPageState extends State<OrderPage> {
   final OrderRepository _orderRepository = OrderRepository();
   late final SupplierOrderCubit _cubit;
-  late CameraPosition _initialCamera;
+   CameraPosition? _initialCamera;
   final Completer<GoogleMapController> _mapController = Completer();
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
   final Location _locationTracker = Location();
-  late LatLng _sourceLatLng;
+   LatLng? _sourceLatLng;
    LatLng? _destinationLatLng;
   String? _username;
   String? _userId;
   String? _token;
-  bool _isConfirm = false;
+  bool _isConfirm =false;
   String? _orderId;
   String? _orderCost;
   String? _orderPrice;
@@ -121,13 +121,13 @@ class _OrderPageState extends State<OrderPage> {
         double.parse(orderDist.disLat.toString()),
         double.parse(orderDist.disLong.toString()),
       );
-      _initialCamera = CameraPosition(target: _sourceLatLng, zoom: 17.0);
+      _initialCamera = CameraPosition(target: _sourceLatLng!, zoom: 17.0);
     });
 
     _markers.addAll([
       Marker(
         markerId: const MarkerId("1"),
-        position: _sourceLatLng,
+        position: _sourceLatLng!,
         infoWindow: const InfoWindow(title: "source"),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       ),
@@ -140,7 +140,7 @@ class _OrderPageState extends State<OrderPage> {
     ]);
 
     await _cubit.fetchRoute(
-      _sourceLatLng,
+      _sourceLatLng!,
       _destinationLatLng!,
       AppConfig.googleMapsApiKey,
     );
@@ -256,7 +256,7 @@ class _OrderPageState extends State<OrderPage> {
       size: _packageSize,
       price: _priceController.text.trim(),
       priceCheck: _paymentMethod,
-      source: _sourceLatLng,
+      source: _sourceLatLng!,
       destination: _destinationLatLng!,
       distance: _distance ?? '0.0',
     );
@@ -311,50 +311,59 @@ class _OrderPageState extends State<OrderPage> {
       );
       return;
     }
+
     if (_orderId == null || _token == null) return;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
         title: Text(
-          _loc(lang, 'Confirm', 'تحذير '),
-          style: const TextStyle(color: Colors.red),
+          _loc(lang, 'Confirm', 'تأكيد'),
+          style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
         ),
         content: Text(
           _loc(
             lang,
             'Please confirm that the order is complete',
-            '     يرجي تأكيد عملية اكتمال الطلب ',
+            'يرجى تأكيد عملية اكتمال الطلب',
           ),
-          style:  TextStyle(fontSize: 15.sp, color: Colors.red),
+          style: TextStyle(fontSize: 15.sp),
         ),
         actions: [
           TextButton(
-            child: Text(_loc(lang, 'Yes', 'نعم')),
-            onPressed: () async{
-              await _cubit.completeOrder(
-                orderId: _orderId!,
-                token: _token!,
-                shipperApiToken: _shipperApiToken ?? '',
-                lang: lang,
-              );
-             Navigator.pushReplacementNamed(context, RoutesManager.suHome);
-            }
+            child: Text(_loc(lang, 'No', 'لا'), style: const TextStyle(color: Colors.grey)),
+            onPressed: () => Navigator.pop(c, false),
           ),
           TextButton(
-            child: Text(_loc(lang, 'No', 'لا')),
-            onPressed: () => Navigator.pop(context, false),
+            child: Text(_loc(lang, 'Yes', 'نعم'), style: const TextStyle(color: Colors.red)),
+            onPressed: () => Navigator.pop(c, true),
           ),
         ],
       ),
     );
 
-  }
+    if (confirmed != true) return;
 
+    await _cubit.completeOrder(
+      orderId: _orderId!,
+      token: _token!,
+      shipperApiToken: _shipperApiToken ?? '',
+      lang: lang,
+    );
+
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        RoutesManager.suHome,
+            (route) => false,
+      );
+    }
+  }
   void _animateCamera() async {
     final controller = await _mapController.future;
     controller.animateCamera(
       CameraUpdate.newLatLngBounds(
-        getBounds(_sourceLatLng, _destinationLatLng!),
+        getBounds(_sourceLatLng!, _destinationLatLng!),
         70,
       ),
     );
@@ -411,7 +420,6 @@ class _OrderPageState extends State<OrderPage> {
               _orderPriceCheck = order.priceCheck;
               _orderState = order.state;
               _orderShipperId=order.shipperId;
-              print("CREATED COST:================================== ${order.cost}");
             });
             _showSnackBar(
               lang,
@@ -479,8 +487,8 @@ class _OrderPageState extends State<OrderPage> {
                     notificationCount: _unreadMessageCount,
                     disLat: _destinationLatLng?.latitude.toString(),
                     disLong: _destinationLatLng?.longitude.toString(),
-                    sorLat: _sourceLatLng.latitude.toString(),
-                    sorlong: _sourceLatLng.longitude.toString(),
+                    sorLat: _sourceLatLng?.latitude.toString(),
+                    sorlong: _sourceLatLng?.longitude.toString(),
                     isConfirm: _isConfirm,
                     order_cost: _orderCost ?? '',
                     order_price: _orderPrice ?? '',
@@ -496,18 +504,19 @@ class _OrderPageState extends State<OrderPage> {
               body: Stack(
                 children: [
                   Positioned.fill(
-                    child: GoogleMap(
+                    child:_initialCamera!=null?
+                    GoogleMap(
                       zoomControlsEnabled: true,
                       scrollGesturesEnabled: true,
                       zoomGesturesEnabled: true,
-                      initialCameraPosition: _initialCamera,
+                      initialCameraPosition: _initialCamera!,
                       markers: _markers,
                       polylines: _polylines,
                       onMapCreated: (controller) =>
                           _mapController.complete(controller),
                       myLocationButtonEnabled: true,
                       mapType: MapType.normal,
-                    ),
+                    ): Center(child: CircularProgressIndicator(color: Colors.blue,),),
                   ),
                   Positioned(
                     left: 0,

@@ -24,10 +24,10 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
   SupplierOrderCubit(this._orderRepository) : super(SupplierOrderInitial());
 
   Future<void> fetchRoute(
-    LatLng source,
-    LatLng destination,
-    String apiKey,
-  ) async {
+      LatLng source,
+      LatLng destination,
+      String apiKey,
+      ) async {
     emit(SupplierOrderLoading());
 
     try {
@@ -36,6 +36,7 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
         destination,
         apiKey,
       );
+      if (isClosed) return;
 
       if (routeData == null) {
         emit(SupplierOrderError("Could not calculate route."));
@@ -45,10 +46,13 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
       final points = decodePolyline(routeData['encodedPoints']);
       final distance = routeData['distance'];
 
+      if (isClosed) return;
+
       emit(
         SupplierOrderRouteLoaded(polylinePoints: points, distance: distance),
       );
     } catch (e) {
+      if (isClosed) return;
       emit(SupplierOrderError(_mapError(e)));
     }
   }

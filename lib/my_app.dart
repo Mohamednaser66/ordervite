@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Maps',
       theme: ThemeManager.light,
-      home:  LandingPage(),
+      initialRoute: RoutesManager.landingPage,
       routes: RoutesManager.router,
     );
   }

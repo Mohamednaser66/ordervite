@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/lang.dart';
+import 'package:flutter_maps/main.dart';
 import 'package:flutter_maps/supplier/home_page/widgets/home_drawer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -309,11 +311,21 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
   }
+  Future<void> _init() async {
+    await initNotifications();
 
+    await Future.delayed(Duration(milliseconds: 500));
+
+    final trackingStatus =
+    await AppTrackingTransparency.trackingAuthorizationStatus;
+
+    if (trackingStatus == TrackingStatus.notDetermined) {
+      await AppTrackingTransparency.requestTrackingAuthorization();
+    }}
   @override
   void initState() {
     super.initState();
-
+    _init();
     _shipperController = StreamController();
 
     getPref();

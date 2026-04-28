@@ -48,15 +48,6 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  final trackingStatus =
-  await AppTrackingTransparency.trackingAuthorizationStatus;
-
-  if (trackingStatus == TrackingStatus.notDetermined) {
-    await AppTrackingTransparency.requestTrackingAuthorization();
-  }
-
-  await initNotifications();
-
   runApp(const MyApp());
 }
 class PointObject {
