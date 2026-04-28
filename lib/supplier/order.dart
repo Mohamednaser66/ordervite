@@ -17,8 +17,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
   final String title = "OrderVite";
@@ -29,17 +27,17 @@ class OrderPage extends StatefulWidget {
 class _OrderPageState extends State<OrderPage> {
   final OrderRepository _orderRepository = OrderRepository();
   late final SupplierOrderCubit _cubit;
-   CameraPosition? _initialCamera;
+  CameraPosition? _initialCamera;
   final Completer<GoogleMapController> _mapController = Completer();
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
   final Location _locationTracker = Location();
-   LatLng? _sourceLatLng;
-   LatLng? _destinationLatLng;
+  LatLng? _sourceLatLng;
+  LatLng? _destinationLatLng;
   String? _username;
   String? _userId;
   String? _token;
-  bool _isConfirm =false;
+  bool _isConfirm = false;
   String? _orderId;
   String? _orderCost;
   String? _orderPrice;
@@ -221,6 +219,7 @@ class _OrderPageState extends State<OrderPage> {
       );
     }
   }
+
   void _navigateToHome(String en, String ar) {
     if (!mounted) return;
     final lang = Lang.of(context);
@@ -261,6 +260,7 @@ class _OrderPageState extends State<OrderPage> {
       distance: _distance ?? '0.0',
     );
   }
+
   Future<void> _cancelOrder(Lang lang) async {
     if (_orderId == null || _userId == null || _token == null) return;
     final confirmed = await showDialog<bool>(
@@ -319,7 +319,10 @@ class _OrderPageState extends State<OrderPage> {
       builder: (c) => AlertDialog(
         title: Text(
           _loc(lang, 'Confirm', 'تأكيد'),
-          style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Text(
           _loc(
@@ -331,16 +334,28 @@ class _OrderPageState extends State<OrderPage> {
         ),
         actions: [
           TextButton(
-            child: Text(_loc(lang, 'No', 'لا'), style: const TextStyle(color: Colors.grey)),
+            child: Text(
+              _loc(lang, 'No', 'لا'),
+              style: const TextStyle(color: Colors.grey),
+            ),
             onPressed: () => Navigator.pop(c, false),
           ),
           TextButton(
-            child: Text(_loc(lang, 'Yes', 'نعم'), style: const TextStyle(color: Colors.red)),
+            child: Text(
+              _loc(lang, 'Yes', 'نعم'),
+              style: const TextStyle(color: Colors.red),
+            ),
             onPressed: () => Navigator.pop(c, true),
           ),
         ],
       ),
     );
+
+    // Real-time data sync: Refresh order data when dialog is dismissed (even if user clicked 'No')
+    if (confirmed == false && mounted && _userId != null && _token != null) {
+      _cubit.refreshCurrentOrder(_userId!, _token!);
+      return;
+    }
 
     if (confirmed != true) return;
 
@@ -355,10 +370,11 @@ class _OrderPageState extends State<OrderPage> {
       Navigator.pushNamedAndRemoveUntil(
         context,
         RoutesManager.suHome,
-            (route) => false,
+        (route) => false,
       );
     }
   }
+
   void _animateCamera() async {
     final controller = await _mapController.future;
     controller.animateCamera(
@@ -419,7 +435,7 @@ class _OrderPageState extends State<OrderPage> {
               _orderPrice = order.price;
               _orderPriceCheck = order.priceCheck;
               _orderState = order.state;
-              _orderShipperId=order.shipperId;
+              _orderShipperId = order.shipperId;
             });
             _showSnackBar(
               lang,
@@ -471,7 +487,7 @@ class _OrderPageState extends State<OrderPage> {
               appBar: AppBar(
                 title: Text(
                   lang.lang == "en" ? 'OrderVite' : ' أوردرفيت ',
-                  style:  TextStyle(
+                  style: TextStyle(
                     fontSize: 25.sp,
                     fontWeight: FontWeight.bold,
                     fontStyle: FontStyle.normal,
@@ -504,19 +520,24 @@ class _OrderPageState extends State<OrderPage> {
               body: Stack(
                 children: [
                   Positioned.fill(
-                    child:_initialCamera!=null?
-                    GoogleMap(
-                      zoomControlsEnabled: true,
-                      scrollGesturesEnabled: true,
-                      zoomGesturesEnabled: true,
-                      initialCameraPosition: _initialCamera!,
-                      markers: _markers,
-                      polylines: _polylines,
-                      onMapCreated: (controller) =>
-                          _mapController.complete(controller),
-                      myLocationButtonEnabled: true,
-                      mapType: MapType.normal,
-                    ): Center(child: CircularProgressIndicator(color: Colors.blue,),),
+                    child: _initialCamera != null
+                        ? GoogleMap(
+                            zoomControlsEnabled: true,
+                            scrollGesturesEnabled: true,
+                            zoomGesturesEnabled: true,
+                            initialCameraPosition: _initialCamera!,
+                            markers: _markers,
+                            polylines: _polylines,
+                            onMapCreated: (controller) =>
+                                _mapController.complete(controller),
+                            myLocationButtonEnabled: true,
+                            mapType: MapType.normal,
+                          )
+                        : Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.blue,
+                            ),
+                          ),
                   ),
                   Positioned(
                     left: 0,
@@ -596,21 +617,21 @@ class _OrderPageState extends State<OrderPage> {
                   hintText: lang.lang == "en"
                       ? "Package Price"
                       : "  سعر الطرد ",
-                  hintStyle:  TextStyle(
+                  hintStyle: TextStyle(
                     fontSize: 12.sp,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                   fillColor: Colors.white,
                   filled: true,
-                  prefixIcon:  Padding(
+                  prefixIcon: Padding(
                     padding: REdgeInsets.only(left: 5),
                     child: Icon(Icons.money, size: 24.sp, color: Colors.blue),
                   ),
                   labelText: lang.lang == "en"
                       ? "click here to set the price"
                       : "اضغط هنا لتحديد السعر",
-                  labelStyle:  TextStyle(
+                  labelStyle: TextStyle(
                     fontSize: 15.sp,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -621,19 +642,16 @@ class _OrderPageState extends State<OrderPage> {
                   ),
                 ),
               ),
-               SizedBox(height: 5.h),
+              SizedBox(height: 5.h),
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () => _createOrder(lang),
-                      icon:  Icon(Icons.done_all, size: 20.sp),
+                      icon: Icon(Icons.done_all, size: 20.sp),
                       label: Text(
                         lang.lang == "en" ? "Confirm" : "تأكيد ",
-                        style:  TextStyle(
-                          fontSize: 12.sp,
-                          color: Colors.white,
-                        ),
+                        style: TextStyle(fontSize: 12.sp, color: Colors.white),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
@@ -676,7 +694,7 @@ class _OrderPageState extends State<OrderPage> {
   Widget _buildSectionTitle(String text) {
     return Text(
       text,
-      style:  TextStyle(
+      style: TextStyle(
         fontSize: 15.sp,
         fontWeight: FontWeight.bold,
         fontStyle: FontStyle.normal,
@@ -700,7 +718,7 @@ class _OrderPageState extends State<OrderPage> {
           final isSelected = _packageSize == size;
           return Expanded(
             child: Padding(
-              padding:  REdgeInsets.symmetric(horizontal: 5, vertical: 8),
+              padding: REdgeInsets.symmetric(horizontal: 5, vertical: 8),
               child: ElevatedButton(
                 onPressed: () => setState(() => _packageSize = size),
                 style: ElevatedButton.styleFrom(
@@ -754,7 +772,7 @@ class _OrderPageState extends State<OrderPage> {
           final isSelected = _paymentMethod == payment;
           return Expanded(
             child: Padding(
-              padding:  REdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              padding: REdgeInsets.symmetric(horizontal: 5, vertical: 5),
               child: ElevatedButton(
                 onPressed: () => setState(() => _paymentMethod = payment),
                 style: ElevatedButton.styleFrom(
@@ -780,7 +798,7 @@ class _OrderPageState extends State<OrderPage> {
   Widget _buildOrderStatus(Lang lang) {
     return Container(
       height: 300.h,
-      decoration:  BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.topLeft,
@@ -792,18 +810,18 @@ class _OrderPageState extends State<OrderPage> {
         ),
       ),
       child: Padding(
-        padding:  REdgeInsets.symmetric(horizontal: 24, vertical: 18),
+        padding: REdgeInsets.symmetric(horizontal: 24, vertical: 18),
         child: SingleChildScrollView(
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
-              borderRadius:  BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(18.r),
                 topRight: Radius.circular(18.r),
               ),
             ),
             child: Padding(
-              padding:  REdgeInsets.all(20),
+              padding: REdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -815,13 +833,13 @@ class _OrderPageState extends State<OrderPage> {
                     orderState: _orderState,
                     orderId: _orderId,
                   ),
-                   SizedBox(height: 10.h),
+                  SizedBox(height: 10.h),
                   _buildInfoRow(
                     lang.lang == "en"
                         ? "Shipper ID: $_orderShipperId"
                         : "كود المسئول : $_orderShipperId",
                   ),
-                   SizedBox(height: 10.h),
+                  SizedBox(height: 10.h),
                   Row(
                     children: [
                       Expanded(
@@ -850,13 +868,13 @@ class _OrderPageState extends State<OrderPage> {
                               ? "نظام الدفع  : كاش"
                               : "نظام الدفع  : تحويل"),
                   ),
-                   SizedBox(height: 10.h),
+                  SizedBox(height: 10.h),
                   Row(
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () => _completeOrder(lang),
-                          icon:  Icon(Icons.done_all, size: 20.sp),
+                          icon: Icon(Icons.done_all, size: 20.sp),
                           label: Text(
                             lang.lang == "en" ? "Complete " : "اكمال ",
                             style: TextStyle(
@@ -872,14 +890,14 @@ class _OrderPageState extends State<OrderPage> {
                           ),
                         ),
                       ),
-                       SizedBox(width: 20.w),
+                      SizedBox(width: 20.w),
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () => _cancelOrder(lang),
-                          icon:  Icon(Icons.cancel, size: 20.sp),
+                          icon: Icon(Icons.cancel, size: 20.sp),
                           label: Text(
                             lang.lang == "en" ? "Cancel" : "إلغاء",
-                            style:  TextStyle(
+                            style: TextStyle(
                               fontSize: 12.sp,
                               color: Colors.white,
                             ),
@@ -906,7 +924,7 @@ class _OrderPageState extends State<OrderPage> {
   Widget _buildInfoRow(String text) {
     return Text(
       text,
-      style:  TextStyle(
+      style: TextStyle(
         fontSize: 15.sp,
         fontWeight: FontWeight.bold,
         fontStyle: FontStyle.normal,
@@ -921,17 +939,17 @@ class _OrderPageState extends State<OrderPage> {
       children: [
         Text(
           title,
-          style:  TextStyle(
+          style: TextStyle(
             fontSize: 15.sp,
             fontWeight: FontWeight.bold,
             fontStyle: FontStyle.normal,
             color: Colors.white,
           ),
         ),
-         SizedBox(height: 5.h),
+        SizedBox(height: 5.h),
         Text(
           value,
-          style:  TextStyle(
+          style: TextStyle(
             fontSize: 15.sp,
             fontWeight: FontWeight.bold,
             fontStyle: FontStyle.normal,

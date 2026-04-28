@@ -285,6 +285,13 @@ class _CreatProfileState extends State<SUProfilePage> {
                 lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
               ),
               SizedBox(height: 30.h),
+              Row(
+                children: [
+                  Text(lang.lang=='en'?'Delete account Contact: ':'لمسح الحساب تواصل مع: ',style: TextStyle(fontSize: 14.sp,color: Colors.black),),
+                  Text(lang.lang=='en'?'support@ordervite.com':'support@ordervite.com',style: TextStyle(color: Colors.blue,fontSize: 14.sp,fontWeight: FontWeight.w400),)
+                ],
+              ),
+              SizedBox(height: 30.h),
               ElevatedButton(
                 onPressed: updateProfile,
                 child: circular

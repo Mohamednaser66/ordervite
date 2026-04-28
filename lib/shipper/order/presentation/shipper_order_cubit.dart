@@ -382,6 +382,29 @@ class ShipperOrderCubit extends Cubit<ShipperOrderState> {
     return e.toString();
   }
 
+  Future<void> refreshCurrentOrder(String shipperId, String token) async {
+    try {
+      final orderData = await _realtimeService.getShipperCurrentOrder(
+        shipperId: shipperId,
+      );
+      if (isClosed) return;
+
+      if (orderData != null) {
+        emit(ShipperOrderCurrentLoaded(orderData));
+
+        final currentState = orderData['order_state']?.toString() ?? '';
+        if (currentState.isNotEmpty && currentState != _previousOrderState) {
+          _previousOrderState = currentState;
+          emit(ShipperOrderStatusChanged(orderData));
+        }
+      }
+    } catch (e) {
+      if (!isClosed) {
+        emit(ShipperOrderError(_mapError(e)));
+      }
+    }
+  }
+
   @override
   Future<void> close() {
     _orderStreamSubscription?.cancel();

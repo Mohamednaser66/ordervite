@@ -24,10 +24,10 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
   SupplierOrderCubit(this._orderRepository) : super(SupplierOrderInitial());
 
   Future<void> fetchRoute(
-      LatLng source,
-      LatLng destination,
-      String apiKey,
-      ) async {
+    LatLng source,
+    LatLng destination,
+    String apiKey,
+  ) async {
     emit(SupplierOrderLoading());
 
     try {
@@ -56,8 +56,6 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
       emit(SupplierOrderError(_mapError(e)));
     }
   }
-
-
 
   Future<void> calculateEstimatedCost({
     required String token,
@@ -170,8 +168,6 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
       'commission': commission.toStringAsFixed(2),
     };
   }
-
-
 
   void listenToCurrentOrder(String supplierId, String token) {
     _orderStreamSubscription?.cancel();
@@ -334,9 +330,9 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
   }
 
   Future<String?> handleOrderStateMessage(
-      Map<String, dynamic> data,
-      String token,
-      ) async {
+    Map<String, dynamic> data,
+    String token,
+  ) async {
     final stateName = data["state_name"]?.toString();
     if (stateName == null) return null;
 
@@ -357,8 +353,29 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
 
     return null;
   }
+
   String _mapError(Object e) {
     return e.toString();
+  }
+
+  Future<void> refreshCurrentOrder(String supplierId, String token) async {
+    try {
+      final order = await _orderRepository.getOrder(supplierId, token);
+      if (isClosed) return;
+
+      if (order != null) {
+        emit(SupplierOrderCurrentLoaded(order));
+
+        if (order.state.isNotEmpty && order.state != _previousOrderState) {
+          _previousOrderState = order.state;
+          emit(SupplierOrderStatusChanged(order));
+        }
+      }
+    } catch (e) {
+      if (!isClosed) {
+        emit(SupplierOrderError(_mapError(e)));
+      }
+    }
   }
 
   @override

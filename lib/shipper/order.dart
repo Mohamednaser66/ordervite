@@ -56,7 +56,6 @@ class _ShOrderState extends State<ShOrder> {
 
   int _orderMessagesCount = 0;
 
-
   late final ShipperOrderCubit _cubit;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
@@ -265,6 +264,7 @@ class _ShOrderState extends State<ShOrder> {
       ),
     );
   }
+
   Future<void> _onConfirm(Lang lang) async {
     if (_isConfirm) {
       _showSnackBar(
@@ -310,6 +310,12 @@ class _ShOrderState extends State<ShOrder> {
           ],
         ),
       );
+
+      // Real-time data sync: Refresh order when dialog closes
+      if (confirmed == false && mounted && _userId != null && _token != null) {
+        _cubit.refreshCurrentOrder(_userId!, _token!);
+        return;
+      }
 
       if (confirmed != true) return;
 
@@ -370,6 +376,12 @@ class _ShOrderState extends State<ShOrder> {
       ),
     );
 
+    // Real-time data sync: Refresh order when dialog closes
+    if (confirmed == false && mounted && _userId != null && _token != null) {
+      _cubit.refreshCurrentOrder(_userId!, _token!);
+      return;
+    }
+
     if (confirmed != true || _orderId == null || _token == null) return;
 
     final success = await _cubit.receiveOrder(
@@ -410,7 +422,7 @@ class _ShOrderState extends State<ShOrder> {
         actions: [
           TextButton(
             child: Text(_loc(lang, 'Yes', 'نعم')),
-            onPressed: ()async {
+            onPressed: () async {
               final success = await _cubit.deliverOrder(
                 orderId: _orderId!,
                 token: _token!,
@@ -429,8 +441,12 @@ class _ShOrderState extends State<ShOrder> {
                   backgroundColor: Colors.green,
                 );
               }
-              Navigator.pushNamedAndRemoveUntil(context, RoutesManager.shHome,(route) => true,);
-            }
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                RoutesManager.shHome,
+                (route) => true,
+              );
+            },
           ),
           TextButton(
             child: Text(_loc(lang, 'No', 'لا')),
@@ -440,6 +456,10 @@ class _ShOrderState extends State<ShOrder> {
       ),
     );
 
+    // Real-time data sync: Refresh order when dialog closes with false
+    if (confirmed == false && mounted && _userId != null && _token != null) {
+      _cubit.refreshCurrentOrder(_userId!, _token!);
+    }
   }
 
   Future<void> _onCancel(Lang lang) async {
@@ -470,6 +490,12 @@ class _ShOrderState extends State<ShOrder> {
         ],
       ),
     );
+
+    // Real-time data sync: Refresh order when dialog closes
+    if (confirmed == false && mounted && _userId != null && _token != null) {
+      _cubit.refreshCurrentOrder(_userId!, _token!);
+      return;
+    }
 
     if (confirmed != true ||
         _orderId == null ||

@@ -76,6 +76,10 @@ class OrderRepository {
     _pollTimer = null;
   }
 
+  /// Public method to fetch a single order (for refresh operations)
+  Future<Order?> getOrder(String userId, String token) async {
+    return _fetchCurrentOrder(userId, token);
+  }
 
   Future<Order?> _fetchCurrentOrder(String userId, String token) async {
     try {
@@ -216,7 +220,6 @@ class OrderRepository {
       rethrow;
     }
   }
-
 
   Future<bool> cancelOrder(
     String orderId,

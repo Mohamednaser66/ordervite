@@ -164,6 +164,20 @@ class RealtimeService {
     return null;
   }
 
+  /// Public method to fetch a single shipper order (for refresh operations)
+  Future<Map<String, dynamic>?> getShipperCurrentOrder({
+    required String shipperId,
+  }) async {
+    return _fetchShipperCurrentOrder(shipperId);
+  }
+
+  /// Public method to fetch a single supplier order (for refresh operations)
+  Future<Map<String, dynamic>?> getSupplierCurrentOrder({
+    required String supplierId,
+  }) async {
+    return _fetchSupplierCurrentOrder(supplierId);
+  }
+
   /// Cancels every active stream.  Call this on logout or app shutdown.
   void dispose() {
     for (final timer in _timers.values) {
