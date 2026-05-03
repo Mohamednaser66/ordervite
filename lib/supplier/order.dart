@@ -882,40 +882,45 @@ class _OrderPageState extends State<OrderPage> {
                   Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => _completeOrder(lang),
-                          icon: Icon(Icons.done_all, size: 20.sp),
-                          label: Text(
-                            lang.lang == "en" ? "Complete " : "اكمال ",
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Colors.white,
+                        child: SizedBox(
+                          height: 32.h,
+                          child: ElevatedButton.icon(
+                            onPressed: () => _completeOrder(lang),
+                            icon: Icon(Icons.done_all, size: 20.sp),
+                            label: Text(
+                              lang.lang == "en" ? "Complete " : "اكمال ",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
                             ),
                           ),
                         ),
                       ),
                       SizedBox(width: 20.w),
                       Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => _cancelOrder(lang),
-                          icon: Icon(Icons.cancel, size: 20.sp),
-                          label: Text(
-                            lang.lang == "en" ? "Cancel" : "إلغاء",
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Colors.white,
+                        child: SizedBox(height: 32.h,
+                          child: ElevatedButton.icon(
+                            onPressed: () => _cancelOrder(lang),
+                            icon: Icon(Icons.cancel, size: 20.sp),
+                            label: Text(
+                              lang.lang == "en" ? "Cancel" : "إلغاء",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
                         ),
