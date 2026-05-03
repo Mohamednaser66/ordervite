@@ -153,7 +153,7 @@ String roles = ConstantManager.shipper;
               key: formstatesignup,
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: REdgeInsets.all(16.0.r),
+                  padding: REdgeInsets.all(12.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
