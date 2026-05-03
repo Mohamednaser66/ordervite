@@ -254,7 +254,7 @@ class _RegisterState extends State<Register> {
                     height: 40.h,
                       width: 140.w,
                     child: ElevatedButton.icon(
-                      icon: Icon(Icons.app_registration),
+                      icon: Icon(Icons.app_registration,size: 22.sp,),
                       label: Text(lang.lang == "en" ? "Sign UP" : "تسجيل كمورد"),
                       onPressed: () async {
                         if (!formstatesignup.currentState!.validate()) return;

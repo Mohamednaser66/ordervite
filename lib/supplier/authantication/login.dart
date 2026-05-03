@@ -173,7 +173,7 @@ class _LogInState extends State<LogIn> {
                         height: 40.h,
                         width: 140.w,
                         child: ElevatedButton.icon(
-                          icon: Icon(Icons.login),
+                          icon: Icon(Icons.login,size: 22.sp,),
                           label: Text(lang.lang == "en" ? 'Sign In' : ' دخول '),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,

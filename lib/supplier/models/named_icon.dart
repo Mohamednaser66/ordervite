@@ -92,11 +92,11 @@ class NamedIcon extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Icon(iconData),
+                Icon(iconData,size: 14.sp,),
                 Text(
                   text,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 8.sp),
+                  style: TextStyle(fontSize: 6.sp,color: Colors.white),
                 ),
               ],
             ),

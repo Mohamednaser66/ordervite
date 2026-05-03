@@ -516,37 +516,42 @@ class _OrderPageState extends State<OrderPage> {
                 ],
                 automaticallyImplyLeading: false,
               ),
-              body: Stack(
-                children: [
-                  Positioned.fill(
-                    child: _initialCamera != null
-                        ? GoogleMap(
-                            zoomControlsEnabled: true,
-                            scrollGesturesEnabled: true,
-                            zoomGesturesEnabled: true,
-                            initialCameraPosition: _initialCamera!,
-                            markers: _markers,
-                            polylines: _polylines,
-                            onMapCreated: (controller) =>
-                                _mapController.complete(controller),
-                            myLocationButtonEnabled: true,
-                            mapType: MapType.normal,
-                          )
-                        : Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.blue,
+              body: InkWell(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                },
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: _initialCamera != null
+                          ? GoogleMap(
+                              zoomControlsEnabled: true,
+                              scrollGesturesEnabled: true,
+                              zoomGesturesEnabled: true,
+                              initialCameraPosition: _initialCamera!,
+                              markers: _markers,
+                              polylines: _polylines,
+                              onMapCreated: (controller) =>
+                                  _mapController.complete(controller),
+                              myLocationButtonEnabled: true,
+                              mapType: MapType.normal,
+                            )
+                          : Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.blue,
+                              ),
                             ),
-                          ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: !_isConfirm
-                        ? _buildOrderForm(lang)
-                        : _buildOrderStatus(lang),
-                  ),
-                ],
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: !_isConfirm
+                          ? _buildOrderForm(lang)
+                          : _buildOrderStatus(lang),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -557,20 +562,20 @@ class _OrderPageState extends State<OrderPage> {
 
   Widget _buildOrderForm(Lang lang) {
     return Container(
-      height: 350,
-      decoration: const BoxDecoration(
+      height: 350.h,
+      decoration:  BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.topLeft,
           colors: [Color.fromRGBO(21, 42, 72, 1), Color.fromRGBO(7, 15, 33, 1)],
         ),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(18),
-          topRight: Radius.circular(18),
+          topLeft: Radius.circular(18.r),
+          topRight: Radius.circular(18.r),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+        padding:  REdgeInsets.symmetric(horizontal: 24, vertical: 18),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -578,41 +583,41 @@ class _OrderPageState extends State<OrderPage> {
               _buildSectionTitle(
                 lang.lang == "en" ? 'Choose Package Size ' : 'اختار حجم الطرد ',
               ),
-              const SizedBox(height: 6),
+               SizedBox(height: 6.h),
               _buildSizeSelector(),
-              const SizedBox(height: 6),
+               SizedBox(height: 6.h),
               _buildSectionTitle(
                 lang.lang == "en"
                     ? 'Distance: $_distance km'
                     : 'المسافة: $_distance كم',
               ),
-              const SizedBox(height: 6),
+               SizedBox(height: 6.h),
               _buildSectionTitle(
                 lang.lang == "en"
                     ? 'Choose Payment Method'
                     : ' اختر  نظام الدفع  ',
               ),
-              const SizedBox(height: 6),
+               SizedBox(height: 6.h),
               _buildPaymentSelector(),
-              const SizedBox(height: 6),
+               SizedBox(height: 6.h),
               _buildSectionTitle(
                 lang.lang == "en"
                     ? 'Enter Package Price  '
                     : '  ادخل سعر الطرد  ',
               ),
-              const SizedBox(height: 6),
+               SizedBox(height: 6.h),
               TextFormField(
                 controller: _priceController,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(
-                  fontSize: 15,
+                style:  TextStyle(
+                  fontSize: 15.sp,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
                 maxLength: 30,
                 onChanged: (value) => setState(() {}),
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.only(top: 20, bottom: 20),
+                  contentPadding:  REdgeInsets.only(top: 20, bottom: 20),
                   hintText: lang.lang == "en"
                       ? "Package Price"
                       : "  سعر الطرد ",
@@ -641,42 +646,48 @@ class _OrderPageState extends State<OrderPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 5.h),
+              SizedBox(height: 6.h),
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => _createOrder(lang),
-                      icon: Icon(Icons.done_all, size: 20.sp),
-                      label: Text(
-                        lang.lang == "en" ? "Confirm" : "تأكيد ",
-                        style: TextStyle(fontSize: 12.sp, color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    child: SizedBox(
+                      height: 34.h,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _createOrder(lang),
+                        icon: Icon(Icons.done_all, size: 20.sp),
+                        label: Text(
+                          lang.lang == "en" ? "Confirm" : "تأكيد ",
+                          style: TextStyle(fontSize: 12.sp, color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 40),
+                   SizedBox(width: 40.w),
                   Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () =>
-                          _navigateToHome("You have canceld", " تم الإلغاء "),
-                      icon: const Icon(Icons.cancel, size: 20),
-                      label: Text(
-                        lang.lang == "en" ? "Cancel" : "إلغاء",
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
+                    child: SizedBox(
+                      height: 34.h,
+                      child: ElevatedButton.icon(
+                        onPressed: () =>
+                            _navigateToHome("You have canceld", " تم الإلغاء "),
+                        icon:  Icon(Icons.cancel, size: 20.sp),
+                        label: Text(
+                          lang.lang == "en" ? "Cancel" : "إلغاء",
+                          style:  TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
                         ),
                       ),
                     ),
