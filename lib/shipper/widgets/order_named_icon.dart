@@ -27,16 +27,16 @@ class OrdersNamedIcon extends StatelessWidget {
         }
       },
       child: Container(
-        width: 72.w,
-        padding: EdgeInsets.symmetric(horizontal: 8.w),
+        width: 50.w,
+        padding: EdgeInsets.symmetric(horizontal: 4.w),
         child: Stack(
           alignment: Alignment.center,
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Icon(iconData),
-                Text(text, overflow: TextOverflow.ellipsis),
+                Icon(iconData,size: 14.sp,),
+                Text(text, overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: 6.sp,color: Colors.white),),
               ],
             ),
             Positioned(

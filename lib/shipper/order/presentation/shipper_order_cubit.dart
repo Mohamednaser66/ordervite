@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_maps/config/app_config.dart';
 import 'package:flutter_maps/core/map_utils.dart';
 import 'package:flutter_maps/lang.dart';
+import 'package:flutter_maps/services/api.dart';
 import 'package:flutter_maps/services/realtime_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -21,7 +22,6 @@ class ShipperOrderCubit extends Cubit<ShipperOrderState> {
 
   ShipperOrderCubit() : super(ShipperOrderInitial());
 
-  /// Listen to real-time order updates via polling stream.
   void listenToCurrentOrder(String shipperId, String token) {
     _orderStreamSubscription?.cancel();
 
@@ -55,14 +55,13 @@ class ShipperOrderCubit extends Cubit<ShipperOrderState> {
     _orderStreamSubscription = null;
   }
 
-  /// Fetch route from Google Maps Directions API.
+
   Future<void> fetchRoute(
     LatLng source,
     LatLng destination,
     String apiKey,
   ) async {
     emit(ShipperOrderLoading());
-
     try {
       final url =
           "https://maps.googleapis.com/maps/api/directions/json?"

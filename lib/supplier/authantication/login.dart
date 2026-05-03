@@ -120,161 +120,166 @@ class _LogInState extends State<LogIn> {
         appBar: AppBar(
           title: Text(lang.lang == "en" ? 'Supplier Login' : ' دخول مورد '),
         ),
-        body: Container(
-          height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF152A48), Color(0xFF0D1B2A)],
+        body: InkWell(onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+
+          child: Container(
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF152A48), Color(0xFF0D1B2A)],
+              ),
             ),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(16.0.r),
-            child: Form(
-              key: formstatesignin,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Padding(padding: EdgeInsets.only(top: 2.h)),
-                    Container(
-                      margin: REdgeInsets.symmetric(vertical: 30.h),
-                      width: 70.w,
-                      height: 70.h,
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(244, 67, 54, 0.9),
-                        borderRadius: BorderRadius.circular(100.r),
-                      ),
-                      child: Icon(Icons.person, size: 50.sp, color: Colors.white),
-                    ),
-                    CustomTextFormField(
-                      validation: validemail,
-                      controller: email,
-                      icon: Icon(Icons.email, color: Colors.blue),
-                      hintText: lang.lang == 'en'
-                          ? 'Email Address'
-                          : 'عنوان البريد الالكترونى',
-                      lable: lang.lang == 'en' ? 'email' : 'البريد الالكترونى ',
-                    ),
-                    SizedBox(height: 10.h),
-                    CustomTextFormField(
-                      secure: true,
-                      validation: validepassword,
-                      controller: password,
-                      icon: Icon(Icons.key, color: Colors.blue),
-                      hintText: lang.lang == 'en' ? 'Password' : 'كلمة السر',
-                      lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
-                    ),
-                    SizedBox(
-                      height: 40.h,
-                      width: 140.w,
-                      child: ElevatedButton.icon(
-                        icon: Icon(Icons.login),
-                        label: Text(lang.lang == "en" ? 'Sign In' : ' دخول '),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.r),
-                          ),
+            child: Padding(
+              padding: EdgeInsets.all(16.0.r),
+              child: Form(
+                key: formstatesignin,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Padding(padding: EdgeInsets.only(top: 2.h)),
+                      Container(
+                        margin: REdgeInsets.symmetric(vertical: 30.h),
+                        width: 70.w,
+                        height: 70.h,
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(244, 67, 54, 0.9),
+                          borderRadius: BorderRadius.circular(100.r),
                         ),
-                        onPressed: () async {
-                          if (!formstatesignin.currentState!.validate()) return;
-                          setState(() => isLoading = true);
-                          try {
-                            var data = {
-                              "email": email.text,
-                              "password": password.text,
-                            };
-                            var url =
-                                "https://www.ordervite.com/api/supplier/login";
+                        child: Icon(Icons.person, size: 50.sp, color: Colors.white),
+                      ),
+                      CustomTextFormField(
+                        validation: validemail,
+                        controller: email,
+                        icon: Icon(Icons.email, color: Colors.blue),
+                        hintText: lang.lang == 'en'
+                            ? 'Email Address'
+                            : 'عنوان البريد الالكترونى',
+                        lable: lang.lang == 'en' ? 'email' : 'البريد الالكترونى ',
+                      ),
+                      SizedBox(height: 10.h),
+                      CustomTextFormField(
+                        secure: true,
+                        validation: validepassword,
+                        controller: password,
+                        icon: Icon(Icons.key, color: Colors.blue),
+                        hintText: lang.lang == 'en' ? 'Password' : 'كلمة السر',
+                        lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
+                      ),
+                      SizedBox(
+                        height: 40.h,
+                        width: 140.w,
+                        child: ElevatedButton.icon(
+                          icon: Icon(Icons.login),
+                          label: Text(lang.lang == "en" ? 'Sign In' : ' دخول '),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.r),
+                            ),
+                          ),
+                          onPressed: () async {
+                            if (!formstatesignin.currentState!.validate()) return;
+                            setState(() => isLoading = true);
+                            try {
+                              var data = {
+                                "email": email.text,
+                                "password": password.text,
+                              };
+                              var url =
+                                  "https://www.ordervite.com/api/supplier/login";
 
-                            var response = await http.post(
-                              Uri.parse(url),
-                              body: data,
-                            );
-
-                            var reposnsebody = jsonDecode(response.body);
-
-                            if (reposnsebody["success"] == true) {
-                              setState(() => isLoading = false);
-
-                              await savePref(
-                                reposnsebody["data"]["name"]["name"],
-                                reposnsebody["data"]["name"]["email"],
-                                reposnsebody["data"]["token"],
-                                reposnsebody["data"]["name"]["id"].toString(),
-                                "supplier",
-                                reposnsebody["data"]["logo"].toString(),
+                              var response = await http.post(
+                                Uri.parse(url),
+                                body: data,
                               );
 
-                              AuthService.setToken(
-                                reposnsebody["data"]["token"],
-                                reposnsebody["data"]["token"],
-                                "supplier",
-                              );
+                              var reposnsebody = jsonDecode(response.body);
 
-                              Navigator.of(
-                                context,
-                              ).pushNamed(RoutesManager.suHome);
+                              if (reposnsebody["success"] == true) {
+                                setState(() => isLoading = false);
 
-                            } else {
+                                await savePref(
+                                  reposnsebody["data"]["name"]["name"],
+                                  reposnsebody["data"]["name"]["email"],
+                                  reposnsebody["data"]["token"],
+                                  reposnsebody["data"]["name"]["id"].toString(),
+                                  "supplier",
+                                  reposnsebody["data"]["logo"].toString(),
+                                );
+
+                                AuthService.setToken(
+                                  reposnsebody["data"]["token"],
+                                  reposnsebody["data"]["token"],
+                                  "supplier",
+                                );
+
+                                Navigator.of(
+                                  context,
+                                ).pushNamed(RoutesManager.suHome);
+
+                              } else {
+                                setState(() => isLoading = false);
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      lang.lang == "en"
+                                          ? 'these cerditional does not match any account please sign up '
+                                          : ' هذه البيانات لا توافق اي بيانات حساب لدينا من فضلك قم بتسجيل بياناتك ',
+                                    ),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
                               setState(() => isLoading = false);
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                              showDialog(
+                                context: context,
+                                builder: (c) => AlertDialog(
+                                  title: Text(
+                                    lang.lang == "en" ? 'Warning' : 'تحذير',
+                                  ),
                                   content: Text(
                                     lang.lang == "en"
-                                        ? 'these cerditional does not match any account please sign up '
-                                        : ' هذه البيانات لا توافق اي بيانات حساب لدينا من فضلك قم بتسجيل بياناتك ',
+                                        ? 'Please check your network'
+                                        : 'يرجي التحقق من اتصال الشبكة الخاص بك',
                                   ),
                                 ),
                               );
                             }
-                          } catch (e) {
-                            setState(() => isLoading = false);
-
-                            showDialog(
-                              context: context,
-                              builder: (c) => AlertDialog(
-                                title: Text(
-                                  lang.lang == "en" ? 'Warning' : 'تحذير',
-                                ),
-                                content: Text(
-                                  lang.lang == "en"
-                                      ? 'Please check your network'
-                                      : 'يرجي التحقق من اتصال الشبكة الخاص بك',
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Row(
-                      children: [
-                        Text(
-                          lang.lang == "en"
-                              ? "If You do not have an Email Please"
-                              : "اذا كنت لاتملك حساب من فضلك",
-                          style: Theme.of(context).textTheme.labelMedium,
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              RoutesManager.register,
-                            );
                           },
-                          child: Text(
-                            lang.lang == "en" ? "SignUp" : "قم بالاشتراك",
-                            style: TextStyle(color: Colors.white),
-                          ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      SizedBox(height: 8.h),
+                      Row(
+                        children: [
+                          Text(
+                            lang.lang == "en"
+                                ? "If You do not have an Email Please"
+                                : "اذا كنت لاتملك حساب من فضلك",
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                context,
+                                RoutesManager.register,
+                              );
+                            },
+                            child: Text(
+                              lang.lang == "en" ? "SignUp" : "قم بالاشتراك",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

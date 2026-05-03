@@ -28,14 +28,19 @@ class CustomTextFormField extends StatelessWidget {
       style: TextStyle(fontSize: 20.sp, color: Colors.black,),
       maxLength: 50,
       cursorColor: Colors.blue,
-
+      onFieldSubmitted: (value) {
+        FocusScope.of(context).unfocus();
+      },
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.only(top: 1.h, bottom: 1.h),
+                contentPadding: EdgeInsets.only(top: 1.h, bottom: 1.h),
         hintText: hintText,
           hoverColor: Colors.blue,
         fillColor: Colors.white,
         filled: true,
-        prefixIcon: Padding(padding: EdgeInsets.only(left: 5.w), child: icon),
+        prefixIcon: IconTheme(
+      data: IconThemeData(size: 22.sp),
+      child: icon,
+    ),
         prefixStyle: TextStyle(fontSize: 50.sp, color: Colors.blue),
         labelText: lable,
         labelStyle: TextStyle(

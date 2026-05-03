@@ -170,172 +170,177 @@ class _RegisterState extends State<Register> {
             lang.lang == "en" ? 'Supplier Registration' : "تسجيل مورد",
           ),
         ),
-        body: Container(
-          height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF152A48), Color(0xFF0D1B2A)],
+        body: InkWell(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Container(
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF152A48), Color(0xFF0D1B2A)],
+              ),
             ),
-          ),
-          child: Form(
-            key: formstatesignup,
-            child: ListView(
-              padding: EdgeInsets.all(20.r),
-              children: [
-                SizedBox(
-                  height: 70.h,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.blue,
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0.r),
-                      child: Icon(Icons.person, size: 50.sp, color: Colors.white),
+            child: Form(
+              key: formstatesignup,
+              child: ListView(
+                padding: EdgeInsets.all(20.r),
+                children: [
+                  SizedBox(
+                    height: 70.h,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.blue,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0.r),
+                        child: Icon(Icons.person, size: 50.sp, color: Colors.white),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 20.h),
-                CustomTextFormField(
-                  validation: validusername,
-                  icon: Icon(Icons.person, color: Colors.blue),
-                  controller: username,
-                  hintText: lang.lang == 'en' ? "User Name" : "اسم المستخدم",
-                  lable: lang.lang == 'en' ? "User Name" : "اسم المستخدم",
-                ),
-                CustomTextFormField(
-                  icon: Icon(Icons.email, color: Colors.blue),
-                  validation: validemail,
-                  controller: email,
-                  hintText: lang.lang == 'en'
-                      ? 'Email Address'
-                      : 'عنوان البريد الالكترونى',
-                  lable: lang.lang == 'en' ? 'email' : 'البريد الالكترونى ',
-                ),
-                CustomTextFormField(
-                  icon: Icon(Icons.key, color: Colors.blue),
-                  validation: validepassword,
-                  secure: true,
-                  controller: password,
-                  hintText: lang.lang == 'en' ? 'Password' : 'كلمة السر',
-                  lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
-                ),
-                CustomTextFormField(
-                  secure: true,
-                  controller: cpassword,
-                  validation: validecpassword,
-                  icon: Icon(Icons.key, color: Colors.blue),
-                  hintText: lang.lang == 'en'
-                      ? 'Re Password'
-                      : 'تاكيد كلمة المرور',
-                  lable: lang.lang == 'en'
-                      ? 'Re Password'
-                      : 'تاكيد كلمة المرور',
-                ),
-                CustomTextFormField(
-                  validation: validmobile1,
-                  controller: mobile1,
-                  icon: Icon(Icons.phone_android_outlined, color: Colors.blue),
-                  hintText: lang.lang == 'en' ? 'Mobile 1' : 'رقم التليفون 1 ',
-                  lable: lang.lang == 'en' ? 'Mobile 1' : 'رقم التليفون 1 ',
-                ),
-                CustomTextFormField(
-                  controller: mobile2,
-                  validation: validmobile2,
-                  icon: Icon(Icons.phone_android_outlined, color: Colors.blue),
-                  hintText: lang.lang == 'en' ? 'Mobile 2' : 'رقم التليفون 2 ',
-                  lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم التليفون 2 ',
-                ),
-                SizedBox(height: 20.h),
-                SizedBox(
-                  height: 40.h,
-                    width: 140.w,
-                  child: ElevatedButton.icon(
-                    icon: Icon(Icons.app_registration),
-                    label: Text(lang.lang == "en" ? "Sign UP" : "تسجيل كمورد"),
-                    onPressed: () async {
-                      if (!formstatesignup.currentState!.validate()) return;
+                  SizedBox(height: 20.h),
+                  CustomTextFormField(
+                    validation: validusername,
+                    icon: Icon(Icons.person, color: Colors.blue),
+                    controller: username,
+                    hintText: lang.lang == 'en' ? "User Name" : "اسم المستخدم",
+                    lable: lang.lang == 'en' ? "User Name" : "اسم المستخدم",
+                  ),
+                  CustomTextFormField(
+                    icon: Icon(Icons.email, color: Colors.blue),
+                    validation: validemail,
+                    controller: email,
+                    hintText: lang.lang == 'en'
+                        ? 'Email Address'
+                        : 'عنوان البريد الالكترونى',
+                    lable: lang.lang == 'en' ? 'email' : 'البريد الالكترونى ',
+                  ),
+                  CustomTextFormField(
+                    icon: Icon(Icons.key, color: Colors.blue),
+                    validation: validepassword,
+                    secure: true,
+                    controller: password,
+                    hintText: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
+                    lable: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
+                  ),
+                  CustomTextFormField(
+                    secure: true,
+                    controller: cpassword,
+                    validation: validecpassword,
+                    icon: Icon(Icons.key, color: Colors.blue),
+                    hintText: lang.lang == 'en'
+                        ? 'Re Password'
+                        : 'تاكيد كلمة المرور',
+                    lable: lang.lang == 'en'
+                        ? 'Re Password'
+                        : 'تاكيد كلمة المرور',
+                  ),
+                  CustomTextFormField(
+                    validation: validmobile1,
+                    controller: mobile1,
+                    icon: Icon(Icons.phone_android_outlined, color: Colors.blue),
+                    hintText: lang.lang == 'en' ? 'Mobile 1' : 'رقم التليفون 1 ',
+                    lable: lang.lang == 'en' ? 'Mobile 1' : 'رقم التليفون 1 ',
+                  ),
+                  CustomTextFormField(
+                    controller: mobile2,
+                    validation: validmobile2,
+                    icon: Icon(Icons.phone_android_outlined, color: Colors.blue),
+                    hintText: lang.lang == 'en' ? 'Mobile 2' : 'رقم التليفون 2 ',
+                    lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم التليفون 2 ',
+                  ),
+                  SizedBox(height: 20.h),
+                  SizedBox(
+                    height: 40.h,
+                      width: 140.w,
+                    child: ElevatedButton.icon(
+                      icon: Icon(Icons.app_registration),
+                      label: Text(lang.lang == "en" ? "Sign UP" : "تسجيل كمورد"),
+                      onPressed: () async {
+                        if (!formstatesignup.currentState!.validate()) return;
 
-                      setState(() => isLoading = true);
+                        setState(() => isLoading = true);
 
-                      try {
-                        String? apiToken = await _firebaseMessaging.getToken();
+                        try {
+                          String? apiToken = await _firebaseMessaging.getToken();
 
-                        LocationData location = await _locationTracker
-                            .getLocation();
+                          LocationData location = await _locationTracker
+                              .getLocation();
 
-                        var data = {
-                          "name": username.text,
-                          "email": email.text,
-                          "password": password.text,
-                          "c_password": cpassword.text,
-                          "mobile1": mobile1.text,
-                          "mobile2": mobile2.text,
-                          "reg_longitude": location.longitude.toString(),
-                          "reg_latitude": location.latitude.toString(),
-                          "cur_longitude": location.longitude.toString(),
-                          "cur_latitude": location.latitude.toString(),
-                          "api_token": apiToken ?? "",
-                        };
+                          var data = {
+                            "name": username.text,
+                            "email": email.text,
+                            "password": password.text,
+                            "c_password": cpassword.text,
+                            "mobile1": mobile1.text,
+                            "mobile2": mobile2.text,
+                            "reg_longitude": location.longitude.toString(),
+                            "reg_latitude": location.latitude.toString(),
+                            "cur_longitude": location.longitude.toString(),
+                            "cur_latitude": location.latitude.toString(),
+                            "api_token": apiToken ?? "",
+                          };
 
-                        var response = await http.post(
-                          Uri.parse(
-                            "https://www.ordervite.com/api/supplier/register",
-                          ),
-                          body: data,
-                        );
-
-                        var reposnsebody = jsonDecode(response.body);
-
-                        setState(() => isLoading = false);
-
-                        if (reposnsebody["success"] == true) {
-                          await savePref(
-                            reposnsebody["data"]["name"]["name"],
-                            reposnsebody["data"]["name"]["email"],
-                            reposnsebody["data"]["token"],
-                            reposnsebody["data"]["name"]["id"].toString(),
-                            "supplier",
+                          var response = await http.post(
+                            Uri.parse(
+                              "https://www.ordervite.com/api/supplier/register",
+                            ),
+                            body: data,
                           );
 
-                          AuthService.setToken(
-                            reposnsebody["data"]["token"],
-                            reposnsebody["data"]["token"],
-                            "supplier",
-                          );
+                          var reposnsebody = jsonDecode(response.body);
 
-                          Navigator.of(
-                            context,
-                          ).pushReplacementNamed(RoutesManager.suHome);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                          setState(() => isLoading = false);
+
+                          if (reposnsebody["success"] == true) {
+                            await savePref(
+                              reposnsebody["data"]["name"]["name"],
+                              reposnsebody["data"]["name"]["email"],
+                              reposnsebody["data"]["token"],
+                              reposnsebody["data"]["name"]["id"].toString(),
+                              "supplier",
+                            );
+
+                            AuthService.setToken(
+                              reposnsebody["data"]["token"],
+                              reposnsebody["data"]["token"],
+                              "supplier",
+                            );
+
+                            Navigator.of(
+                              context,
+                            ).pushReplacementNamed(RoutesManager.suHome);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  lang.lang == "en"
+                                      ? 'Invalid data'
+                                      : 'البيانات غير صحيحة',
+                                ),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          setState(() => isLoading = false);
+
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              title: Text(lang.lang == "en" ? 'Warning' : 'تحذير'),
                               content: Text(
                                 lang.lang == "en"
-                                    ? 'Invalid data'
-                                    : 'البيانات غير صحيحة',
+                                    ? 'Please check your network'
+                                    : 'يرجي التحقق من اتصال الشبكة',
                               ),
                             ),
                           );
                         }
-                      } catch (e) {
-                        setState(() => isLoading = false);
-
-                        showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                            title: Text(lang.lang == "en" ? 'Warning' : 'تحذير'),
-                            content: Text(
-                              lang.lang == "en"
-                                  ? 'Please check your network'
-                                  : 'يرجي التحقق من اتصال الشبكة',
-                            ),
-                          ),
-                        );
-                      }
-                    },
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

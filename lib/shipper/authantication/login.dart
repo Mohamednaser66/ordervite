@@ -38,6 +38,15 @@ class _LogInSHState extends State<LogInSH> {
 
   final mykey = GlobalKey<ScaffoldState>();
 
+  String? validepassword(String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Password is required';
+    }
+    if (val.length < 6) {
+      return 'Password is too short';
+    }
+    return null;
+  }
 
 
   savePref(
@@ -95,20 +104,21 @@ class _LogInSHState extends State<LogInSH> {
             ),
           ),
         ),
-        body: Container(
-          height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF152A48), Color(0xFF0D1B2A)],
+        body: InkWell(
+          onTap: () {FocusScope.of(context).unfocus();},
+          child: Container(
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF152A48), Color(0xFF0D1B2A)],
+              ),
             ),
-          ),
-          child: Form(
-            child: SingleChildScrollView(
-              child: Form(
-                key: formstatesignin,
+            child: Form(
+              key: formstatesignin,
 
+              child: SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.all(16.0.r),
                   child: Column(
@@ -147,7 +157,7 @@ class _LogInSHState extends State<LogInSH> {
                       CustomTextFormField(
                         secure: true,
                         controller: password,
-                        validation: AppValidators.validepassword,
+                        validation: validepassword,
                         icon: Icon(Icons.key, color: Colors.blue),
                         hintText: lang.lang == 'en' ? 'Password' : 'كلمة السر',
                         lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
@@ -158,6 +168,7 @@ class _LogInSHState extends State<LogInSH> {
                         width: 140.w,
                         child: ElevatedButton.icon(
                           onPressed: () async {
+                            FocusScope.of(context).unfocus();
                             formstatesignin.currentState?.save();
                             setState(() {
                               isLoading = true;
@@ -237,7 +248,7 @@ class _LogInSHState extends State<LogInSH> {
                               );
                             }
                           },
-                          icon: Icon(Icons.login),
+                          icon: Icon(Icons.login,size: 22.sp,),
                           label: Text(lang.lang == "en" ? 'Sign In' : 'دخول'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,

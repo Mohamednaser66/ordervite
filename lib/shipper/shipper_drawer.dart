@@ -32,10 +32,6 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
       child: Container(
         decoration: BoxDecoration(
           color: Color.fromRGBO(7, 15, 33, 0.9),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(18.0.r),
-            topRight: Radius.circular(18.0.r),
-          ),
         ),
 
         child: ListView(

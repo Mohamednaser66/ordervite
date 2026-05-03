@@ -17,21 +17,18 @@ final class ShipperOrderRouteLoaded extends ShipperOrderState {
   });
 }
 
-/// Emitted when the current order is fetched or updated via stream.
 final class ShipperOrderCurrentLoaded extends ShipperOrderState {
   final Map<String, dynamic>? orderData;
 
   ShipperOrderCurrentLoaded(this.orderData);
 }
 
-/// Emitted when the order status string changes (e.g. "new" → "shipper confirmed").
 final class ShipperOrderStatusChanged extends ShipperOrderState {
   final Map<String, dynamic> orderData;
 
   ShipperOrderStatusChanged(this.orderData);
 }
 
-/// Emitted when unread chat message count changes.
 final class ShipperOrderMessageCountUpdated extends ShipperOrderState {
   final int count;
 

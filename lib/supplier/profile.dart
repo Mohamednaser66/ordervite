@@ -2,13 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/core/app_validators.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
 import 'package:flutter_maps/lang.dart';
+import 'package:flutter_maps/services/api.dart';
+import 'package:flutter_maps/services/auth.dart';
 import 'package:flutter_maps/shipper/widgets/profile_bottom_sheet.dart';
 import 'package:flutter_maps/supplier/home_page/widgets/home_drawer.dart';
+import 'package:flutter_maps/supplier/supplier_profile_cubit/supplier_profile_cubit.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -74,7 +78,14 @@ class _CreatProfileState extends State<SUProfilePage> {
     _mobile2.dispose();
     super.dispose();
   }
+Future<void> _deleteData()async{
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+preferences.remove("username");
+preferences.remove("email");
+preferences.remove("token");
+preferences.remove("id");
 
+}
   Future<void> getPref() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
@@ -180,7 +191,9 @@ class _CreatProfileState extends State<SUProfilePage> {
 
     return Directionality(
       textDirection: lang.lang == "en" ? TextDirection.ltr : TextDirection.rtl,
-      child: Scaffold(
+      child: BlocProvider<SupplierProfileCubit>(
+  create: (context) => SupplierProfileCubit(api: Api()),
+  child: Scaffold(
         drawer: SupplierDrawer(username: username??'', email: email??'', lang: lang, isSignIn: isSignIn),
         key: _scaffoldkey,
         appBar: AppBar(title: Text(username ?? "")),
@@ -285,12 +298,6 @@ class _CreatProfileState extends State<SUProfilePage> {
                 lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
               ),
               SizedBox(height: 30.h),
-              Row(
-                children: [
-                  Text(lang.lang=='en'?'Delete account Contact: ':'لمسح الحساب تواصل مع: ',style: TextStyle(fontSize: 14.sp,color: Colors.black),),
-                  Text(lang.lang=='en'?'support@ordervite.com':'support@ordervite.com',style: TextStyle(color: Colors.blue,fontSize: 14.sp,fontWeight: FontWeight.w400),)
-                ],
-              ),
               SizedBox(height: 30.h),
               ElevatedButton(
                 onPressed: updateProfile,
@@ -298,10 +305,67 @@ class _CreatProfileState extends State<SUProfilePage> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : Text(lang.lang == "en" ? "Submit" : "حفظ"),
               ),
-            ],
+              SizedBox(height: 12.h,),
+              BlocConsumer<SupplierProfileCubit, SupplierProfileState>(
+                listener: (context, state) {
+                  if (state is DeleteSupplierSuccess) {
+                    _deleteData();
+                    AuthService.removeToken();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Account deleted successfully')),
+                    );
+                    Navigator.pushNamedAndRemoveUntil(context, RoutesManager.landingPage,(route) => false,);
+                  }
+
+                  if (state is DeleteSupplierError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(lang.lang=='en'?state.error??'Failed':state.error??'sss')),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is DeleteSupplierLoading) {
+                    return Center(child: CircularProgressIndicator(color: Colors.blue,));
+                  }
+                  return ElevatedButton.icon(
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text('Delete Account'),
+                          content: Text('Are you sure you want to delete your account?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: Text('Cancel',style: TextStyle(color: Colors.red),),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: Text('Delete', style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm != true) return;
+
+                      context.read<SupplierProfileCubit>().deleteSupplierAccount(token!);
+                    },
+                    icon: Icon(Icons.delete, size: 24.sp, color: Colors.white),
+                    label: Text(
+                      'Delete Account',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
+              )],
           ),
         ),
       ),
+),
     );
   }
 }

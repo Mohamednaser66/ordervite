@@ -199,12 +199,11 @@ class _SHHomePageState extends State<SHHomePage> {
     if (order_id_session != null) {
       order_data_session = preferences.get('order_data $order_id_session');
     }
-
     username = preferences.getString('username');
     email = preferences.getString('email');
     token = preferences.getString('token');
     id = preferences.getString('id');
-
+   print('Token ========================================$token');
     if (username != null && email != null && token != null && id != null) {
       if (mounted) {
         setState(() {

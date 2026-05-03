@@ -713,7 +713,7 @@ class _ShOrderState extends State<ShOrder> {
         ),
       ),
       child: Padding(
-        padding: REdgeInsets.symmetric(horizontal: 16.0.w, vertical: 12.0.h),
+        padding: REdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),

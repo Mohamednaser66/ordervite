@@ -3,17 +3,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemeManager {
   static final ThemeData light = ThemeData(
-    iconTheme: IconThemeData(color: Colors.blue),
+    iconTheme: IconThemeData(color: Colors.blue,size: 20.sp),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
+        textStyle: TextStyle(color: Colors.white,fontSize: 14.sp,fontWeight: FontWeight.w400),
         foregroundColor: Colors.white,
         backgroundColor: Colors.blue,
       ),
+
     ),
     appBarTheme: AppBarTheme(
 
       centerTitle: true,
-      iconTheme: IconThemeData(color: Colors.white,size: 26.sp),
+      iconTheme: IconThemeData(color: Colors.white,size: 20.sp),
       titleTextStyle: TextStyle(
         fontSize: 18.sp,
         fontWeight: FontWeight.bold,
