@@ -1,9 +1,13 @@
 import 'dart:convert';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/authpages.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/firebase_options.dart';
+import 'package:flutter_maps/main.dart';
 import 'package:flutter_maps/services/auth.dart';
 import 'package:flutter_maps/shipper/home.dart';
 import 'package:flutter_maps/supplier/home_page/home_page.dart';
@@ -29,8 +33,14 @@ class _LandingPageState extends State<LandingPage> {
   void initState() {
     super.initState();
     _initialize();
+    _initServices();
   }
 
+  Future<void> _initServices() async {
+
+
+    await initNotifications();
+  }
   Future<void> _initialize() async {
     await _loadLanguage();
 

@@ -260,7 +260,7 @@ class _LogInState extends State<LogIn> {
                         children: [
                           Text(
                             lang.lang == "en"
-                                ? "If You do not have an Email Please"
+                                ? "If You don`t have an Email Please"
                                 : "اذا كنت لاتملك حساب من فضلك",
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
@@ -273,7 +273,7 @@ class _LogInState extends State<LogIn> {
                             },
                             child: Text(
                               lang.lang == "en" ? "SignUp" : "قم بالاشتراك",
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.white,fontSize: 12.sp),
                             ),
                           ),
                         ],

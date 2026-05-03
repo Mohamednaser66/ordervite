@@ -34,7 +34,6 @@ showdialog(context) {
 }
 
 class _RegisterSHState extends State<RegisterSH> {
-  late TapGestureRecognizer _changesign;
 
  late TextEditingController username ;
  late TextEditingController email ;
@@ -109,10 +108,6 @@ class _RegisterSHState extends State<RegisterSH> {
 
   @override
   void initState() {
-    _changesign =  TapGestureRecognizer()
-      ..onTap = () {
-        Navigator.of(context).pushNamed(RoutesManager.shLogin);
-      };
     super.initState();
     username =  TextEditingController();
     email =  TextEditingController();
@@ -358,36 +353,16 @@ String roles = ConstantManager.shipper;
                         ),
                       ),
                       SizedBox(height: 10.h,),
-                      Container(
-                        margin: EdgeInsets.only(left: 5.w),
-                        child: RichText(
-                          text: TextSpan(
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: lang.lang == "en"
-                                    ? " If you already have an account please    "
-                                    : " اذا يوجد لديك حساب يمكنك الستجيل من هنا ",
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              TextSpan(
-                                recognizer: _changesign,
-                                text: lang.lang == "en"
-                                    ? "Sign in"
-                                    : "تسجيل دخول ",
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                       Row(children: [
+                         Text( lang.lang == "en"
+                             ? "If you already have an account please"
+                             : "اذا يوجد لديك حساب يمكنك الستجيل من هنا",style: TextStyle(color: Colors.white,fontSize: 14.sp),),
+                         TextButton(
+                           onPressed: (){
+                             Navigator.pushReplacementNamed(context, RoutesManager.shLogin);
+                           },
+                           child: Text(lang.lang=='en'?'Sign In':'تسجيل الدخول',style: TextStyle(color: Colors.white,fontSize: 14.sp),),)
+                       ],),
                       SizedBox(height: 10.h,),
                       // TextButton(onPressed: (){
                       //   Navigator.pushNamed(context, RoutesManager.registerWithPhone,arguments: roles);

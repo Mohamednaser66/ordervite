@@ -337,8 +337,18 @@ class _RegisterState extends State<Register> {
                           );
                         }
                       },
-                    ),
-                  ),
+                    )),
+                    SizedBox(height: 10.h,),
+                    Row(children: [
+                      Text( lang.lang == "en"
+                          ? "If you already have an account please"
+                          : "اذا يوجد لديك حساب يمكنك الستجيل من هنا",style: TextStyle(color: Colors.white,fontSize: 14.sp),),
+                      TextButton(
+                        onPressed: (){
+                          Navigator.pushReplacementNamed(context, RoutesManager.login);
+                        },
+                        child: Text(lang.lang=='en'?'Sign In':'تسجيل الدخول',style: TextStyle(color: Colors.white,fontSize: 14.sp),),)
+                    ],),
                 ],
               ),
             ),

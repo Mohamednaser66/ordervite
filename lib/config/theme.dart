@@ -38,7 +38,7 @@ class ThemeManager {
     textTheme: TextTheme(
       labelMedium: TextStyle(
         color: Colors.white,
-        fontSize: 14.sp,
+        fontSize: 12.sp,
         fontWeight: FontWeight.w400,
       ),
     ),
