@@ -262,7 +262,11 @@ class _RegisterState extends State<Register> {
                         setState(() => isLoading = true);
 
                         try {
+                          await _firebaseMessaging.requestPermission();
+
                           String? apiToken = await _firebaseMessaging.getToken();
+
+                          print("FCM TOKEN===========: $apiToken");
 
                           LocationData location = await _locationTracker
                               .getLocation();
@@ -291,8 +295,9 @@ class _RegisterState extends State<Register> {
                           var reposnsebody = jsonDecode(response.body);
 
                           setState(() => isLoading = false);
-
+                          print("===============================${reposnsebody["success"]}");
                           if (reposnsebody["success"] == true) {
+
                             await savePref(
                               reposnsebody["data"]["name"]["name"],
                               reposnsebody["data"]["name"]["email"],
