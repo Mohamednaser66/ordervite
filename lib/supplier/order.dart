@@ -33,8 +33,7 @@ class _OrderPageState extends State<OrderPage> {
   final Set<Polyline> _polylines = {};
   final Location _locationTracker = Location();
   LatLng? _sourceLatLng;
-  LatLng? _destinationLatLng;
-  String? _username;
+  LatLng? _destinationLatLng;  LatLng? _shipperLatLng;  String? _username;
   String? _userId;
   String? _token;
   bool _isConfirm = false;
@@ -175,18 +174,39 @@ class _OrderPageState extends State<OrderPage> {
 
     await _cubit.handleOrderStateMessage(data, _token!);
 
+    LatLng? newShipperLatLng;
+    if (data["sh_latitude"] != null && data["sh_longitude"] != null) {
+      try {
+        final lat = double.parse(data["sh_latitude"].toString());
+        final lng = double.parse(data["sh_longitude"].toString());
+        newShipperLatLng = LatLng(lat, lng);
+      } catch (e) {
+        // Invalid coordinates
+      }
+    }
+
     setState(() {
+      if (newShipperLatLng != null) {
+        _shipperLatLng = newShipperLatLng;
+        if (_isShipperConfirmed || stateName == "shipper confirmed") {
+          _updateShipperPolyline();
+        }
+      }
+      
       if (stateName == "shipper confirmed") {
         _orderShipperId = data["state_type"]?.toString() ?? _orderShipperId;
         _isShipperConfirmed = true;
+        _updateShipperPolyline();
       } else if (stateName == "order received") {
         _isShipperReceived = true;
         _isShipperConfirmed = true;
+        _updateShipperPolyline();
       } else if (stateName == "order delivered") {
         _isConfirmOrder = true;
         _isShipperDelivered = true;
         _isShipperConfirmed = true;
         _isShipperReceived = true;
+        _updateShipperPolyline();
       } else if (stateName == "order cancel") {
         _navigateToHome(
           "Order is Canceled by shipper",
@@ -384,20 +404,69 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 
+  void _updateShipperPolyline() {
+    if (_shipperLatLng == null || _destinationLatLng == null) return;
+    setState(() {
+      _polylines.removeWhere((p) => p.polylineId.value == "shipper_route");
+      _markers.removeWhere((m) => m.markerId.value == "shipper");
+      _polylines.add(
+        Polyline(
+          polylineId: const PolylineId("shipper_route"),
+          points: [_shipperLatLng!, _destinationLatLng!],
+          color: Colors.orange,
+          width: 5,
+          geodesic: true,
+        ),
+      );
+      
+      _markers.add(
+        Marker(
+          markerId: const MarkerId("shipper"),
+          position: _shipperLatLng!,
+          infoWindow: const InfoWindow(title: "Shipper Location"),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+        ),
+      );
+    });
+  }
+
   void _updateOrderStateUI(Order order) {
     final state = order.state;
+    LatLng? newShipperLatLng;
+    
+    if (order.shipperLatitude != null && order.shipperLongitude != null) {
+      try {
+        final lat = double.parse(order.shipperLatitude!);
+        final lng = double.parse(order.shipperLongitude!);
+        newShipperLatLng = LatLng(lat, lng);
+      } catch (e) {
+        // Invalid coordinates
+      }
+    }
+    
     setState(() {
       _orderState = state;
-      if (state == "shipper confirmed")
+      
+      if (newShipperLatLng != null) {
+        _shipperLatLng = newShipperLatLng;
+        if (_isShipperConfirmed) {
+          _updateShipperPolyline();
+        }
+      }
+      
+      if (state == "shipper confirmed") {
         _isShipperConfirmed = true;
-      else if (state == "order received") {
+        _updateShipperPolyline();
+      } else if (state == "order received") {
         _isShipperReceived = true;
         _isShipperConfirmed = true;
+        _updateShipperPolyline();
       } else if (state == "order delivered") {
         _isConfirmOrder = true;
         _isShipperDelivered = true;
         _isShipperReceived = true;
         _isShipperConfirmed = true;
+        _updateShipperPolyline();
       } else if (state == "order complete")
         _navigateToRating();
     });
@@ -728,7 +797,7 @@ class _OrderPageState extends State<OrderPage> {
           final isSelected = _packageSize == size;
           return Expanded(
             child: Padding(
-              padding: REdgeInsets.symmetric(horizontal: 5, vertical: 8),
+              padding: REdgeInsets.symmetric(horizontal: 2, vertical: 4),
               child: ElevatedButton(
                 onPressed: () => setState(() => _packageSize = size),
                 style: ElevatedButton.styleFrom(

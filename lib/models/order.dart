@@ -6,6 +6,8 @@ class Order {
   final String? price;
   final String? priceCheck;
   final dynamic orderCancel;
+  final String? shipperLatitude;
+  final String? shipperLongitude;
 
   Order({
     this.id,
@@ -15,6 +17,8 @@ class Order {
     this.price,
     this.priceCheck,
     this.orderCancel,
+    this.shipperLatitude,
+    this.shipperLongitude,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
@@ -26,6 +30,8 @@ class Order {
       price: (json['order_price'] ?? json['price'])?.toString(),
       priceCheck: (json['order_pricecheck'] ?? json['pricecheck'])?.toString(),
       orderCancel: json['order_cancel'],
+      shipperLatitude: json['sh_latitude']?.toString(),
+      shipperLongitude: json['sh_longitude']?.toString(),
     );
   }
 
@@ -38,6 +44,8 @@ class Order {
       'price': price,
       'pricecheck': priceCheck,
       'order_cancel': orderCancel,
+      'sh_latitude': shipperLatitude,
+      'sh_longitude': shipperLongitude,
     };
   }
 }
