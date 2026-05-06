@@ -62,6 +62,7 @@ deleteData()async{
     email = preferences.getString("email");
 
     if (username != null && email != null) {
+      if(!mounted)return;
       setState(() {
         username = preferences.getString("username");
         email = preferences.getString("email");
@@ -84,18 +85,18 @@ deleteData()async{
 
     var reposnsebody = jsonDecode(response.body);
     if (reposnsebody["success"] == true) {}
-
+       if(!mounted)return;
     setState(() {
-      _username = new TextEditingController(
+      _username =  TextEditingController(
         text: reposnsebody["data"]["name"]["name"].toString(),
       );
-      _email = new TextEditingController(
+      _email =  TextEditingController(
         text: reposnsebody["data"]["name"]["email"].toString(),
       );
-      _mobile1 = new TextEditingController(
+      _mobile1 = TextEditingController(
         text: reposnsebody["data"]["name"]["mobile1"].toString(),
       );
-      _mobile2 = new TextEditingController(
+      _mobile2 = TextEditingController(
         text: reposnsebody["data"]["name"]["mobile1"].toString(),
       );
       logo_src = reposnsebody["data"]["logo"].toString();
@@ -507,7 +508,7 @@ deleteData()async{
                         this.logo_src ?? '',
                         this.id_image_src ?? '',
                       );
-                      Message message = new Message(
+                      Message message =  Message(
                         lang.lang == "en"
                             ? "profile editing sucsses"
                             : "تم تحديث البيانات بنجاح ",

@@ -6,7 +6,6 @@ import 'firebase_options.dart';
 import 'my_app.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {}
-
 Future<void> initNotifications() async {
   try {
     FirebaseMessaging messaging = FirebaseMessaging.instance;

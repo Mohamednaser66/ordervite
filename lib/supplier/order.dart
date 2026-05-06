@@ -72,7 +72,7 @@ class _OrderPageState extends State<OrderPage> {
         backgroundColor: backgroundColor,
         content: Text(
           _loc(lang, en, ar),
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style:  TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
         ),
       ),
     );

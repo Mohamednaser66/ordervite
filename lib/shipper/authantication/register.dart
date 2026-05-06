@@ -263,9 +263,6 @@ String roles = ConstantManager.shipper;
                               await _firebaseMessaging.requestPermission();
 
                               String? api_token = await _firebaseMessaging.getToken();
-
-                              print("FCM TOKEN: $api_token");
-
                               var location = await _locationTracker.getLocation();
 
                               var data = {

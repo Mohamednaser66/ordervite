@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,11 @@ import 'package:flutter_maps/shipper/widgets/sh_order_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../core/map_utils.dart';
 
 class ShOrder extends StatefulWidget {
   const ShOrder({Key? key}) : super(key: key);
@@ -32,6 +36,7 @@ class _ShOrderState extends State<ShOrder> {
   final Set<Polyline> _polyline = {};
   LatLng _sourceLatLong = const LatLng(30.059445, 31.1933067);
   LatLng _destinationLatLong = const LatLng(30.060671, 31.204131);
+  LatLng? _currentLatLong;
   LatLng? _lastUpdatedLocation;
 
   String? _username;
@@ -162,8 +167,19 @@ class _ShOrderState extends State<ShOrder> {
       if (_lastUpdatedLocation == null ||
           _getDistance(_lastUpdatedLocation!, currentLatLng) > 50) {
         setState(() {
-          _sourceLatLong = currentLatLng;
+          _currentLatLong = currentLatLng;
           _lastUpdatedLocation = currentLatLng;
+          _markers.removeWhere((marker) => marker.markerId.value == 'current');
+          _markers.add(
+            Marker(
+              markerId: const MarkerId('current'),
+              position: currentLatLng,
+              infoWindow: const InfoWindow(title: 'Current location'),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueAzure,
+              ),
+            ),
+          );
         });
         _getPolyline();
         _updateCamera(currentLatLng, currentLocation.heading ?? 0.0);
@@ -376,7 +392,6 @@ class _ShOrderState extends State<ShOrder> {
       ),
     );
 
-    // Real-time data sync: Refresh order when dialog closes
     if (confirmed == false && mounted && _userId != null && _token != null) {
       _cubit.refreshCurrentOrder(_userId!, _token!);
       return;
@@ -400,6 +415,7 @@ class _ShOrderState extends State<ShOrder> {
         ar: 'تم استلام الطلب بنجاح',
         backgroundColor: Colors.green,
       );
+      await _updateSourceToDestinationPolyline();
     }
   }
 
@@ -456,7 +472,6 @@ class _ShOrderState extends State<ShOrder> {
       ),
     );
 
-    // Real-time data sync: Refresh order when dialog closes with false
     if (confirmed == false && mounted && _userId != null && _token != null) {
       _cubit.refreshCurrentOrder(_userId!, _token!);
     }
@@ -491,7 +506,6 @@ class _ShOrderState extends State<ShOrder> {
       ),
     );
 
-    // Real-time data sync: Refresh order when dialog closes
     if (confirmed == false && mounted && _userId != null && _token != null) {
       _cubit.refreshCurrentOrder(_userId!, _token!);
       return;
@@ -520,18 +534,87 @@ class _ShOrderState extends State<ShOrder> {
   }
 
   Future<void> _getPolyline() async {
+    await _updateCurrentToSourcePolyline();
+    await _updateSourceToDestinationPolyline();
+  }
+
+  Future<List<LatLng>> _fetchRoutePoints(
+    LatLng origin,
+    LatLng destination,
+  ) async {
     final url =
         "https://maps.googleapis.com/maps/api/directions/json?"
-        "origin=${_sourceLatLong.latitude},${_sourceLatLong.longitude}"
-        "&destination=${_destinationLatLong.latitude},${_destinationLatLong.longitude}"
+        "origin=${origin.latitude},${origin.longitude}"
+        "&destination=${destination.latitude},${destination.longitude}"
         "&key=${AppConfig.googleMapsApiKey}";
 
     try {
-      // Note: actual polyline fetching is handled by cubit/fetchRoute;
-      // this is kept only for live location updates if needed.
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode != 200) return [];
+
+      final json = jsonDecode(response.body);
+      if (json['routes'] == null || (json['routes'] as List).isEmpty) {
+        return [];
+      }
+
+      final route = json['routes'][0];
+      final encodedPoints = route['overview_polyline']?['points'] as String?;
+      if (encodedPoints == null || encodedPoints.isEmpty) {
+        return [];
+      }
+
+      return decodePolyline(encodedPoints);
     } catch (e) {
-      debugPrint("Error fetching polyline: $e");
+      debugPrint('Error fetching route points: $e');
+      return [];
     }
+  }
+
+  Future<void> _updateCurrentToSourcePolyline() async {
+    if (_currentLatLong == null) return;
+    final points = await _fetchRoutePoints(_currentLatLong!, _sourceLatLong);
+    if (points.isEmpty) return;
+
+    setState(() {
+      _polyline.removeWhere(
+        (p) => p.polylineId == const PolylineId('current_source_route'),
+      );
+      _polyline.add(
+        Polyline(
+          polylineId: const PolylineId('current_source_route'),
+          visible: true,
+          width: 5,
+          points: points,
+          color: Colors.green,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap,
+        ),
+      );
+    });
+  }
+
+  Future<void> _updateSourceToDestinationPolyline() async {
+    final points = await _fetchRoutePoints(_sourceLatLong, _destinationLatLong);
+    if (points.isEmpty) return;
+
+    setState(() {
+      _polyline.removeWhere(
+        (p) => p.polylineId == const PolylineId('source_destination_route'),
+      );
+      _polyline.add(
+        Polyline(
+          polylineId: const PolylineId('source_destination_route'),
+          visible: true,
+          width: 5,
+          points: points,
+          color: Colors.blue,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap,
+        ),
+      );
+    });
   }
 
   @override
@@ -544,10 +627,14 @@ class _ShOrderState extends State<ShOrder> {
         listener: (context, state) {
           if (state is ShipperOrderRouteLoaded) {
             setState(() {
-              _polyline.clear();
+              _polyline.removeWhere(
+                (p) =>
+                    p.polylineId ==
+                    const PolylineId('source_destination_route'),
+              );
               _polyline.add(
                 Polyline(
-                  polylineId: const PolylineId("route_line"),
+                  polylineId: const PolylineId('source_destination_route'),
                   visible: true,
                   width: 5,
                   points: state.polylinePoints,

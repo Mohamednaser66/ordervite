@@ -231,7 +231,6 @@ class _ShOrdersState extends State<ShOrders> {
               );
             }
 
-            // Show snackbar when new orders arrive
             if (orders.length > _orderNum && _orderNum > 0) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (!mounted) return;

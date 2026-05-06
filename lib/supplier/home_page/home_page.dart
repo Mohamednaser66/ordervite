@@ -45,7 +45,6 @@ class _MyHomePageState extends State<MyHomePage> {
   late BitmapDescriptor iconHalte;
   late BitmapDescriptor iconMe;
   bool _locationPermissionGranted = false;
-
   double bottomPaddingOfMap = 0;
   String? placeAddress;
 

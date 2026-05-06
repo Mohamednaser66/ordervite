@@ -203,7 +203,6 @@ class _SHHomePageState extends State<SHHomePage> {
     email = preferences.getString('email');
     token = preferences.getString('token');
     id = preferences.getString('id');
-   print('Token ========================================$token');
     if (username != null && email != null && token != null && id != null) {
       if (mounted) {
         setState(() {
