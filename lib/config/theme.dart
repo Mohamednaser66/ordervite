@@ -6,7 +6,7 @@ class ThemeManager {
     iconTheme: IconThemeData(color: Colors.blue,size: 20.sp),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        textStyle: TextStyle(color: Colors.white,fontSize: 14.sp,fontWeight: FontWeight.w400),
+        textStyle: TextStyle(color: Colors.blue,fontSize: 14.sp,fontWeight: FontWeight.w400),
         foregroundColor: Colors.white,
         backgroundColor: Colors.blue,
       ),

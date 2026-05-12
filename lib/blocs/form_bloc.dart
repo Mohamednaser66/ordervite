@@ -10,12 +10,10 @@ class FormBloc with ValidationMixin {
     addError(null);
     return _email.sink.add;
   }
-
   Function(String) get changePassword {
     addError(null);
     return _password.sink.add;
   }
-
   Function(String?) get addError => _errorMessage.sink.add;
   Stream<String> get email => _email.stream.transform(validatorEmail);
 
@@ -29,7 +27,6 @@ class FormBloc with ValidationMixin {
     errorMessage,
     (e, p, er) => er == null || er.isEmpty,
   );
-
   void dispose() {
     _email.close();
     _password.close();

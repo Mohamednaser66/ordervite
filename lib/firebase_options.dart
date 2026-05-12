@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '610950052144',
     projectId: 'orderviteapp-fa32e',
     storageBucket: 'orderviteapp-fa32e.firebasestorage.app',
-    iosBundleId: 'com.retroportalstudio.www.fluttermaps.flutterMaps',
+    iosBundleId: 'com.ordervite.app',
   );
 }

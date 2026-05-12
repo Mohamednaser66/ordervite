@@ -85,9 +85,9 @@ class _ShOrderState extends State<ShOrder> {
 
     final prefs = await SharedPreferences.getInstance();
 
-    _username = prefs.getString("username");
-    _email = prefs.getString("email");
-    _token = prefs.getString("token");
+    _username =prefs.getString('gmailName')?? prefs.getString("username");
+    _email =prefs.getString('gmailEmail')?? prefs.getString("email");
+    _token =prefs.getString('gmailToken')?? prefs.getString("token");
     _userId = prefs.getString("id");
 
     setState(() {

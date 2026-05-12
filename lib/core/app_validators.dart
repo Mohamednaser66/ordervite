@@ -2,18 +2,22 @@
 class AppValidators {
   AppValidators._();
 
-  static String? validateEmail(String? val) {
-    RegExp emailRegex = RegExp(
-        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-    if (val == null) {
-      return 'this field is required';
-    } else if (val.trim().isEmpty) {
-      return 'this field is required';
-    } else if (emailRegex.hasMatch(val) == false) {
-      return 'enter valid email';
-    } else {
-      return null;
+ static String? emailOrPhoneValidator(String? value) {
+
+    if (value == null || value.trim().isEmpty) {
+      return "Required";
     }
+    value = value.trim();
+    bool isEmail = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    ).hasMatch(value);
+    bool isPhone = RegExp(
+      r'^(010|011|012|015)\d{8}$',
+    ).hasMatch(value);
+    if (!isEmail && !isPhone) {
+      return "Enter valid email or phone";
+    }
+    return null;
   }
  static String? validepassword(String? val) {
     RegExp passwordRegex = RegExp(r'^(?=.*[a-zA-Z])(?=.*[0-9])');

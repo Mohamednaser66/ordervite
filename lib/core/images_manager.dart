@@ -3,4 +3,5 @@ class ImagesManager {
   static const String pasta ='assets/pasta.jpeg';
   static const String sugar ='assets/sugar.jpeg';
   static const String rice ='assets/rice.jpeg';
+  static const String google='assets/google.png';
 }

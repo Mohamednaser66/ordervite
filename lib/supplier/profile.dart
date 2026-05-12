@@ -245,7 +245,7 @@ preferences.remove("id");
               ),
               SizedBox(height: 20.h),
               CustomTextFormField(
-                validation: AppValidators.validateEmail,
+                validation: AppValidators.emailOrPhoneValidator,
                 controller: _email,
                 icon: Icon(Icons.email, color: Colors.blue,),
                 hintText: lang.lang == 'en'

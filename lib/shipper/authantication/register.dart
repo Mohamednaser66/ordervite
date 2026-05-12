@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/core/app_validators.dart';
 import 'package:flutter_maps/core/constant_manager.dart';
+import 'package:flutter_maps/core/firebase_service.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
+import 'package:flutter_maps/core/widgets/sign_in_with_google_widget.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,7 +24,42 @@ class RegisterSH extends StatefulWidget {
   @override
   _RegisterSHState createState() => _RegisterSHState();
 }
+Future<void> loginWithGoogle(BuildContext context) async {
+  try {
+    await FirebaseService.signInWithGoogle();
 
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('User logged in successfully'),
+      ),
+    );
+
+    Navigator.pushReplacementNamed(
+      context,
+      RoutesManager.shHome,
+    );
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'invalid-credential') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Wrong email or password'),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message ?? 'Login failed'),
+        ),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(e.toString()),
+      ),
+    );
+  }
+}
 showdialog(context) {
   return showDialog(
     context: context,
@@ -32,18 +68,14 @@ showdialog(context) {
     },
   );
 }
-
 class _RegisterSHState extends State<RegisterSH> {
-
  late TextEditingController username ;
  late TextEditingController email ;
  late TextEditingController password ;
  late TextEditingController cpassword ;
  late TextEditingController mobile1 ;
  late TextEditingController mobile2 ;
-
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-
   Location _locationTracker = Location();
   late Marker marker;
   late Circle circle;
@@ -68,7 +100,6 @@ class _RegisterSHState extends State<RegisterSH> {
     }
     return null;
   }
-
   String? validecpassword(String? val) {
     if (val == null || val.isEmpty) {
       return 'Password is not Confirmed';
@@ -157,7 +188,6 @@ String roles = ConstantManager.shipper;
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    //   mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
                       Padding(padding: EdgeInsets.only(top: 2.h)),
                       Container(
@@ -183,7 +213,7 @@ String roles = ConstantManager.shipper;
                       CustomTextFormField(
                         icon: Icon(Icons.email, color: Colors.blue),
                         controller: email,
-                        validation: AppValidators.validateEmail,
+                        validation: AppValidators.emailOrPhoneValidator,
                         hintText: lang.lang == 'en'
                             ? 'Email Address'
                             : 'عنوان البريد الالكترونى',
@@ -236,7 +266,6 @@ String roles = ConstantManager.shipper;
                       SizedBox(height: 20.h),
                       SizedBox(
                         height: 40.h,
-                        width: 140.w,
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue, // instead of color
@@ -250,7 +279,6 @@ String roles = ConstantManager.shipper;
                           label: Text(
                             lang.lang == "en" ? 'Sign UP' : 'تسجيل كمسئول شحن ',
                           ),
-
                           onPressed: () async {
                             FocusScope.of(context).unfocus();
                             formstatesignup.currentState!.save();
@@ -313,8 +341,8 @@ String roles = ConstantManager.shipper;
                                   });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(
-                                        'Invlid data Please Insert Correct Data',
+                                      content: Text(lang.lang=='en'?
+                                        'Invlid data Please Insert Correct Data':"بيانات غير صحيحة، من فضلك أدخل بيانات صحيحة.",
                                         style: TextStyle(
                                           fontSize: 15.sp,
                                           color: Colors.red,
@@ -347,6 +375,12 @@ String roles = ConstantManager.shipper;
                           },
                         ),
                       ),
+                      SizedBox(height: 16.h),
+                      InkWell(
+                          onTap: (){
+                            loginWithGoogle(context);
+                          },
+                          child: SignInWithGoogleWidget(tittle: lang.lang=='en'?'Login With Google':'سجل بحساب google')),
                       SizedBox(height: 10.h,),
                        Row(children: [
                          Text( lang.lang == "en"
@@ -356,7 +390,7 @@ String roles = ConstantManager.shipper;
                            onPressed: (){
                              Navigator.pushReplacementNamed(context, RoutesManager.shLogin);
                            },
-                           child: Text(lang.lang=='en'?'Sign In':'تسجيل الدخول',style: TextStyle(color: Colors.white,fontSize: 14.sp),),)
+                           child: Text(lang.lang=='en'?'Sign In':'تسجيل الدخول',style: TextStyle(color: Colors.blue,fontSize: 14.sp),),)
                        ],),
                       SizedBox(height: 10.h,),
                       // TextButton(onPressed: (){

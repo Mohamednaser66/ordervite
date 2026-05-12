@@ -33,7 +33,9 @@ class _OrderPageState extends State<OrderPage> {
   final Set<Polyline> _polylines = {};
   final Location _locationTracker = Location();
   LatLng? _sourceLatLng;
-  LatLng? _destinationLatLng;  LatLng? _shipperLatLng;  String? _username;
+  LatLng? _destinationLatLng;
+  LatLng? _shipperLatLng;
+  String? _username;
   String? _userId;
   String? _token;
   bool _isConfirm = false;
@@ -71,7 +73,7 @@ class _OrderPageState extends State<OrderPage> {
         backgroundColor: backgroundColor,
         content: Text(
           _loc(lang, en, ar),
-          style:  TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
         ),
       ),
     );
@@ -192,7 +194,7 @@ class _OrderPageState extends State<OrderPage> {
           _updateShipperPolyline();
         }
       }
-      
+
       if (stateName == "shipper confirmed") {
         _orderShipperId = data["state_type"]?.toString() ?? _orderShipperId;
         _isShipperConfirmed = true;
@@ -386,12 +388,45 @@ class _OrderPageState extends State<OrderPage> {
     );
 
     if (mounted) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        RoutesManager.suHome,
-        (route) => false,
-      );
+      _navigateToRating();
     }
+  }
+
+  Future<void> _showCancelDialog(Lang lang) async {
+    if (_orderId != null && _userId != null && _token != null) {
+      await _cancelOrder(lang);
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(
+          _loc(lang, 'Confirm', 'تأكيد'),
+          style: const TextStyle(color: Colors.red),
+        ),
+        content: Text(
+          _loc(
+            lang,
+            'Are you sure you want to cancel the order?',
+            'هل أنت متأكد من إلغاء الطلب؟',
+          ),
+          style: const TextStyle(fontSize: 15, color: Colors.red),
+        ),
+        actions: [
+          TextButton(
+            child: Text(_loc(lang, 'No', 'لا')),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          TextButton(
+            child: Text(_loc(lang, 'Yes', 'نعم')),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    _navigateToHome("You have canceled", " تم الإلغاء ");
   }
 
   void _animateCamera() async {
@@ -418,13 +453,15 @@ class _OrderPageState extends State<OrderPage> {
           geodesic: true,
         ),
       );
-      
+
       _markers.add(
         Marker(
           markerId: const MarkerId("shipper"),
           position: _shipperLatLng!,
           infoWindow: const InfoWindow(title: "Shipper Location"),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueOrange,
+          ),
         ),
       );
     });
@@ -433,7 +470,7 @@ class _OrderPageState extends State<OrderPage> {
   void _updateOrderStateUI(Order order) {
     final state = order.state;
     LatLng? newShipperLatLng;
-    
+
     if (order.shipperLatitude != null && order.shipperLongitude != null) {
       try {
         final lat = double.parse(order.shipperLatitude!);
@@ -443,17 +480,17 @@ class _OrderPageState extends State<OrderPage> {
         // Invalid coordinates
       }
     }
-    
+
     setState(() {
       _orderState = state;
-      
+
       if (newShipperLatLng != null) {
         _shipperLatLng = newShipperLatLng;
         if (_isShipperConfirmed) {
           _updateShipperPolyline();
         }
       }
-      
+
       if (state == "shipper confirmed") {
         _isShipperConfirmed = true;
         _updateShipperPolyline();
@@ -632,7 +669,7 @@ class _OrderPageState extends State<OrderPage> {
   Widget _buildOrderForm(Lang lang) {
     return Container(
       height: 350.h,
-      decoration:  BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.topLeft,
@@ -644,7 +681,7 @@ class _OrderPageState extends State<OrderPage> {
         ),
       ),
       child: Padding(
-        padding:  REdgeInsets.symmetric(horizontal: 24, vertical: 18),
+        padding: REdgeInsets.symmetric(horizontal: 24, vertical: 18),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -652,33 +689,33 @@ class _OrderPageState extends State<OrderPage> {
               _buildSectionTitle(
                 lang.lang == "en" ? 'Choose Package Size ' : 'اختار حجم الطرد ',
               ),
-               SizedBox(height: 6.h),
+              SizedBox(height: 6.h),
               _buildSizeSelector(),
-               SizedBox(height: 6.h),
+              SizedBox(height: 6.h),
               _buildSectionTitle(
                 lang.lang == "en"
                     ? 'Distance: $_distance km'
                     : 'المسافة: $_distance كم',
               ),
-               SizedBox(height: 6.h),
+              SizedBox(height: 6.h),
               _buildSectionTitle(
                 lang.lang == "en"
                     ? 'Choose Payment Method'
                     : ' اختر  نظام الدفع  ',
               ),
-               SizedBox(height: 6.h),
+              SizedBox(height: 6.h),
               _buildPaymentSelector(),
-               SizedBox(height: 6.h),
+              SizedBox(height: 6.h),
               _buildSectionTitle(
                 lang.lang == "en"
                     ? 'Enter Package Price  '
                     : '  ادخل سعر الطرد  ',
               ),
-               SizedBox(height: 6.h),
+              SizedBox(height: 6.h),
               TextFormField(
                 controller: _priceController,
                 keyboardType: TextInputType.number,
-                style:  TextStyle(
+                style: TextStyle(
                   fontSize: 15.sp,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
@@ -686,7 +723,7 @@ class _OrderPageState extends State<OrderPage> {
                 maxLength: 30,
                 onChanged: (value) => setState(() {}),
                 decoration: InputDecoration(
-                  contentPadding:  REdgeInsets.only(top: 20, bottom: 20),
+                  contentPadding: REdgeInsets.only(top: 20, bottom: 20),
                   hintText: lang.lang == "en"
                       ? "Package Price"
                       : "  سعر الطرد ",
@@ -726,7 +763,10 @@ class _OrderPageState extends State<OrderPage> {
                         icon: Icon(Icons.done_all, size: 20.sp),
                         label: Text(
                           lang.lang == "en" ? "Confirm" : "تأكيد ",
-                          style: TextStyle(fontSize: 12.sp, color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.white,
+                          ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
@@ -737,17 +777,16 @@ class _OrderPageState extends State<OrderPage> {
                       ),
                     ),
                   ),
-                   SizedBox(width: 40.w),
+                  SizedBox(width: 40.w),
                   Expanded(
                     child: SizedBox(
                       height: 34.h,
                       child: ElevatedButton.icon(
-                        onPressed: () =>
-                            _navigateToHome("You have canceld", " تم الإلغاء "),
-                        icon:  Icon(Icons.cancel, size: 20.sp),
+                        onPressed: () => _showCancelDialog(lang),
+                        icon: Icon(Icons.cancel, size: 20.sp),
                         label: Text(
                           lang.lang == "en" ? "Cancel" : "إلغاء",
-                          style:  TextStyle(
+                          style: TextStyle(
                             fontSize: 12.sp,
                             color: Colors.white,
                           ),
@@ -974,7 +1013,8 @@ class _OrderPageState extends State<OrderPage> {
                       ),
                       SizedBox(width: 20.w),
                       Expanded(
-                        child: SizedBox(height: 32.h,
+                        child: SizedBox(
+                          height: 32.h,
                           child: ElevatedButton.icon(
                             onPressed: () => _cancelOrder(lang),
                             icon: Icon(Icons.cancel, size: 20.sp),

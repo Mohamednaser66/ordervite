@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
+import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/firebase_service.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
+import 'package:flutter_maps/core/widgets/sign_in_with_google_widget.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,12 +25,11 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  TapGestureRecognizer? _changesign;
 
   late TextEditingController username ;
   late TextEditingController email ;
   late TextEditingController password ;
-  late TextEditingController cpassword ;
+  late TextEditingController cPassword ;
   late TextEditingController mobile1 ;
   late TextEditingController mobile2 ;
 
@@ -38,6 +41,42 @@ class _RegisterState extends State<Register> {
   final GlobalKey<FormState> formstatesignup = GlobalKey<FormState>();
 
   final GlobalKey<ScaffoldState> mykey2 = GlobalKey<ScaffoldState>();
+  Future<void> loginWithGoogle(BuildContext context) async {
+    try {
+      await FirebaseService.signInWithGoogle();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User logged in successfully'),
+        ),
+      );
+
+      Navigator.pushReplacementNamed(
+        context,
+        RoutesManager.shHome,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-credential') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Wrong email or password'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message ?? 'Login failed'),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -45,13 +84,10 @@ class _RegisterState extends State<Register> {
     username = TextEditingController();
     email = TextEditingController();
     password = TextEditingController();
-    cpassword = TextEditingController();
+    cPassword = TextEditingController();
     mobile1 = TextEditingController();
     mobile2 = TextEditingController();
-    _changesign = TapGestureRecognizer()
-      ..onTap = () {
-        Navigator.of(context).pushNamed("login");
-      };
+
   }
 
 
@@ -61,10 +97,9 @@ class _RegisterState extends State<Register> {
     username.dispose();
     email.dispose();
     password.dispose();
-    cpassword.dispose();
+    cPassword.dispose();
     mobile1.dispose();
     mobile2.dispose();
-    _changesign?.dispose();
     super.dispose();
   }
 
@@ -208,7 +243,7 @@ class _RegisterState extends State<Register> {
                   ),
                   CustomTextFormField(
                     icon: Icon(Icons.email, color: Colors.blue),
-                    validation: validemail,
+                    validation: AppValidators.emailOrPhoneValidator,
                     controller: email,
                     hintText: lang.lang == 'en'
                         ? 'Email Address'
@@ -225,7 +260,7 @@ class _RegisterState extends State<Register> {
                   ),
                   CustomTextFormField(
                     secure: true,
-                    controller: cpassword,
+                    controller: cPassword,
                     validation: validecpassword,
                     icon: Icon(Icons.key, color: Colors.blue),
                     hintText: lang.lang == 'en'
@@ -252,7 +287,6 @@ class _RegisterState extends State<Register> {
                   SizedBox(height: 20.h),
                   SizedBox(
                     height: 40.h,
-                      width: 140.w,
                     child: ElevatedButton.icon(
                       icon: Icon(Icons.app_registration,size: 22.sp,),
                       label: Text(lang.lang == "en" ? "Sign UP" : "تسجيل كمورد"),
@@ -265,9 +299,6 @@ class _RegisterState extends State<Register> {
                           await _firebaseMessaging.requestPermission();
 
                           String? apiToken = await _firebaseMessaging.getToken();
-
-                          print("FCM TOKEN===========: $apiToken");
-
                           LocationData location = await _locationTracker
                               .getLocation();
 
@@ -275,7 +306,7 @@ class _RegisterState extends State<Register> {
                             "name": username.text,
                             "email": email.text,
                             "password": password.text,
-                            "c_password": cpassword.text,
+                            "c_password": cPassword.text,
                             "mobile1": mobile1.text,
                             "mobile2": mobile2.text,
                             "reg_longitude": location.longitude.toString(),
@@ -295,9 +326,7 @@ class _RegisterState extends State<Register> {
                           var reposnsebody = jsonDecode(response.body);
 
                           setState(() => isLoading = false);
-                          print("===============================${reposnsebody["success"]}");
                           if (reposnsebody["success"] == true) {
-
                             await savePref(
                               reposnsebody["data"]["name"]["name"],
                               reposnsebody["data"]["name"]["email"],
@@ -305,13 +334,11 @@ class _RegisterState extends State<Register> {
                               reposnsebody["data"]["name"]["id"].toString(),
                               "supplier",
                             );
-
                             AuthService.setToken(
                               reposnsebody["data"]["token"],
                               reposnsebody["data"]["token"],
                               "supplier",
                             );
-
                             Navigator.of(
                               context,
                             ).pushReplacementNamed(RoutesManager.suHome);
@@ -328,7 +355,6 @@ class _RegisterState extends State<Register> {
                           }
                         } catch (e) {
                           setState(() => isLoading = false);
-
                           showDialog(
                             context: context,
                             builder: (_) => AlertDialog(
@@ -343,16 +369,23 @@ class _RegisterState extends State<Register> {
                         }
                       },
                     )),
+                  SizedBox(height: 16.h,),
+                  InkWell(
+                      onTap: (){
+                        loginWithGoogle(context);
+                      },
+                      child: SignInWithGoogleWidget(tittle: lang.lang=='en'?'Login With Google':'سجل بحساب google')),
                     SizedBox(height: 10.h,),
                     Row(children: [
                       Text( lang.lang == "en"
                           ? "If you already have an account please"
-                          : "اذا يوجد لديك حساب يمكنك الستجيل من هنا",style: TextStyle(color: Colors.white,fontSize: 14.sp),),
+                          : "اذا يوجد لديك حساب يمكنك الستجيل من هنا",style: TextStyle(color: Colors.white,fontSize: 12.sp),),
                       TextButton(
+                        style: TextButton.styleFrom(padding: REdgeInsets.all(4)),
                         onPressed: (){
                           Navigator.pushReplacementNamed(context, RoutesManager.login);
                         },
-                        child: Text(lang.lang=='en'?'Sign In':'تسجيل الدخول',style: TextStyle(color: Colors.white,fontSize: 14.sp),),)
+                        child: Text(lang.lang=='en'?'Sign In':'تسجيل الدخول',style: TextStyle(color: Colors.blue,fontSize: 12.sp),),)
                     ],),
                 ],
               ),

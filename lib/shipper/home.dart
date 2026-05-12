@@ -54,12 +54,9 @@ class _SHHomePageState extends State<SHHomePage> {
   String? sorlong;
   String? order_id;
   int order_num = 0;
-
   bool isConfirm = false;
-
   bool isSignIn = false;
   bool isMessage = true;
-
   bool isVerifed = true;
 
   late final StreamController<List<dynamic>?> _orderController;
@@ -82,7 +79,6 @@ class _SHHomePageState extends State<SHHomePage> {
     }
     return headers;
   }
-
   void _showSnackBar(
     String message, {
     Color backgroundColor = Colors.redAccent,
@@ -98,10 +94,8 @@ class _SHHomePageState extends State<SHHomePage> {
       ),
     );
   }
-
   Future<LocationData?> _getCurrentLocation() async {
     final locationService = Location();
-
     bool serviceEnabled = await locationService.serviceEnabled();
     if (!serviceEnabled) {
       serviceEnabled = await locationService.requestService();
@@ -199,9 +193,9 @@ class _SHHomePageState extends State<SHHomePage> {
     if (order_id_session != null) {
       order_data_session = preferences.get('order_data $order_id_session');
     }
-    username = preferences.getString('username');
-    email = preferences.getString('email');
-    token = preferences.getString('token');
+    username =preferences.getString('gmailName')??preferences.getString('username');
+    email = preferences.getString('gmailEmail')??preferences.getString('email');
+    token = preferences.getString('gmailToken')??preferences.getString('token');
     id = preferences.getString('id');
     if (username != null && email != null && token != null && id != null) {
       if (mounted) {

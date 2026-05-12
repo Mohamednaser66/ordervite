@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/firebase_service.dart';
 import 'package:flutter_maps/core/routes_manager.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
+import 'package:flutter_maps/core/widgets/sign_in_with_google_widget.dart';
 import 'package:flutter_maps/services/auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
@@ -90,6 +94,42 @@ class _LogInState extends State<LogIn> {
     await preferences.setString('type', type);
     await preferences.setString('logo_src', logo_src);
   }
+  Future<void> loginWithGoogle(BuildContext context) async {
+    try {
+      await FirebaseService.signInWithGoogle();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User logged in successfully'),
+        ),
+      );
+
+      Navigator.pushReplacementNamed(
+        context,
+        RoutesManager.suHome,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-credential') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Wrong email or password'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message ?? 'Login failed'),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -110,6 +150,7 @@ class _LogInState extends State<LogIn> {
 
   @override
   Widget build(BuildContext context) {
+
     Lang lang = Lang.of(context);
 
     return Directionality(
@@ -152,7 +193,7 @@ class _LogInState extends State<LogIn> {
                         child: Icon(Icons.person, size: 50.sp, color: Colors.white),
                       ),
                       CustomTextFormField(
-                        validation: validemail,
+                        validation: AppValidators.emailOrPhoneValidator,
                         controller: email,
                         icon: Icon(Icons.email, color: Colors.blue),
                         hintText: lang.lang == 'en'
@@ -160,7 +201,7 @@ class _LogInState extends State<LogIn> {
                             : 'عنوان البريد الالكترونى',
                         lable: lang.lang == 'en' ? 'email' : 'البريد الالكترونى ',
                       ),
-                      SizedBox(height: 10.h),
+                      SizedBox(height: 12.h),
                       CustomTextFormField(
                         secure: true,
                         validation: validepassword,
@@ -171,7 +212,6 @@ class _LogInState extends State<LogIn> {
                       ),
                       SizedBox(
                         height: 40.h,
-                        width: 140.w,
                         child: ElevatedButton.icon(
                           icon: Icon(Icons.login,size: 22.sp,),
                           label: Text(lang.lang == "en" ? 'Sign In' : ' دخول '),
@@ -255,7 +295,13 @@ class _LogInState extends State<LogIn> {
                           },
                         ),
                       ),
-                      SizedBox(height: 8.h),
+                      SizedBox(height: 16.h,),
+                      InkWell(
+                          onTap: (){
+                        loginWithGoogle(context);
+                      },
+                          child: SignInWithGoogleWidget(tittle: lang.lang=='en'?'Login With Google':'سجل بحساب google')),
+                      SizedBox(height: 16.h),
                       Row(
                         children: [
                           Text(
@@ -273,7 +319,7 @@ class _LogInState extends State<LogIn> {
                             },
                             child: Text(
                               lang.lang == "en" ? "SignUp" : "قم بالاشتراك",
-                              style: TextStyle(color: Colors.white,fontSize: 12.sp),
+                              style: TextStyle(color: Colors.blue,fontSize: 12.sp),
                             ),
                           ),
                         ],

@@ -322,7 +322,7 @@ deleteData()async{
                 ),
                 SizedBox(height: 20.h),
                 CustomTextFormField(
-                  validation: AppValidators.validateEmail,
+                  validation: AppValidators.emailOrPhoneValidator,
                   controller: _email,
                   icon: Icon(Icons.mail, color: Colors.blue),
                   hintText: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',

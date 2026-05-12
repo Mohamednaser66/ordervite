@@ -12,7 +12,20 @@
           "package_name": "com.ordervite.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "610950052144-fafjvcd7i590o9ip8b56s4njt3305foj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ordervite.app",
+            "certificate_hash": "7136c1a006ddde7dbb222094ae05179f4c4a4dc5"
+          }
+        },
+        {
+          "client_id": "610950052144-a6ga5poq0ohuobk00ppv1rgc69eo5eon.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB1oyXPGv8yrJAYwYBIbfP0L5qc1BpdS1I"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "610950052144-a6ga5poq0ohuobk00ppv1rgc69eo5eon.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "610950052144-424h8qotoj7n7hnopta4b1o4b57uqn53.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.retroportalstudio.www.fluttermaps.flutterMaps"
+              }
+            }
+          ]
         }
       }
     }

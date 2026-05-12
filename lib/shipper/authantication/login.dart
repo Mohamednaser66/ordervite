@@ -1,16 +1,18 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/core/app_validators.dart';
 import 'package:flutter_maps/core/constant_manager.dart';
+import 'package:flutter_maps/core/firebase_service.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
+import 'package:flutter_maps/core/widgets/sign_in_with_google_widget.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-//import 'package:flutter_maps/supplier/register.dart';
 
 class LogInSH extends StatefulWidget {
   LogInSH({Key? key}) : super(key: key);
@@ -64,6 +66,42 @@ class _LogInSHState extends State<LogInSH> {
     preferences.setString('id', id);
     preferences.setString('type', type);
     preferences.setString('logo_src', logo_src);
+  }
+  Future<void> loginWithGoogle(BuildContext context) async {
+    try {
+      await FirebaseService.signInWithGoogle();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User logged in successfully'),
+        ),
+      );
+
+      Navigator.pushReplacementNamed(
+        context,
+        RoutesManager.shHome,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-credential') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Wrong email or password'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message ?? 'Login failed'),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    }
   }
 
   @override
@@ -144,11 +182,11 @@ class _LogInSHState extends State<LogInSH> {
                       ),
                       CustomTextFormField(
                         controller: email,
-                        validation: AppValidators.validateEmail,
+                        validation: AppValidators.emailOrPhoneValidator,
                         icon: Icon(Icons.email, color: Colors.blue),
                         hintText: lang.lang == 'en'
-                            ? 'Email Address'
-                            : 'عنوان البريد الالكترونى',
+                            ? 'Email Address or Phone Number'
+                            : 'عنوان البريد الالكترونى او رقم التليفون',
                         lable: lang.lang == 'en'
                             ? 'email'
                             : 'البريد الالكترونى ',
@@ -165,7 +203,6 @@ class _LogInSHState extends State<LogInSH> {
 
                       SizedBox(
                         height: 40.h,
-                        width: 140.w,
                         child: ElevatedButton.icon(
                           onPressed: () async {
                             FocusScope.of(context).unfocus();
@@ -259,7 +296,12 @@ class _LogInSHState extends State<LogInSH> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.h),
+                      SizedBox(height: 16.h),
+                      InkWell(
+                          onTap: (){
+                            loginWithGoogle(context);
+                          },
+                          child: SignInWithGoogleWidget(tittle: lang.lang=='en'?'Login With Google':'سجل بحساب google')),
                       Row(
                         children: [
                           Text(
@@ -277,7 +319,7 @@ class _LogInSHState extends State<LogInSH> {
                             },
                             child: Text(
                               lang.lang == "en" ? "SignUp" : "قم بالاشتراك",
-                              style: TextStyle(color: Colors.white,fontSize: 12.sp),
+                              style: TextStyle(color: Colors.blue,fontSize: 12.sp),
                             ),
                           ),
 
