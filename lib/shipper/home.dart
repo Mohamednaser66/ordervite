@@ -58,7 +58,6 @@ class _SHHomePageState extends State<SHHomePage> {
   bool isSignIn = false;
   bool isMessage = true;
   bool isVerifed = true;
-
   late final StreamController<List<dynamic>?> _orderController;
   dynamic order_id_session;
   dynamic order_data_session;
@@ -196,7 +195,7 @@ class _SHHomePageState extends State<SHHomePage> {
     username =preferences.getString('gmailName')??preferences.getString('username');
     email = preferences.getString('gmailEmail')??preferences.getString('email');
     token = preferences.getString('gmailToken')??preferences.getString('token');
-    id = preferences.getString('id');
+    id =preferences.getString('gmailToken')?? preferences.getString('id');
     if (username != null && email != null && token != null && id != null) {
       if (mounted) {
         setState(() {
