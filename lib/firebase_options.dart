@@ -59,10 +59,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyANO4nsEcMlDbqceEuqAy9JP-gZ0OlGT34',
-    appId: '1:610950052144:ios:b049591fbdab820be2f0f5',
+    appId: '1:610950052144:ios:380736e37fb91361e2f0f5',
     messagingSenderId: '610950052144',
     projectId: 'orderviteapp-fa32e',
     storageBucket: 'orderviteapp-fa32e.firebasestorage.app',
+    androidClientId: '610950052144-fafjvcd7i590o9ip8b56s4njt3305foj.apps.googleusercontent.com',
+    iosClientId: '610950052144-qakhqd1efamvso10soib010eung9feok.apps.googleusercontent.com',
     iosBundleId: 'com.ordervite.app',
   );
 }
