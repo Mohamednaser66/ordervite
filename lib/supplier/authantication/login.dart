@@ -295,12 +295,12 @@ class _LogInState extends State<LogIn> {
                           },
                         ),
                       ),
-                      SizedBox(height: 16.h,),
-                      InkWell(
-                          onTap: (){
-                        loginWithGoogle(context);
-                      },
-                          child: SignInWithGoogleWidget(tittle: lang.lang=='en'?'Login With Google':'سجل بحساب google')),
+                      // SizedBox(height: 16.h,),
+                      // InkWell(
+                      //     onTap: (){
+                      //   loginWithGoogle(context);
+                      // },
+                      //     child: SignInWithGoogleWidget(tittle: lang.lang=='en'?'Login With Google':'سجل بحساب google')),
                       SizedBox(height: 16.h),
                       Row(
                         children: [

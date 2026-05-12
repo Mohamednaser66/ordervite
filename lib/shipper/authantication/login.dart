@@ -297,11 +297,11 @@ class _LogInSHState extends State<LogInSH> {
                         ),
                       ),
                       SizedBox(height: 16.h),
-                      InkWell(
-                          onTap: (){
-                            loginWithGoogle(context);
-                          },
-                          child: SignInWithGoogleWidget(tittle: lang.lang=='en'?'Login With Google':'سجل بحساب google')),
+                      // InkWell(
+                      //     onTap: (){
+                      //       loginWithGoogle(context);
+                      //     },
+                      //     child: SignInWithGoogleWidget(tittle: lang.lang=='en'?'Login With Google':'سجل بحساب google')),
                       Row(
                         children: [
                           Text(

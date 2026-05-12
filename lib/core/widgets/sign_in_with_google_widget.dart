@@ -18,7 +18,7 @@ class SignInWithGoogleWidget extends StatelessWidget {
     return Container(
       padding: REdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.blue,
           width: 1.w,
@@ -29,8 +29,8 @@ class SignInWithGoogleWidget extends StatelessWidget {
         children: [
           Image.asset(
             ImagesManager.google,
-            height: 26.h,
-            width: 26.w,
+            height: 24.h,
+            width: 24.w,
           ),
 
           SizedBox(width: 10.w),

@@ -369,12 +369,12 @@ class _RegisterState extends State<Register> {
                         }
                       },
                     )),
-                  SizedBox(height: 16.h,),
-                  InkWell(
-                      onTap: (){
-                        loginWithGoogle(context);
-                      },
-                      child: SignInWithGoogleWidget(tittle: lang.lang=='en'?'Login With Google':'سجل بحساب google')),
+                  // SizedBox(height: 16.h,),
+                  // InkWell(
+                  //     onTap: (){
+                  //       loginWithGoogle(context);
+                  //     },
+                  //     child: SignInWithGoogleWidget(tittle: lang.lang=='en'?'Login With Google':'سجل بحساب google')),
                     SizedBox(height: 10.h,),
                     Row(children: [
                       Text( lang.lang == "en"
