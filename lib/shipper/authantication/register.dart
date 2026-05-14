@@ -292,7 +292,6 @@ String roles = ConstantManager.shipper;
 
                               String? api_token = await _firebaseMessaging.getToken();
                               var location = await _locationTracker.getLocation();
-
                               var data = {
                                 "name": username.text,
                                 "email": email.text,
@@ -304,7 +303,7 @@ String roles = ConstantManager.shipper;
                                 "reg_latitude": location.latitude.toString(),
                                 "cur_longitude": location.longitude.toString(),
                                 "cur_latitude": location.latitude.toString(),
-                                "api_token": api_token.toString(),
+                                "api_token": api_token??'',
                               };
                               var url =
                                   "https://www.ordervite.com/api/shippier/register";
@@ -313,7 +312,6 @@ String roles = ConstantManager.shipper;
                                 body: data,
                               );
                               var reposnsebody = jsonDecode(response.body);
-
                               if (formstatesignup.currentState!.validate()) {
                                 if (reposnsebody["success"] == true) {
                                   setState(() {
