@@ -271,42 +271,27 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
     required String shipperApiToken,
     required Lang lang,
   }) async {
+    if (isClosed) return;
     emit(SupplierOrderLoading());
 
     try {
-      final success = await _orderRepository.updateOrderState(
-        orderId,
-        "order complete",
-        token,
-      );
+      final success = await _orderRepository.updateOrderState(orderId, "order complete", token);
+
+      if (isClosed) return;
 
       if (!success) {
         emit(SupplierOrderError("Failed to complete order"));
         return;
       }
-
-      final text = lang.lang == "en"
-          ? "your order is complete great work !!!"
-          : "هنيأ تم إكمال الطلب !!!";
-
-      await _orderRepository.sendNotification(
-        text,
-        shipperApiToken,
-        token,
-        "order complete",
-      );
-
-      emit(
-        SupplierOrderCompleted(
-          orderId: orderId,
-          shipperApiToken: shipperApiToken,
-        ),
-      );
+      if (!isClosed) {
+        emit(SupplierOrderCompleted(orderId: orderId, shipperApiToken: shipperApiToken));
+      }
     } catch (e) {
-      emit(SupplierOrderError(_mapError(e)));
+      if (!isClosed) {
+        emit(SupplierOrderError(e.toString()));
+      }
     }
   }
-
   Future<void> updateFcmToken(
     String supplierId,
     String fcmToken,

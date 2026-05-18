@@ -92,11 +92,13 @@ class _OrderPageState extends State<OrderPage> {
     super.didChangeDependencies();
     _loadPreferences();
   }
-
+  bool _isDataLoaded = false;
   Future<void> _loadPreferences() async {
+    if (_isDataLoaded) return;
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is! OrderDist) return;
     final orderDist = args;
+    _isDataLoaded = true;
 
     final prefs = await SharedPreferences.getInstance();
     _username = prefs.getString("username");
@@ -326,73 +328,39 @@ class _OrderPageState extends State<OrderPage> {
 
   Future<void> _completeOrder(Lang lang) async {
     if (!_isConfirmOrder) {
-      _showSnackBar(
-        lang,
-        en: 'You can not complete the order before its delivered',
-        ar: 'لا يمكنك اكمال الطلب قبل أن يتم تسليمه',
-      );
+      _showSnackBar(lang, en: 'Order not delivered', ar: 'لم يتم تسليم الطلب بعد');
       return;
     }
 
-    if (_orderId == null || _token == null) return;
-
-    final confirmed = await showDialog<bool>(
+    final bool? confirmed = await showDialog<bool>(
       context: context,
-      builder: (c) => AlertDialog(
-        title: Text(
-          _loc(lang, 'Confirm', 'تأكيد'),
-          style: const TextStyle(
-            color: Colors.red,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          _loc(
-            lang,
-            'Please confirm that the order is complete',
-            'يرجى تأكيد عملية اكتمال الطلب',
-          ),
-          style: TextStyle(fontSize: 15.sp),
-        ),
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: Text(_loc(lang, 'Confirm', 'تأكيد')),
+        content: Text(_loc(lang, 'Confirm completion?', 'هل تؤكد اكتمال الطلب؟')),
         actions: [
           TextButton(
-            child: Text(
-              _loc(lang, 'No', 'لا'),
-              style: const TextStyle(color: Colors.grey),
-            ),
-            onPressed: () => Navigator.pop(c, false),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(_loc(lang, 'No', 'لا')),
           ),
           TextButton(
-            child: Text(
-              _loc(lang, 'Yes', 'نعم'),
-              style: const TextStyle(color: Colors.red),
-            ),
-            onPressed: () => Navigator.pop(c, true),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(_loc(lang, 'Yes', 'نعم')),
           ),
         ],
       ),
     );
 
-    if (confirmed == false && mounted && _userId != null && _token != null) {
-      _cubit.refreshCurrentOrder(_userId!, _token!);
-      return;
+    if (confirmed == true) {
+       _cubit.completeOrder(
+        orderId: _orderId!,
+        token: _token!,
+        shipperApiToken: _shipperApiToken ?? '',
+        lang: lang,
+      );
     }
-
-    if (confirmed != true) return;
-
-    await _cubit.completeOrder(
-      orderId: _orderId!,
-      token: _token!,
-      shipperApiToken: _shipperApiToken ?? '',
-      lang: lang,
-    );
-
-    if (mounted) {
-      _navigateToRating();
-    }
-  }
-
-  Future<void> _showCancelDialog(Lang lang) async {
+  }  Future<void> _showCancelDialog(Lang lang) async {
     if (_orderId != null && _userId != null && _token != null) {
       await _cancelOrder(lang);
       return;
@@ -994,6 +962,7 @@ class _OrderPageState extends State<OrderPage> {
                           height: 32.h,
                           child: ElevatedButton.icon(
                             onPressed: () => _completeOrder(lang),
+
                             icon: Icon(Icons.done_all, size: 20.sp),
                             label: Text(
                               lang.lang == "en" ? "Complete " : "اكمال ",
