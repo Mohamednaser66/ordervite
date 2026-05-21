@@ -97,19 +97,19 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
               onTap: () =>
                   Navigator.of(context).pushNamedAndRemoveUntil(RoutesManager.suHome,(route) => false,),
             ),
-            // ListTile(
-            //   leading: Icon(Icons.card_travel, color: Colors.blue),
-            //   title: Text(
-            //     widget.lang.lang == "en" ? 'Orders ' : ' الطلبات  ',
-            //     style: TextStyle(
-            //       fontSize: 15.sp,
-            //       fontWeight: FontWeight.bold,
-            //       color: Colors.white,
-            //     ),
-            //   ),
-            //   onTap: () =>
-            //       Navigator.of(context).pushNamed(RoutesManager.suListOrders),
-            // ),
+            ListTile(
+              leading: Icon(Icons.card_travel, color: Colors.blue),
+              title: Text(
+                widget.lang.lang == "en" ? 'Products ' : ' المنتجات  ',
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(RoutesManager.productsScreen),
+            ),
             ListTile(
               leading: Icon(Icons.card_travel, color: Colors.blue),
               title: Text(

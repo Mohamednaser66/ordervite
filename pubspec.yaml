@@ -55,6 +55,8 @@ dependencies:
   firebase_messaging:
   firebase_core:
   timeago:
+  injectable:
+    # add get_it
   get_it:
   rate_my_app: ^2.3.1
   image_picker:
@@ -67,9 +69,12 @@ dependencies:
   permission_handler: ^12.0.1
   flutter_bloc: ^9.1.1
   google_sign_in: ^6.3.0
+  dartz: ^0.10.1
 
 
 dev_dependencies:
+  injectable_generator:
+  build_runner:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.1

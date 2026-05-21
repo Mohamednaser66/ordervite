@@ -9,30 +9,30 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        InkWell(
-          onTap: (){
-            showModalBottomSheet(context: context, builder: (context) {
-             return ProductDescription();
-            },);
-          },
-          child: Container(
-            height: 100.h,
-            width: 100.w,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.blue,width: 2.w,
+    return Padding(
+      padding:  REdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        children: [
+          Container(
+              height: 130.h,
+              width: 100.w,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.blue,width: 2.w,
+                ),
+                borderRadius: BorderRadius.circular(12.r),
               ),
-              borderRadius: BorderRadius.circular(12.r),
+              child: Column(
+                children: [
+                  ClipRRect(borderRadius: BorderRadius.circular(12.r),
+                      child: Image.asset(image,fit:BoxFit.fill,)),
+                  Text(name,style: TextStyle(color: Colors.blue,fontSize: 16.sp,fontWeight: FontWeight.w400),)
+                ],
+              ),
             ),
-            child: ClipRRect(borderRadius: BorderRadius.circular(12.r),
-                child: Image.asset(image,fit:BoxFit.fill,)),
-          ),
-        ),
-        SizedBox(height: 4.h,),
-        Text(name,style: TextStyle(color: Colors.blue,fontSize: 16.sp,fontWeight: FontWeight.w400),)
-      ],
+
+        ],
+      ),
     );
   }
 }

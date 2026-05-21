@@ -4,6 +4,7 @@ import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/core/images_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/main.dart';
 import 'package:flutter_maps/shipper/shipper_drawer.dart';
@@ -136,7 +137,12 @@ class _SHHomePageState extends State<SHHomePage> {
     }
   }
 
-  void _updateMarker(LatLng position) {
+  void _updateMarker(LatLng position) async {
+    final icon = await BitmapDescriptor.asset(
+       ImageConfiguration(size: Size(20.w, 20.h)),
+      ImagesManager.cycle,
+    );
+
     _markers
       ..clear()
       ..add(
@@ -144,9 +150,11 @@ class _SHHomePageState extends State<SHHomePage> {
           markerId: const MarkerId('1'),
           position: position,
           infoWindow: InfoWindow(title: username),
-          icon: BitmapDescriptor.defaultMarker,
+          icon: icon,
         ),
       );
+
+    setState(() {});
   }
 
   Future<void> _updateLocationOnServer(LocationData locationData) async {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'core/di/di.dart';
 import 'firebase_options.dart';
 import 'my_app.dart';
 
@@ -15,8 +16,8 @@ Future<void> initNotifications() async {
 }
 
 Future<void> main() async {
+  configureDependencies();
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

@@ -12,12 +12,11 @@ class Api {
   Api._internal();
 
   String? token;
-  String baseUrl = 'www.ordervite.com';
-  String path = '/api';
+
 
 
   Future<http.Response> httpGet(String endPath, {Map<String, String>? query}) async {
-    Uri uri = Uri.http(baseUrl, '$path/$endPath', query);
+    Uri uri = Uri.http(ConstantManager.baseUrl, endPath, query);
     return await http.get(uri, headers: {
       'Authorization': 'Bearer ${token ?? ''}',
       'Accept': 'application/json',
@@ -41,7 +40,7 @@ class Api {
     required String endpoint,
   }) async {
     try {
-      final url = Uri.https(baseUrl, '$path/$endpoint');
+      final url = Uri.https(ConstantManager.baseUrl, endpoint);
 
       print("DELETE URL: $url");
 
@@ -66,7 +65,7 @@ class Api {
   }
 
   Future<http.Response> httpPost(String endPath, Object body) async {
-    Uri uri = Uri.http(baseUrl, '$path/$endPath');
+    Uri uri = Uri.http(ConstantManager.baseUrl, endPath);
     return await http.post(uri, body: body, headers: {
       'Authorization': 'Bearer ${token ?? ''}',
       'Accept': 'application/json',
@@ -78,7 +77,7 @@ class Api {
       'Authorization': 'Bearer ${token ?? ''}',
       'Accept': 'application/json',
     };
-    var uri = Uri.parse("http://${baseUrl}${path}/$endPath");
+    var uri = Uri.parse("http://${ConstantManager.baseUrl}$endPath");
     var length = await file.length();
     var request = http.MultipartRequest('POST', uri)
       ..headers.addAll(headers)

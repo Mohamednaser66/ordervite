@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/config/theme.dart';
-import 'package:flutter_maps/landing_page.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,6 +22,14 @@ class MyApp extends StatelessWidget {
             minTextAdapt: true,
             splitScreenMode: true,
             builder: (context, child) => MaterialApp(
+              builder: (context, child) {
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: TextScaler.noScaling,
+                  ),
+                  child: child!,
+                );
+              },
               themeMode: ThemeMode.light,
               debugShowCheckedModeBanner: false,
               title: 'Flutter Maps',

@@ -333,7 +333,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               borderRadius: BorderRadius.circular(5.0.r),
                             ),
                             child: Padding(
-                              padding: EdgeInsets.all(3.0.r),
+                              padding: REdgeInsets.all(4.0),
                               child: TextField(
                                 cursorColor: Colors.white,
                                 style: TextStyle(

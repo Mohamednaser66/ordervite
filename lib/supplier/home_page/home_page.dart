@@ -4,10 +4,13 @@ import 'dart:typed_data';
 
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/core/di/di.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/main.dart';
+import 'package:flutter_maps/supplier/home_page/persintation/supplier_home_cubit.dart';
 import 'package:flutter_maps/supplier/home_page/widgets/home_drawer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -36,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late StreamController _shipperController;
   StreamSubscription<LocationData>? _locationSubscription;
   StreamSubscription? _mapIdleSubscription;
+  Timer? _shipperUpdateTimer;
   Location _locationTracker = Location();
 
   LatLng? _initialLocation;
@@ -50,48 +54,73 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
 
-  Future<List<dynamic>> getShippers() async {
+  // Future<List<dynamic>> getShippers() async {
+  //   try {
+  //     String Url = "https://www.ordervite.com/api/supplier/shippiers";
+  //     var response = await http.get(
+  //       Uri.parse(Url),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Accept': 'application/json',
+  //         'Authorization': 'Bearer $token2',
+  //       },
+  //     );
+  //     var reposnsebody = jsonDecode(response.body);
+  //     return reposnsebody["data"];
+  //   } catch (e) {
+  //     return [];
+  //   }
+  // }
+
+  Future<List<dynamic>> _fetchShippersFromApi() async {
+    if (token2 == null || token2!.isEmpty) return [];
     try {
-      String Url = "https://www.ordervite.com/api/supplier/shippiers";
-      var response = await http.get(
-        Uri.parse(Url),
+      final String url = "https://www.ordervite.com/api/supplier/shippiers";
+      final response = await http.get(
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Authorization': 'Bearer $token2',
         },
       );
-      var reposnsebody = jsonDecode(response.body);
-      return reposnsebody["data"];
-    } catch (e) {
-      return [];
-    }
+      if (response.statusCode != 200) return [];
+      final body = jsonDecode(response.body);
+      final data = body["data"];
+      if (data is List) return data;
+    } catch (_) {}
+    return [];
   }
 
   Future<void> loadShipper() async {
-    var res = await getShippers();
+    final res = await _fetchShippersFromApi();
+    final Set<Marker> tempMarkers = {};
 
-    Set<Marker> tempMarkers = {};
+    for (final shipper in res) {
+      final double lat =
+          double.tryParse(shipper["cur_latitude"].toString()) ?? 0;
+      final double lng =
+          double.tryParse(shipper["cur_longitude"].toString()) ?? 0;
+      final String id = shipper["id"].toString();
+      final String name = shipper["name"].toString();
 
-    for (var shipper in res) {
-      double lat = double.tryParse(shipper["cur_latitude"].toString()) ?? 0;
-      double lng = double.tryParse(shipper["cur_longitude"].toString()) ?? 0;
+      if (lat == 0 && lng == 0) continue;
 
       tempMarkers.add(
         Marker(
-          markerId: MarkerId(shipper["id"].toString()),
+          markerId: MarkerId(id),
           icon: iconHalte,
           position: LatLng(lat, lng),
-          infoWindow: InfoWindow(title: shipper["name"]),
+          infoWindow: InfoWindow(title: name),
         ),
       );
     }
 
-    if (mounted) {
-      setState(() {
-        _markers.addAll(tempMarkers);
-      });
-    }
+    if (!mounted) return;
+    setState(() {
+      _markers.removeWhere((marker) => marker.markerId.value != "home");
+      _markers.addAll(tempMarkers);
+    });
   }
 
   getPref() async {
@@ -310,17 +339,20 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
   }
+
   Future<void> _init() async {
     await initNotifications();
 
     await Future.delayed(Duration(milliseconds: 500));
 
     final trackingStatus =
-    await AppTrackingTransparency.trackingAuthorizationStatus;
+        await AppTrackingTransparency.trackingAuthorizationStatus;
 
     if (trackingStatus == TrackingStatus.notDetermined) {
       await AppTrackingTransparency.requestTrackingAuthorization();
-    }}
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -344,11 +376,16 @@ class _MyHomePageState extends State<MyHomePage> {
       iconMe = icons[1];
 
       loadShipper();
+      _shipperUpdateTimer = Timer.periodic(
+        const Duration(seconds: 15),
+        (_) => loadShipper(),
+      );
     });
   }
 
   @override
   void dispose() {
+    _shipperUpdateTimer?.cancel();
     _shipperController.close();
     _locationSubscription?.cancel();
     _mapIdleSubscription?.cancel();
@@ -385,21 +422,24 @@ class _MyHomePageState extends State<MyHomePage> {
         textDirection: lang.lang == "en"
             ? TextDirection.ltr
             : TextDirection.rtl,
-        child: Scaffold(
-          key: _scaffoldkey,
-          drawer: SupplierDrawer(
-            username: username ?? '',
-            email: email ?? '',
-            lang: lang,
-            isSignIn: isSignIn,
-          ),
-          appBar: buildAppBar(lang),
-          body: buildBody(lang),
-          floatingActionButton: FloatingActionButton(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.blue,
-            child: Icon(Icons.location_searching),
-            onPressed: () => getCurrentLocation(),
+        child: BlocProvider(
+          create: (context) => getIt<SupplierHomeCubit>()..getShippers(token2!),
+          child: Scaffold(
+            key: _scaffoldkey,
+            drawer: SupplierDrawer(
+              username: username ?? '',
+              email: email ?? '',
+              lang: lang,
+              isSignIn: isSignIn,
+            ),
+            appBar: buildAppBar(lang),
+            body: buildBody(lang),
+            floatingActionButton: FloatingActionButton(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blue,
+              child: Icon(Icons.location_searching),
+              onPressed: () => getCurrentLocation(),
+            ),
           ),
         ),
       ),
