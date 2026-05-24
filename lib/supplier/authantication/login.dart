@@ -159,7 +159,7 @@ class _LogInState extends State<LogIn> {
         key: mykey,
         backgroundColor: const Color.fromRGBO(21, 42, 72, 0.9),
         appBar: AppBar(
-          title: Text(lang.lang == "en" ? 'Supplier Login' : ' دخول مورد '),
+          title: Text(lang.lang == "en" ? 'Client Login' : ' دخول العميل '),
         ),
         body: InkWell(onTap: () {
           FocusScope.of(context).unfocus();

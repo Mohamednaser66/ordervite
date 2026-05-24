@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter_maps/core/constant_manager.dart';
+import 'package:flutter_maps/core/routes_manager.dart';
 import 'package:flutter_maps/models/placeAtuocomplete.dart';
+import 'package:flutter_maps/classes.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/lang.dart';
@@ -35,6 +38,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
       'en': 'Fixed store location: Tagamoa warehouse',
       'ar': 'مكان المخزن الثابت: مخزن التجمع',
     },
+  };
+
+  static const Map<String, LatLng> areaStoreLatLng = {
+    'zayed': LatLng(30.059445, 31.1933067),
+    'tagamoa': LatLng(30.060671, 31.204131),
   };
 
   final List<CategoryData> categories = [
@@ -176,6 +184,44 @@ class _ProductsScreenState extends State<ProductsScreen> {
     } catch (e) {
       print("Error in getPlaceAddressDetails: $e");
     }
+  }
+
+  void _confirmOrder(BuildContext context) {
+    final fixedLocation = areaStoreLatLng[selectedArea]!;
+
+    if (sorlat == null ||
+        sorlng == null ||
+        destinationController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            Lang.of(context).lang == 'en'
+                ? 'Please choose a destination from the list first.'
+                : 'يرجى اختيار وجهة من القائمة أولاً.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final orderDist = OrderDist(
+      fixedLocation.latitude.toString(),
+      sorlat!,
+      fixedLocation.longitude.toString(),
+      sorlng!,
+      false,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      orderNote: orderController.text.trim().isNotEmpty
+          ? orderController.text.trim()
+          : null,
+    );
+
+    Navigator.pushNamed(context, RoutesManager.orderPage, arguments: orderDist);
   }
 
   @override
@@ -413,10 +459,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
               ],
               SizedBox(height: 12.h),
               SizedBox(
-                  width: double.infinity,
-                  height: 40.h,
-                  child: ElevatedButton(onPressed: (){}, child: Text(isEnglish?'Confirm':'تاكيد',style: TextStyle(color: Colors.white,fontSize: 14.sp),)))
-              
+                width: double.infinity,
+                height: 40.h,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _confirmOrder(context);
+                  },
+                  child: Text(
+                    isEnglish ? 'Confirm' : 'تاكيد',
+                    style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

@@ -127,7 +127,7 @@ class _AuthPagesState extends State<AuthPages> {
       children: [
         _buildFullWidthButton(
           icon: Icons.home,
-          label: isEnglish ? 'Supplier Panel' : 'إدارة حساب المورد',
+          label: isEnglish ? 'Client Panel' : 'إدارة حساب العميل',
           color: Colors.blue,
           onTap: () {},
           horizontalPadding: 20,

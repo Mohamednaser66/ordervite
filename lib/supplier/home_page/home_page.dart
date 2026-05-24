@@ -528,38 +528,34 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
                           SizedBox(height: 20.h),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(18.r),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black54,
-                                  blurRadius: 6.r,
-                                  spreadRadius: 0.5.r,
-                                  offset: Offset(0.7.w, 0.7.h),
-                                ),
-                              ],
-                            ),
-                            child: TextButton.icon(
-                              onPressed: () {
-                                Navigator.of(
-                                  context,
-                                ).pushNamed(RoutesManager.terms);
-                              },
-                              icon: Icon(Icons.search, color: Colors.red),
-                              label: Text(
-                                lang.lang == "en"
-                                    ? "Search your destination  "
-                                    : " ابحث عن وجهتك ",
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  color: Colors.red,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pushNamed(RoutesManager.terms);
+                                  },
+                                  style: ElevatedButton.styleFrom(foregroundColor: Colors.white,
+                                      backgroundColor: Colors.blue,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r))),
+                                  child: Text(lang.lang=='en'?'Package Delivery':' توصيل طرد',style: TextStyle(fontSize: 12.sp),),
                                 ),
                               ),
-                            ),
+                              SizedBox(width: 6.w,),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: (){
+                                    Navigator.of(context).pushNamed(RoutesManager.productsScreen);
+                                  },
+                                  style: ElevatedButton.styleFrom(foregroundColor: Colors.white,
+                                      backgroundColor: Colors.blue,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r))),
+                                  child:  Text(lang.lang=='en'?'Goods Order':'طلب منتجات',style: TextStyle(fontSize: 12.sp)),
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(height: 10.h),
                           Divider(height: 10.h, thickness: 1.w),

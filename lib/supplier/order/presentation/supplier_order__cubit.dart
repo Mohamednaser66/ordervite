@@ -97,6 +97,7 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
     required LatLng source,
     required LatLng destination,
     required String distance,
+    String? orderNote,
     double? preCalculatedCost,
   }) async {
     emit(SupplierOrderLoading());
@@ -123,6 +124,7 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
         destination: destination,
         distance: distance,
         financeConfig: financeConfig,
+        orderNote: orderNote,
       );
 
       final order = await _orderRepository.createOrder(orderData, token);
@@ -147,6 +149,7 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
     required LatLng destination,
     required String distance,
     required FinanceConfig financeConfig,
+    String? orderNote,
   }) {
     final commission = financeConfig.calculateCommission(calculatedCost);
     final shipperPay = calculatedCost - commission;
@@ -163,6 +166,7 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
       "dist_longitude": destination.longitude.toString(),
       "dist_latitude": destination.latitude.toString(),
       "distance": distance,
+      if (orderNote != null && orderNote.isNotEmpty) 'order_note': orderNote,
       'percentage': financeConfig.percentage.toString(),
       'shipper_pay': shipperPay.toStringAsFixed(2),
       'commission': commission.toStringAsFixed(2),
@@ -275,7 +279,11 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
     emit(SupplierOrderLoading());
 
     try {
-      final success = await _orderRepository.updateOrderState(orderId, "order complete", token);
+      final success = await _orderRepository.updateOrderState(
+        orderId,
+        "order complete",
+        token,
+      );
 
       if (isClosed) return;
 
@@ -284,7 +292,12 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
         return;
       }
       if (!isClosed) {
-        emit(SupplierOrderCompleted(orderId: orderId, shipperApiToken: shipperApiToken));
+        emit(
+          SupplierOrderCompleted(
+            orderId: orderId,
+            shipperApiToken: shipperApiToken,
+          ),
+        );
       }
     } catch (e) {
       if (!isClosed) {
@@ -292,6 +305,7 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
       }
     }
   }
+
   Future<void> updateFcmToken(
     String supplierId,
     String fcmToken,

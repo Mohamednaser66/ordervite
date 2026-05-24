@@ -45,6 +45,7 @@ class _OrderPageState extends State<OrderPage> {
   String? _orderPriceCheck;
   String _orderShipperId = "....";
   String? _orderState;
+  String? _orderNote;
   String? _shipperApiToken;
   int _unreadMessageCount = 0;
   bool _isShipperConfirmed = false;
@@ -92,6 +93,7 @@ class _OrderPageState extends State<OrderPage> {
     super.didChangeDependencies();
     _loadPreferences();
   }
+
   bool _isDataLoaded = false;
   Future<void> _loadPreferences() async {
     if (_isDataLoaded) return;
@@ -111,6 +113,7 @@ class _OrderPageState extends State<OrderPage> {
       _orderCost = orderDist.order_cost;
       _orderPrice = orderDist.order_price;
       _orderPriceCheck = orderDist.order_pricecheck;
+      _orderNote = orderDist.orderNote;
       _orderShipperId = orderDist.order_shippier_id ?? 'pending';
       _orderState = orderDist.order_state;
 
@@ -264,7 +267,11 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   Future<void> _createOrder(Lang lang) async {
-    if (_priceController.text.trim().isEmpty) {
+    final orderPrice = _priceController.text.trim().isNotEmpty
+        ? _priceController.text.trim()
+        : '0';
+
+    if (orderPrice == '0' && _orderNote == null) {
       _showSnackBar(
         lang,
         en: 'Please fill all order entries',
@@ -272,16 +279,25 @@ class _OrderPageState extends State<OrderPage> {
       );
       return;
     }
+
     if (_userId == null || _token == null) return;
+
+    if (_orderNote != null) {
+      setState(() {
+        _isConfirm = true;
+      });
+    }
+
     await _cubit.createOrder(
       token: _token!,
       supplierId: _userId!,
       size: _packageSize,
-      price: _priceController.text.trim(),
+      price: orderPrice,
       priceCheck: _paymentMethod,
       source: _sourceLatLng!,
       destination: _destinationLatLng!,
       distance: _distance ?? '0.0',
+      orderNote: _orderNote,
     );
   }
 
@@ -328,7 +344,11 @@ class _OrderPageState extends State<OrderPage> {
 
   Future<void> _completeOrder(Lang lang) async {
     if (!_isConfirmOrder) {
-      _showSnackBar(lang, en: 'Order not delivered', ar: 'لم يتم تسليم الطلب بعد');
+      _showSnackBar(
+        lang,
+        en: 'Order not delivered',
+        ar: 'لم يتم تسليم الطلب بعد',
+      );
       return;
     }
 
@@ -338,7 +358,9 @@ class _OrderPageState extends State<OrderPage> {
       useRootNavigator: true,
       builder: (BuildContext dialogContext) => AlertDialog(
         title: Text(_loc(lang, 'Confirm', 'تأكيد')),
-        content: Text(_loc(lang, 'Confirm completion?', 'هل تؤكد اكتمال الطلب؟')),
+        content: Text(
+          _loc(lang, 'Confirm completion?', 'هل تؤكد اكتمال الطلب؟'),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -353,14 +375,16 @@ class _OrderPageState extends State<OrderPage> {
     );
 
     if (confirmed == true) {
-       _cubit.completeOrder(
+      _cubit.completeOrder(
         orderId: _orderId!,
         token: _token!,
         shipperApiToken: _shipperApiToken ?? '',
         lang: lang,
       );
     }
-  }  Future<void> _showCancelDialog(Lang lang) async {
+  }
+
+  Future<void> _showCancelDialog(Lang lang) async {
     if (_orderId != null && _userId != null && _token != null) {
       await _cancelOrder(lang);
       return;

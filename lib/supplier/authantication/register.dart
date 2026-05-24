@@ -202,7 +202,7 @@ class _RegisterState extends State<Register> {
         backgroundColor: const Color.fromRGBO(21, 42, 72, 0.9),
         appBar: AppBar(
           title: Text(
-            lang.lang == "en" ? 'Supplier Registration' : "تسجيل مورد",
+            lang.lang == "en" ? 'Client Registration' : "تسجيل العميل",
           ),
         ),
         body: InkWell(
@@ -289,7 +289,7 @@ class _RegisterState extends State<Register> {
                     height: 40.h,
                     child: ElevatedButton.icon(
                       icon: Icon(Icons.app_registration,size: 22.sp,),
-                      label: Text(lang.lang == "en" ? "Sign UP" : "تسجيل كمورد"),
+                      label: Text(lang.lang == "en" ? "Sign UP" : "تسجيل "),
                       onPressed: () async {
                         if (!formstatesignup.currentState!.validate()) return;
 

@@ -143,8 +143,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   showMessage() {
-    Message? message = ModalRoute.of(context)?.settings.arguments as Message?;
     if (!mounted) return;
+    Message? message = ModalRoute.of(context)?.settings.arguments as Message?;
     if (message != null && isMessage) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
