@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/core/firebase_service.dart';
 import 'package:flutter_maps/core/routes_manager.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
@@ -171,7 +172,7 @@ class _LogInState extends State<LogIn> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFF152A48), Color(0xFF0D1B2A)],
+                colors: [ColorsManager.darkerGreen, ColorsManager.darkerGreen],
               ),
             ),
             child: Padding(
@@ -195,7 +196,7 @@ class _LogInState extends State<LogIn> {
                       CustomTextFormField(
                         validation: AppValidators.emailOrPhoneValidator,
                         controller: email,
-                        icon: Icon(Icons.email, color: Colors.blue),
+                        icon: Icon(Icons.email, color: ColorsManager.primaryGreen),
                         hintText: lang.lang == 'en'
                             ? 'Email Address'
                             : 'عنوان البريد الالكترونى',
@@ -206,7 +207,7 @@ class _LogInState extends State<LogIn> {
                         secure: true,
                         validation: validepassword,
                         controller: password,
-                        icon: Icon(Icons.key, color: Colors.blue),
+                        icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
                         hintText: lang.lang == 'en' ? 'Password' : 'كلمة السر',
                         lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
                       ),
@@ -216,7 +217,7 @@ class _LogInState extends State<LogIn> {
                           icon: Icon(Icons.login,size: 22.sp,),
                           label: Text(lang.lang == "en" ? 'Sign In' : ' دخول '),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: ColorsManager.primaryGreen,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15.r),
@@ -319,7 +320,7 @@ class _LogInState extends State<LogIn> {
                             },
                             child: Text(
                               lang.lang == "en" ? "SignUp" : "قم بالاشتراك",
-                              style: TextStyle(color: Colors.blue,fontSize: 12.sp),
+                              style: TextStyle(color: ColorsManager.white,fontSize: 12.sp),
                             ),
                           ),
                         ],

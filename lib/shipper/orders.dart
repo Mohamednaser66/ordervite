@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/core/routes_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/realtime_service.dart';
@@ -204,7 +205,7 @@ class _ShOrdersState extends State<ShOrders> {
             if (snapshot.connectionState == ConnectionState.waiting &&
                 !snapshot.hasData) {
               return const Center(
-                child: CircularProgressIndicator(color: Colors.blue),
+                child: CircularProgressIndicator(color: ColorsManager.primaryGreen),
               );
             }
 
@@ -299,8 +300,9 @@ class _ShOrdersState extends State<ShOrders> {
                     );
                   },
                   leading: CircleAvatar(
+                    backgroundColor: ColorsManager.primaryGreen,
                     child: Icon(
-                      Icons.card_travel_rounded,
+                      Icons.shopping_cart,
                       size: 20.sp,
                       color: Colors.white,
                     ),

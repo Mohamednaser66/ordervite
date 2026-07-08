@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/api.dart';
@@ -229,7 +230,7 @@ preferences.remove("id");
                           )
                           );
                         },
-                        icon: Icon(Icons.camera_alt, color: Colors.blue,),
+                        icon: Icon(Icons.camera_alt, color: ColorsManager.primaryGreen,),
                       ),
                     ),
                   ],
@@ -239,7 +240,7 @@ preferences.remove("id");
               CustomTextFormField(
                 validation: AppValidators.validateUsername,
                 controller: _username,
-                icon: Icon(Icons.person_rounded),
+                icon: Icon(Icons.person_rounded,color: ColorsManager.primaryGreen,),
                 hintText: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
                 lable: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
               ),
@@ -247,7 +248,7 @@ preferences.remove("id");
               CustomTextFormField(
                 validation: AppValidators.emailOrPhoneValidator,
                 controller: _email,
-                icon: Icon(Icons.email, color: Colors.blue,),
+                icon: Icon(Icons.email, color: ColorsManager.primaryGreen,),
                 hintText: lang.lang == 'en'
                     ? 'Enter Email'
                     : 'ادخل البريد الالكترونى',
@@ -258,7 +259,7 @@ preferences.remove("id");
               SizedBox(height: 20.h),
               CustomTextFormField(
                 controller: _password,
-                icon: Icon(Icons.key, color: Colors.blue,),
+                icon: Icon(Icons.key, color: ColorsManager.primaryGreen,),
                 validation: AppValidators.validateChangePassword,
                 secure: true,
                 hintText: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
@@ -267,7 +268,7 @@ preferences.remove("id");
               SizedBox(height: 20.h),
               CustomTextFormField(
                 controller: _c_password,
-                icon: Icon(Icons.key, color: Colors.blue,),
+                icon: Icon(Icons.key, color: ColorsManager.primaryGreen,),
                 hintText: lang.lang == 'en'
                     ? 'Confirm Password'
                     : 'تاكيد كلمة المرور',
@@ -284,7 +285,7 @@ preferences.remove("id");
               SizedBox(height: 20.h),
               CustomTextFormField(
                 controller: _mobile1,
-                icon: Icon(Icons.phone, color: Colors.blue,),
+                icon: Icon(Icons.phone, color: ColorsManager.primaryGreen,),
                 validation: AppValidators.validatePhoneNumber,
                 hintText: lang.lang == 'en' ? 'Mobile 1' : 'رقم الهاتف 1',
                 lable: lang.lang == 'en' ? 'Mobile 1' : 'رقم الهاتف 1',
@@ -292,7 +293,7 @@ preferences.remove("id");
               SizedBox(height: 20.h),
               CustomTextFormField(
                 controller: _mobile2,
-                icon: Icon(Icons.phone, color: Colors.blue,),
+                icon: Icon(Icons.phone, color: ColorsManager.primaryGreen,),
                 validation: AppValidators.validatePhoneNumber,
                 hintText: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
                 lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
@@ -325,7 +326,7 @@ preferences.remove("id");
                 },
                 builder: (context, state) {
                   if (state is DeleteSupplierLoading) {
-                    return Center(child: CircularProgressIndicator(color: Colors.blue,));
+                    return Center(child: CircularProgressIndicator(color: ColorsManager.primaryGreen,));
                   }
                   return ElevatedButton.icon(
                     onPressed: () async {

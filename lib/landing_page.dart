@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/authpages.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/firebase_options.dart';
 import 'package:flutter_maps/main.dart';
 import 'package:flutter_maps/services/auth.dart';
@@ -226,7 +227,7 @@ class _LandingPageState extends State<LandingPage> {
     }
 
     return Scaffold(
-      backgroundColor: Color(0xFF0D1B2A),
+      backgroundColor:ColorsManager.darkerGreen,
       body: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

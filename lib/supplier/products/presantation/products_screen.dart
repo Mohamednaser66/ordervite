@@ -10,6 +10,8 @@ import 'package:flutter_maps/lang.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:location/location.dart';
 
+import '../../../core/app_validators.dart';
+
 class ProductsScreen extends StatefulWidget {
   ProductsScreen({super.key});
 
@@ -20,6 +22,8 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   late TextEditingController orderController;
   late TextEditingController destinationController;
+  final _formKey = GlobalKey<FormState>();
+
   Location _locationTracker = Location();
   var location;
   String placeaddress = "pick up your address";
@@ -187,8 +191,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   void _confirmOrder(BuildContext context) {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
     final fixedLocation = areaStoreLatLng[selectedArea]!;
-
     if (sorlat == null ||
         sorlng == null ||
         destinationController.text.isEmpty) {
@@ -219,6 +225,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       orderNote: orderController.text.trim().isNotEmpty
           ? orderController.text.trim()
           : null,
+      orderType: 'goods'
     );
 
     Navigator.pushNamed(context, RoutesManager.orderPage, arguments: orderDist);
@@ -235,243 +242,251 @@ class _ProductsScreenState extends State<ProductsScreen> {
         appBar: AppBar(title: Text(isEnglish ? 'Products' : 'المنتجات')),
         body: SingleChildScrollView(
           padding: REdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                isEnglish ? 'Choose a category' : 'اختر الفئة',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 12.h),
-              SizedBox(
-                height: 120.h,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
-                  separatorBuilder: (_, __) => SizedBox(width: 12.w),
-                  itemBuilder: (context, index) {
-                    final category = categories[index];
-                    final isSelected = selectedCategory == index;
-                    return GestureDetector(
-                      onTap: () => setState(() => selectedCategory = index),
-                      child: Container(
-                        width: 110.w,
-                        padding: REdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.blue.shade50
-                              : Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(16.r),
-                          border: Border.all(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isEnglish ? 'Choose a category' : 'اختر الفئة',
+                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 12.h),
+                SizedBox(
+                  height: 120.h,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length,
+                    separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                    itemBuilder: (context, index) {
+                      final category = categories[index];
+                      final isSelected = selectedCategory == index;
+                      return GestureDetector(
+                        onTap: () => setState(() => selectedCategory = index),
+                        child: Container(
+                          width: 110.w,
+                          padding: REdgeInsets.all(12),
+                          decoration: BoxDecoration(
                             color: isSelected
-                                ? Colors.blue
-                                : Colors.grey.shade300,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? Colors.blue
-                                    : Colors.blueGrey.shade100,
-                                shape: BoxShape.circle,
-                              ),
-                              padding: REdgeInsets.all(12),
-                              child: Icon(
-                                category.icon,
-                                size: 28.sp,
-                                color: Colors.white,
-                              ),
+                                ? Colors.blue.shade50
+                                : Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(16.r),
+                            border: Border.all(
+                              color: isSelected
+                                  ? Colors.blue
+                                  : Colors.grey.shade300,
+                              width: 1.5,
                             ),
-                            SizedBox(height: 10.h),
-                            Text(
-                              isEnglish ? category.en : category.ar,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 24.h),
-              Text(
-                isEnglish ? 'Your order details' : 'تفاصيل الطلب',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8.h),
-              TextFormField(
-                controller: orderController,
-                maxLines: 4,
-                style: TextStyle(fontSize: 18.sp, color: Colors.black),
-                decoration: InputDecoration(
-                  hintText: isEnglish
-                      ? 'Write your order here'
-                      : 'اكتب طلبك هنا',
-                  labelText: isEnglish ? 'Order' : 'الطلب',
-                  alignLabelWithHint: true,
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.r),
-                    borderSide: BorderSide(color: Colors.blue),
-                  ),
-                ),
-              ),
-              SizedBox(height: 24.h),
-              Text(
-                isEnglish ? 'Choose area' : 'اختر المنطقة',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: ChoiceChip(
-                      label: Text(isEnglish ? 'Zayed' : 'زايد'),
-                      selected: selectedArea == 'zayed',
-                      onSelected: (_) => setState(() => selectedArea = 'zayed'),
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: ChoiceChip(
-                      label: Text(isEnglish ? 'Tagamoa' : 'التجمع'),
-                      selected: selectedArea == 'tagamoa',
-                      onSelected: (_) =>
-                          setState(() => selectedArea = 'tagamoa'),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12.h),
-              Container(
-                width: double.infinity,
-                padding: REdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: Text(
-                  areaStoreLocation[selectedArea]?[lang.lang] ?? '',
-                  style: TextStyle(fontSize: 16.sp, color: Colors.black87),
-                ),
-              ),
-              SizedBox(height: 24.h),
-              Text(
-                isEnglish ? 'Destination address' : 'عنوان التوصيل',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8.h),
-              TextFormField(
-                controller: destinationController,
-                onChanged: (val) {
-                  findPlace(val);
-                },
-                style: TextStyle(fontSize: 18.sp, color: Colors.black),
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.location_on, size: 20.sp),
-                  hintText: isEnglish
-                      ? 'Enter destination address'
-                      : 'ادخل عنوان التوصيل',
-                  labelText: isEnglish ? 'Destination' : 'الوجهة',
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.r),
-                    borderSide: BorderSide(color: Colors.blue),
-                  ),
-                ),
-              ),
-              if (placePredictionsList.isNotEmpty) ...[
-                SizedBox(height: 8.h),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16.r),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Column(
-                    children: placePredictionsList.map((place) {
-                      return InkWell(
-                        onTap: () {
-                          getPlaceAddressDetails(context, place.place_id ?? '');
-                        },
-                        child: Padding(
-                          padding: REdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 12,
                           ),
-                          child: Row(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                Icons.location_on,
-                                color: Colors.blue,
-                                size: 20.sp,
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? Colors.blue
+                                      : Colors.blueGrey.shade100,
+                                  shape: BoxShape.circle,
+                                ),
+                                padding: REdgeInsets.all(12),
+                                child: Icon(
+                                  category.icon,
+                                  size: 28.sp,
+                                  color: Colors.white,
+                                ),
                               ),
-                              SizedBox(width: 10.w),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      place.main_text ?? '',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    Text(
-                                      place.secondary_text ?? '',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
+                              SizedBox(height: 10.h),
+                              Text(
+                                isEnglish ? category.en : category.ar,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
                                 ),
                               ),
                             ],
                           ),
                         ),
                       );
-                    }).toList(),
+                    },
+                  ),
+                ),
+                SizedBox(height: 24.h),
+                Text(
+                  isEnglish ? 'Your order details' : 'تفاصيل الطلب',
+                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8.h),
+                TextFormField(
+                  controller: orderController,
+                  validator: (value) => AppValidators.minLength(
+            value,
+            6,
+            isEnglish?'en':'ar',
+                    ),
+                  maxLines: 4,
+                  style: TextStyle(fontSize: 18.sp, color: Colors.black),
+                  decoration: InputDecoration(
+                    hintText: isEnglish
+                        ? 'Write your order here'
+                        : 'اكتب طلبك هنا',
+                    labelText: isEnglish ? 'Order' : 'الطلب',
+                    alignLabelWithHint: true,
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.r),
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24.h),
+                Text(
+                  isEnglish ? 'Choose area' : 'اختر المنطقة',
+                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ChoiceChip(
+                        label: Text(isEnglish ? 'Zayed' : 'زايد'),
+                        selected: selectedArea == 'zayed',
+                        onSelected: (_) => setState(() => selectedArea = 'zayed'),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: ChoiceChip(
+                        label: Text(isEnglish ? 'Tagamoa' : 'التجمع'),
+                        selected: selectedArea == 'tagamoa',
+                        onSelected: (_) =>
+                            setState(() => selectedArea = 'tagamoa'),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12.h),
+                Container(
+                  width: double.infinity,
+                  padding: REdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(16.r),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Text(
+                    areaStoreLocation[selectedArea]?[lang.lang] ?? '',
+                    style: TextStyle(fontSize: 16.sp, color: Colors.black87),
+                  ),
+                ),
+                SizedBox(height: 24.h),
+                Text(
+                  isEnglish ? 'Destination address' : 'عنوان التوصيل',
+                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8.h),
+                TextFormField(
+                  controller: destinationController,
+                  onChanged: (val) {
+                    findPlace(val);
+                  },
+                  style: TextStyle(fontSize: 18.sp, color: Colors.black),
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.location_on, size: 20.sp),
+                    hintText: isEnglish
+                        ? 'Enter destination address'
+                        : 'ادخل عنوان التوصيل',
+                    labelText: isEnglish ? 'Destination' : 'الوجهة',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.r),
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                  ),
+                ),
+                if (placePredictionsList.isNotEmpty) ...[
+                  SizedBox(height: 8.h),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16.r),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      children: placePredictionsList.map((place) {
+                        return InkWell(
+                          onTap: () {
+                            getPlaceAddressDetails(context, place.place_id ?? '');
+                          },
+                          child: Padding(
+                            padding: REdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  color: Colors.blue,
+                                  size: 20.sp,
+                                ),
+                                SizedBox(width: 10.w),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        place.main_text ?? '',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Text(
+                                        place.secondary_text ?? '',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+                SizedBox(height: 12.h),
+                SizedBox(
+                  width: double.infinity,
+                  height: 40.h,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _confirmOrder(context);
+                    },
+                    child: Text(
+                      isEnglish ? 'Confirm' : 'تاكيد',
+                      style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                    ),
                   ),
                 ),
               ],
-              SizedBox(height: 12.h),
-              SizedBox(
-                width: double.infinity,
-                height: 40.h,
-                child: ElevatedButton(
-                  onPressed: () {
-                    _confirmOrder(context);
-                  },
-                  child: Text(
-                    isEnglish ? 'Confirm' : 'تاكيد',
-                    style: TextStyle(color: Colors.white, fontSize: 14.sp),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

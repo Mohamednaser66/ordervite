@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/models/placeAtuocomplete.dart';
 import 'package:flutter_maps/supplier/home_page/widgets/home_drawer.dart';
@@ -264,7 +265,7 @@ class _SearchScreenState extends State<SearchScreen> {
       textDirection: lang.lang == "en" ? TextDirection.ltr : TextDirection.rtl,
       child: Scaffold(
         key: _scaffoldkey,
-        backgroundColor: Color.fromRGBO(21, 42, 72, 0.9),
+        backgroundColor: ColorsManager.darkerGreen,
         drawer: SupplierDrawer(
           username: username,
           email: email,
@@ -303,12 +304,13 @@ class _SearchScreenState extends State<SearchScreen> {
                           onTap: () {
                             Navigator.pop(context);
                           },
-                          child: Icon(Icons.arrow_back),
+                          child: Icon(Icons.arrow_back,size: 20.sp,color: ColorsManager.darkerGreen,),
                         ),
                         Center(
                           child: Text(
                             lang.lang == "en" ? "Set Drop off" : " اضف وجهتك ",
                             style: TextStyle(
+                              color: ColorsManager.darkerGreen,
                               fontSize: 18.sp,
                               fontFamily: "Brand-bold",
                             ),
@@ -323,7 +325,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         Icon(
                           Icons.location_city,
                           size: 30.sp,
-                          color: Color.fromRGBO(21, 42, 72, 0.9),
+                          color: ColorsManager.darkerGreen
                         ),
                         SizedBox(width: 18.w),
                         Expanded(
@@ -352,7 +354,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15.sp,
                                   ),
-                                  fillColor: Color.fromRGBO(21, 42, 72, 0.9),
+                                  fillColor: ColorsManager.darkerGreen,
                                   filled: true,
                                   border: InputBorder.none,
                                   isDense: true,
@@ -374,7 +376,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         Icon(
                           Icons.bike_scooter,
                           size: 30.sp,
-                          color: Color.fromRGBO(21, 42, 72, 0.9),
+                          color: ColorsManager.darkerGreen
                         ),
                         SizedBox(width: 18.w),
                         Expanded(
@@ -405,7 +407,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15.sp,
                                   ),
-                                  fillColor: Color.fromRGBO(21, 42, 72, 0.9),
+                                  fillColor: ColorsManager.darkerGreen,
                                   filled: true,
                                   border: InputBorder.none,
                                   isDense: true,

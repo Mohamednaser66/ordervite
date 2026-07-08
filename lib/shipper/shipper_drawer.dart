@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -31,7 +32,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
       width: 220.w,
       child: Container(
         decoration: BoxDecoration(
-          color: Color.fromRGBO(7, 15, 33, 0.9),
+          color: ColorsManager.darkerGreen,
         ),
 
         child: ListView(
@@ -39,7 +40,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
             SizedBox(
               height: 150.h,
               child: DrawerHeader(
-                decoration: BoxDecoration(color: Colors.blue),
+                decoration: BoxDecoration(color: ColorsManager.primaryGreen),
                 padding: EdgeInsets.all(10.r),
 
                 child: Column(
@@ -92,7 +93,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
             ),
 
             ListTile(
-              leading: Icon(Icons.home, color: Colors.blue),
+              leading: Icon(Icons.home, color: ColorsManager.primaryGreen),
 
               title: Text(
                 widget.lang.lang == "en" ? 'Home ' : 'الرئيسية ',
@@ -108,7 +109,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.card_travel, color: Colors.blue),
+              leading: Icon(Icons.card_travel, color: ColorsManager.primaryGreen),
 
               title: Text(
                 widget.lang.lang == "en" ? 'Orders ' : ' الطلبات  ',
@@ -124,7 +125,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.card_travel, color: Colors.blue),
+              leading: Icon(Icons.card_travel, color: ColorsManager.primaryGreen),
 
               title: Text(
                 widget.lang.lang == "en" ? 'Profile ' : ' الملف الشخصي ',
@@ -141,7 +142,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
             ),
 
             ListTile(
-              leading: Icon(Icons.logout, color: Colors.blue),
+              leading: Icon(Icons.logout, color: ColorsManager.primaryGreen),
 
               title: Text(
                 widget.lang.lang == "en" ? 'Log out ' : ' تسجيل خروج ',
@@ -163,7 +164,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
             ),
 
             ListTile(
-              leading: Icon(Icons.label_important_sharp, color: Colors.blue),
+              leading: Icon(Icons.label_important_sharp, color: ColorsManager.primaryGreen),
 
               title: Text(
                 widget.lang.lang == "en" ? ' عربي' : ' English ',

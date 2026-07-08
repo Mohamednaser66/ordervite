@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/auth.dart';
@@ -316,7 +317,7 @@ deleteData()async{
                 CustomTextFormField(
                   validation: AppValidators.validateFullName,
                   controller: _username,
-                  icon: Icon(Icons.person, color: Colors.blue),
+                  icon: Icon(Icons.person, color: ColorsManager.primaryGreen),
                   hintText: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
                   lable: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
                 ),
@@ -324,7 +325,7 @@ deleteData()async{
                 CustomTextFormField(
                   validation: AppValidators.emailOrPhoneValidator,
                   controller: _email,
-                  icon: Icon(Icons.mail, color: Colors.blue),
+                  icon: Icon(Icons.mail, color: ColorsManager.primaryGreen),
                   hintText: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',
                   lable: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',
                 ),
@@ -343,7 +344,7 @@ deleteData()async{
                 CustomTextFormField(
                   validation: AppValidators.validateChangePassword,
                   controller: _password,
-                  icon: Icon(Icons.key, color: Colors.blue),
+                  icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
                   hintText: lang.lang == 'en'
                       ? 'Enter Password'
                       : 'ادخل كلمة السر',
@@ -357,7 +358,7 @@ deleteData()async{
 
                   secure: true,
                   controller: _c_password,
-                  icon: Icon(Icons.key, color: Colors.blue),
+                  icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
                   hintText: lang.lang == 'en'
                       ? 'Confirm Password'
                       : 'تاكيد كلمة السر',
@@ -369,7 +370,7 @@ deleteData()async{
                 CustomTextFormField(
                   validation: AppValidators.validatePhoneNumber,
                   controller: _mobile1,
-                  icon: Icon(Icons.phone, color: Colors.blue),
+                  icon: Icon(Icons.phone, color: ColorsManager.primaryGreen),
                   hintText: lang.lang == 'en'
                       ? 'Enter Mobile 1'
                       : 'ادخل رقم التليفون 1',
@@ -379,7 +380,7 @@ deleteData()async{
                 CustomTextFormField(
                   validation: AppValidators.validatePhoneNumber,
                   controller: _mobile2,
-                  icon: Icon(Icons.phone, color: Colors.blue),
+                  icon: Icon(Icons.phone, color: ColorsManager.primaryGreen),
                   hintText: lang.lang == 'en'
                       ? 'Enter Mobile 2'
                       : 'ادخل رقم التليفون 2',

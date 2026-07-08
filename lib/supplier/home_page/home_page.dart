@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/core/di/di.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/main.dart';
@@ -435,8 +436,8 @@ class _MyHomePageState extends State<MyHomePage> {
             appBar: buildAppBar(lang),
             body: buildBody(lang),
             floatingActionButton: FloatingActionButton(
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.blue,
+              foregroundColor: ColorsManager.darkerGreen,
+              backgroundColor: ColorsManager.white,
               child: Icon(Icons.location_searching),
               onPressed: () => getCurrentLocation(),
             ),
@@ -485,7 +486,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Container(
                     height: 300.h,
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(21, 42, 72, 0.9),
+                      color: ColorsManager.darkerGreen,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(18.0.r),
                         topRight: Radius.circular(18.0.r),
@@ -537,8 +538,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                       context,
                                     ).pushNamed(RoutesManager.terms);
                                   },
-                                  style: ElevatedButton.styleFrom(foregroundColor: Colors.white,
-                                      backgroundColor: Colors.blue,
+                                  style: ElevatedButton.styleFrom(foregroundColor: ColorsManager.darkerGreen,
+                                      backgroundColor: ColorsManager.white,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r))),
                                   child: Text(lang.lang=='en'?'Package Delivery':' توصيل طرد',style: TextStyle(fontSize: 12.sp),),
                                 ),
@@ -549,8 +550,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   onPressed: (){
                                     Navigator.of(context).pushNamed(RoutesManager.productsScreen);
                                   },
-                                  style: ElevatedButton.styleFrom(foregroundColor: Colors.white,
-                                      backgroundColor: Colors.blue,
+                                  style: ElevatedButton.styleFrom(foregroundColor: ColorsManager.darkerGreen,
+                                      backgroundColor: ColorsManager.white,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r))),
                                   child:  Text(lang.lang=='en'?'Goods Order':'طلب منتجات',style: TextStyle(fontSize: 12.sp)),
                                 ),
@@ -592,7 +593,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           )
                                         : const Center(
                                             child: CircularProgressIndicator(
-                                              color: Colors.blue,
+                                              color: ColorsManager.primaryGreen,
                                             ),
                                           ),
                                   ],

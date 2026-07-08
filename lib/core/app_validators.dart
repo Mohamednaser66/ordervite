@@ -1,8 +1,26 @@
 
 class AppValidators {
   AppValidators._();
+  static String? minLength(
+      String? value,
+      int length,
+      String languageCode,
+      ) {
+    if (value == null || value.trim().isEmpty) {
+      return languageCode == 'ar'
+          ?'This field is required': 'هذا الحقل مطلوب'
+           ;
+    }
 
- static String? emailOrPhoneValidator(String? value) {
+    if (value.trim().length < length) {
+      return languageCode == 'en'
+          ?  'Text must be at least $length characters':'يجب ألا يقل النص عن $length أحرف'
+          ;
+    }
+
+    return null;
+  }
+  static String? emailOrPhoneValidator(String? value) {
 
     if (value == null || value.trim().isEmpty) {
       return "Required";

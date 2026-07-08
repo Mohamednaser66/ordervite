@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemeManager {
   static final ThemeData light = ThemeData(
-    iconTheme: IconThemeData(color: Colors.blue,size: 20.sp),
+    iconTheme: IconThemeData(color: ColorsManager.primaryGreen,size: 20.sp),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        textStyle: TextStyle(color: Colors.blue,fontSize: 14.sp,fontWeight: FontWeight.w400),
+        textStyle: TextStyle(color: ColorsManager.white,fontSize: 14.sp,fontWeight: FontWeight.w400),
         foregroundColor: Colors.white,
-        backgroundColor: Colors.blue,
+        backgroundColor: ColorsManager.primaryGreen,
       ),
 
     ),
     appBarTheme: AppBarTheme(
-
       centerTitle: true,
       iconTheme: IconThemeData(color: Colors.white,size: 20.sp),
       titleTextStyle: TextStyle(
@@ -21,7 +21,7 @@ class ThemeManager {
         fontWeight: FontWeight.bold,
         color: Colors.white,
       ),
-      backgroundColor: Colors.blue,
+      backgroundColor: ColorsManager.primaryGreen,
       foregroundColor: Colors.white,
     ),
     textButtonTheme: TextButtonThemeData(

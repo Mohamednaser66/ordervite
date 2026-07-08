@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,8 +30,8 @@ class _AuthPagesState extends State<AuthPages> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFF152A48),
-                Color(0xFF0D1B2A)],
+              colors: [ColorsManager.primaryGreen,
+                ColorsManager.darkerGreen],
             ),
           ),
           child: SafeArea(
@@ -75,9 +76,11 @@ class _AuthPagesState extends State<AuthPages> {
     return Column(
       children: [
         _buildFullWidthButton(
+          iconColor: ColorsManager.darkerGreen,
+          labelColor: ColorsManager.darkerGreen,
           icon: Icons.language,
           label: 'اللغة / Language',
-          color: Colors.blue,
+          color: ColorsManager.white,
           onTap: () {},
           horizontalPadding: 80,
         ),
@@ -86,9 +89,11 @@ class _AuthPagesState extends State<AuthPages> {
           children: [
             Expanded(
               child: _buildFullWidthButton(
+                iconColor: ColorsManager.darkerGreen,
+                labelColor: ColorsManager.darkerGreen,
                 icon: Icons.flag,
                 label: 'عربي',
-                color: Colors.blue,
+                color: ColorsManager.white,
                 onTap: () async {
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.setString('lang', 'ar');
@@ -102,9 +107,11 @@ class _AuthPagesState extends State<AuthPages> {
             SizedBox(width: 12.w),
             Expanded(
               child: _buildFullWidthButton(
+                iconColor: ColorsManager.darkerGreen,
+                labelColor: ColorsManager.darkerGreen,
                 icon: Icons.flag,
                 label: 'English',
-                color: Colors.blue,
+                color: ColorsManager.white,
                 onTap: () async {
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.setString('lang', 'en');
@@ -126,9 +133,11 @@ class _AuthPagesState extends State<AuthPages> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildFullWidthButton(
+          iconColor: ColorsManager.darkerGreen,
+          labelColor: ColorsManager.darkerGreen,
           icon: Icons.home,
           label: isEnglish ? 'Client Panel' : 'إدارة حساب العميل',
-          color: Colors.blue,
+          color: Colors.white,
           onTap: () {},
           horizontalPadding: 20,
         ),
@@ -137,15 +146,19 @@ class _AuthPagesState extends State<AuthPages> {
           children: [
             Expanded(
               child: _buildFullWidthButton(
+                iconColor: ColorsManager.white,
+                labelColor: ColorsManager.white,
                 icon: Icons.login,
                 label: isEnglish ? 'Sign In' : 'دخول',
-                color: Colors.green,
+                color: ColorsManager.darkButtonColor,
                 onTap: () => Navigator.of(context).pushNamed(RoutesManager.login),
               ),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: _buildFullWidthButton(
+                iconColor: ColorsManager.white,
+                labelColor: ColorsManager.white,
                 icon: Icons.app_registration,
                 label: isEnglish ? 'Sign Up' : 'تسجيل',
                 color: Colors.red,
@@ -156,10 +169,12 @@ class _AuthPagesState extends State<AuthPages> {
         ),
         SizedBox(height: 18.h),
         _buildFullWidthButton(
+          iconColor: ColorsManager.darkerGreen,
+          labelColor: ColorsManager.darkerGreen,
           icon: Icons.pedal_bike,
           label:
           isEnglish ? 'Shipper Panel' : 'إدارة حساب مسئول الشحن',
-          color: Colors.blue,
+          color: Colors.white,
           onTap: () {},
           horizontalPadding: 20.w,
         ),
@@ -168,15 +183,19 @@ class _AuthPagesState extends State<AuthPages> {
           children: [
             Expanded(
               child: _buildFullWidthButton(
+                iconColor: ColorsManager.white,
+                labelColor: ColorsManager.white,
                 icon: Icons.login,
                 label: isEnglish ? 'Sign In' : 'دخول',
-                color: Colors.green,
+                color: ColorsManager.darkButtonColor,
                 onTap: () => Navigator.of(context).pushNamed(RoutesManager.shLogin),
               ),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: _buildFullWidthButton(
+                iconColor: ColorsManager.white,
+                labelColor: ColorsManager.white,
                 icon: Icons.app_registration,
                 label: isEnglish ? 'Sign Up' : 'تسجيل',
                 color: Colors.red,
@@ -192,9 +211,11 @@ class _AuthPagesState extends State<AuthPages> {
   }
 
   Widget _buildFullWidthButton({
+    required Color iconColor,
     required IconData icon,
     required String label,
     required Color color,
+    required Color labelColor,
     required VoidCallback onTap,
     double horizontalPadding = 20,
   }) {
@@ -216,7 +237,7 @@ class _AuthPagesState extends State<AuthPages> {
           child: Row(
             children: [
               SizedBox(width: 20.w),
-              Icon(icon, size: 28.sp, color: Colors.white),
+              Icon(icon, size: 28.sp, color:iconColor),
               SizedBox(width: 10.w),
               Expanded(
                 child: Text(
@@ -225,7 +246,7 @@ class _AuthPagesState extends State<AuthPages> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 18.sp,
-                    color: Colors.white,
+                    color: labelColor,
                   ),
                 ),
               ),

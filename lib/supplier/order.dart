@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/config/app_config.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/core/map_utils.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/models/order.dart';
@@ -53,6 +54,7 @@ class _OrderPageState extends State<OrderPage> {
   bool _isShipperDelivered = false;
   bool _isConfirmOrder = false;
   String? _distance;
+  String? orderType;
 
   final TextEditingController _priceController = TextEditingController();
   String _packageSize = 'small';
@@ -100,6 +102,7 @@ class _OrderPageState extends State<OrderPage> {
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is! OrderDist) return;
     final orderDist = args;
+    orderType =args.orderType;
     _isDataLoaded = true;
 
     final prefs = await SharedPreferences.getInstance();
@@ -665,7 +668,7 @@ class _OrderPageState extends State<OrderPage> {
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.topLeft,
-          colors: [Color.fromRGBO(21, 42, 72, 1), Color.fromRGBO(7, 15, 33, 1)],
+          colors: [ColorsManager.darkerGreen,ColorsManager.primaryGreen],
         ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(18.r),
@@ -678,11 +681,11 @@ class _OrderPageState extends State<OrderPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle(
+              orderType=='goods'?const SizedBox.shrink(): _buildSectionTitle(
                 lang.lang == "en" ? 'Choose Package Size ' : 'اختار حجم الطرد ',
               ),
               SizedBox(height: 6.h),
-              _buildSizeSelector(),
+              orderType=='goods'?const SizedBox.shrink():_buildSizeSelector(),
               SizedBox(height: 6.h),
               _buildSectionTitle(
                 lang.lang == "en"
@@ -698,13 +701,13 @@ class _OrderPageState extends State<OrderPage> {
               SizedBox(height: 6.h),
               _buildPaymentSelector(),
               SizedBox(height: 6.h),
-              _buildSectionTitle(
+              orderType=='goods'?const SizedBox.shrink(): _buildSectionTitle(
                 lang.lang == "en"
                     ? 'Enter Package Price  '
                     : '  ادخل سعر الطرد  ',
               ),
               SizedBox(height: 6.h),
-              TextFormField(
+              orderType=='goods'?const SizedBox.shrink(): TextFormField(
                 controller: _priceController,
                 keyboardType: TextInputType.number,
                 style: TextStyle(
@@ -728,7 +731,7 @@ class _OrderPageState extends State<OrderPage> {
                   filled: true,
                   prefixIcon: Padding(
                     padding: REdgeInsets.only(left: 5),
-                    child: Icon(Icons.money, size: 24.sp, color: Colors.blue),
+                    child: Icon(Icons.money, size: 24.sp, color: ColorsManager.primaryGreen),
                   ),
                   labelText: lang.lang == "en"
                       ? "click here to set the price"
@@ -761,7 +764,7 @@ class _OrderPageState extends State<OrderPage> {
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor: ColorsManager.primaryGreen,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
@@ -832,7 +835,7 @@ class _OrderPageState extends State<OrderPage> {
               child: ElevatedButton(
                 onPressed: () => setState(() => _packageSize = size),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isSelected ? Colors.blueAccent : Colors.grey,
+                  backgroundColor: isSelected ? ColorsManager.primaryGreen : Colors.grey,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
                   ),
@@ -886,7 +889,7 @@ class _OrderPageState extends State<OrderPage> {
               child: ElevatedButton(
                 onPressed: () => setState(() => _paymentMethod = payment),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isSelected ? Colors.blueAccent : Colors.grey,
+                  backgroundColor: isSelected ? ColorsManager.primaryGreen : Colors.grey,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
                   ),
@@ -912,7 +915,7 @@ class _OrderPageState extends State<OrderPage> {
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.topLeft,
-          colors: [Color.fromRGBO(21, 42, 72, 1), Color.fromRGBO(7, 15, 33, 1)],
+          colors: [ColorsManager.darkerGreen,ColorsManager.primaryGreen],
         ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(18.r),
@@ -924,7 +927,7 @@ class _OrderPageState extends State<OrderPage> {
         child: SingleChildScrollView(
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: ColorsManager.darkBlue,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(18.r),
                 topRight: Radius.circular(18.r),
@@ -996,7 +999,7 @@ class _OrderPageState extends State<OrderPage> {
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
+                              backgroundColor: ColorsManager.primaryGreen,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12.r),
                               ),

@@ -41,6 +41,7 @@ class OrderDist {
   final String? order_state;
   final String? order_shippier_id;
   final String? orderNote;
+  final String? orderType;
 
   OrderDist(
     this.disLat,
@@ -55,6 +56,7 @@ class OrderDist {
     this.order_state,
     this.order_shippier_id, {
     this.orderNote,
+         this.orderType
   });
 }
 

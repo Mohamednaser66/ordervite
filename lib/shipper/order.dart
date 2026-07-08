@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/config/app_config.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/shipper/order/presentation/shipper_order_cubit.dart';
 import 'package:flutter_maps/shipper/widgets/chat_named_icon.dart';
@@ -792,7 +793,7 @@ class _ShOrderState extends State<ShOrder> {
         gradient: const LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.topLeft,
-          colors: [Color.fromRGBO(21, 42, 72, 1), Color.fromRGBO(7, 15, 33, 1)],
+          colors: [ColorsManager.primaryGreen, ColorsManager.darkerGreen],
         ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(18.0.r),
@@ -803,7 +804,7 @@ class _ShOrderState extends State<ShOrder> {
         padding: REdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: ColorsManager.darkBlue,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(18.0.r),
               topRight: Radius.circular(18.0.r),

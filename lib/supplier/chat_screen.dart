@@ -172,6 +172,7 @@ class _SuChatScreenState extends State<SuChatScreen> {
                 chat.order_pricecheck.toString(),
                 chat.order_state.toString(),
                 chat.order_shippier_id.toString(),
+
               );
 
               Navigator.pushNamed(context, RoutesManager.orderPage, arguments: orderDist);

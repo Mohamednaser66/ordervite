@@ -7,6 +7,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/core/firebase_service.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
 import 'package:flutter_maps/core/widgets/sign_in_with_google_widget.dart';
@@ -215,7 +216,7 @@ class _RegisterState extends State<Register> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFF152A48), Color(0xFF0D1B2A)],
+                colors: [ColorsManager.darkerGreen,ColorsManager.darkerGreen],
               ),
             ),
             child: Form(
@@ -226,7 +227,7 @@ class _RegisterState extends State<Register> {
                   SizedBox(
                     height: 70.h,
                     child: CircleAvatar(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: ColorsManager.primaryGreen,
                       child: Padding(
                         padding: EdgeInsets.all(8.0.r),
                         child: Icon(Icons.person, size: 50.sp, color: Colors.white),
@@ -236,13 +237,13 @@ class _RegisterState extends State<Register> {
                   SizedBox(height: 20.h),
                   CustomTextFormField(
                     validation: validusername,
-                    icon: Icon(Icons.person, color: Colors.blue),
+                    icon: Icon(Icons.person, color: ColorsManager.primaryGreen),
                     controller: username,
                     hintText: lang.lang == 'en' ? "User Name" : "اسم المستخدم",
                     lable: lang.lang == 'en' ? "User Name" : "اسم المستخدم",
                   ),
                   CustomTextFormField(
-                    icon: Icon(Icons.email, color: Colors.blue),
+                    icon: Icon(Icons.email, color:ColorsManager.primaryGreen),
                     validation: AppValidators.emailOrPhoneValidator,
                     controller: email,
                     hintText: lang.lang == 'en'
@@ -251,7 +252,7 @@ class _RegisterState extends State<Register> {
                     lable: lang.lang == 'en' ? 'email' : 'البريد الالكترونى ',
                   ),
                   CustomTextFormField(
-                    icon: Icon(Icons.key, color: Colors.blue),
+                    icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
                     validation: validepassword,
                     secure: true,
                     controller: password,
@@ -262,7 +263,7 @@ class _RegisterState extends State<Register> {
                     secure: true,
                     controller: cPassword,
                     validation: validecpassword,
-                    icon: Icon(Icons.key, color: Colors.blue),
+                    icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
                     hintText: lang.lang == 'en'
                         ? 'Re Password'
                         : 'تاكيد كلمة المرور',
@@ -273,14 +274,14 @@ class _RegisterState extends State<Register> {
                   CustomTextFormField(
                     validation: validmobile1,
                     controller: mobile1,
-                    icon: Icon(Icons.phone_android_outlined, color: Colors.blue),
+                    icon: Icon(Icons.phone_android_outlined, color: ColorsManager.primaryGreen),
                     hintText: lang.lang == 'en' ? 'Mobile 1' : 'رقم التليفون 1 ',
                     lable: lang.lang == 'en' ? 'Mobile 1' : 'رقم التليفون 1 ',
                   ),
                   CustomTextFormField(
                     controller: mobile2,
                     validation: validmobile2,
-                    icon: Icon(Icons.phone_android_outlined, color: Colors.blue),
+                    icon: Icon(Icons.phone_android_outlined, color: ColorsManager.primaryGreen),
                     hintText: lang.lang == 'en' ? 'Mobile 2' : 'رقم التليفون 2 ',
                     lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم التليفون 2 ',
                   ),
@@ -385,7 +386,7 @@ class _RegisterState extends State<Register> {
                         onPressed: (){
                           Navigator.pushReplacementNamed(context, RoutesManager.login);
                         },
-                        child: Text(lang.lang=='en'?'Sign In':'تسجيل الدخول',style: TextStyle(color: Colors.blue,fontSize: 12.sp),),)
+                        child: Text(lang.lang=='en'?'Sign In':'تسجيل الدخول',style: TextStyle(color: ColorsManager.white,fontSize: 12.sp),),)
                     ],),
                 ],
               ),

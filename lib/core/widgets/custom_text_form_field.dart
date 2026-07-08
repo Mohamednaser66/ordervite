@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // ignore: must_be_immutable
@@ -27,7 +28,7 @@ class CustomTextFormField extends StatelessWidget {
 
       style: TextStyle(fontSize: 20.sp, color: Colors.black,),
       maxLength: 50,
-      cursorColor: Colors.blue,
+      cursorColor: Colors.black,
       onFieldSubmitted: (value) {
         FocusScope.of(context).unfocus();
       },
@@ -41,7 +42,7 @@ class CustomTextFormField extends StatelessWidget {
       data: IconThemeData(size: 22.sp),
       child: icon,
     ),
-        prefixStyle: TextStyle(fontSize: 50.sp, color: Colors.blue),
+        prefixStyle: TextStyle(fontSize: 50.sp, color: ColorsManager.primaryGreen),
         labelText: lable,
         labelStyle: TextStyle(
           fontSize: 17.sp,
@@ -50,7 +51,7 @@ class CustomTextFormField extends StatelessWidget {
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.r)),
         errorBorder:  OutlineInputBorder(borderRadius: BorderRadius.circular(20.r),borderSide: BorderSide(color: Colors.red)),
-        focusedBorder: OutlineInputBorder(borderRadius:BorderRadius.circular(20.r),borderSide: BorderSide(color: Colors.blue) )
+        focusedBorder: OutlineInputBorder(borderRadius:BorderRadius.circular(20.r),borderSide: BorderSide(color: ColorsManager.primaryGreen) )
       ),
     );
   }

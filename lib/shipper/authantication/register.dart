@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/core/app_validators.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/core/constant_manager.dart';
 import 'package:flutter_maps/core/firebase_service.dart';
 import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
@@ -177,7 +178,7 @@ String roles = ConstantManager.shipper;
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFF152A48), Color(0xFF0D1B2A)],
+                colors: [ColorsManager.darkerGreen,ColorsManager.darkerGreen],
               ),
             ),
             child: Form(
@@ -195,14 +196,14 @@ String roles = ConstantManager.shipper;
                         width: 70.w,
                         height: 70.h,
                         decoration: BoxDecoration(
-                          color: Colors.blue,
+                          color: ColorsManager.primaryGreen,
                           borderRadius: BorderRadius.circular(100.r),
                         ),
                         child: Icon(Icons.person, size: 50.sp, color: Colors.white),
                       ),
                       SizedBox(height: 20.h),
                       CustomTextFormField(
-                        icon: Icon(Icons.person, color: Colors.blue),
+                        icon: Icon(Icons.person, color: ColorsManager.primaryGreen),
                         validation: AppValidators.validateUsername,
                         controller: username,
                         hintText: lang.lang == 'en'
@@ -211,7 +212,7 @@ String roles = ConstantManager.shipper;
                         lable: lang.lang == 'en' ? "User Name" : "اسم المستخدم",
                       ),
                       CustomTextFormField(
-                        icon: Icon(Icons.email, color: Colors.blue),
+                        icon: Icon(Icons.email, color:ColorsManager.primaryGreen),
                         controller: email,
                         validation: AppValidators.emailOrPhoneValidator,
                         hintText: lang.lang == 'en'
@@ -220,7 +221,7 @@ String roles = ConstantManager.shipper;
                         lable: lang.lang == 'en' ? 'email' : 'البريد الالكترونى ',
                       ),
                       CustomTextFormField(
-                        icon: Icon(Icons.key, color: Colors.blue),
+                        icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
                         validation: validepassword,
                         secure: true,
                         controller: password,
@@ -231,7 +232,7 @@ String roles = ConstantManager.shipper;
                         secure: true,
                         controller: cpassword,
                         validation:validecpassword,
-                        icon: Icon(Icons.key, color: Colors.blue),
+                        icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
                         hintText: lang.lang == 'en'
                             ? 'Re Password'
                             : 'تاكيد كلمة المرور',
@@ -244,7 +245,7 @@ String roles = ConstantManager.shipper;
                         validation: AppValidators.validatePhoneNumber,
                         icon: Icon(
                           Icons.phone_android_outlined,
-                          color: Colors.blue,
+                          color: ColorsManager.primaryGreen,
                         ),
                         hintText: lang.lang == 'en'
                             ? 'Mobile 1'
@@ -256,7 +257,7 @@ String roles = ConstantManager.shipper;
                         controller: mobile2,
                         icon: Icon(
                           Icons.phone_android_outlined,
-                          color: Colors.blue,
+                          color: ColorsManager.primaryGreen,
                         ),
                         hintText: lang.lang == 'en'
                             ? 'Mobile 2'
@@ -268,7 +269,7 @@ String roles = ConstantManager.shipper;
                         height: 40.h,
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue, // instead of color
+                            backgroundColor: ColorsManager.primaryGreen, // instead of color
                             foregroundColor: Colors.white, // instead of textColor
                             splashFactory: InkRipple.splashFactory,
                             shape: RoundedRectangleBorder(
@@ -388,7 +389,7 @@ String roles = ConstantManager.shipper;
                            onPressed: (){
                              Navigator.pushReplacementNamed(context, RoutesManager.shLogin);
                            },
-                           child: Text(lang.lang=='en'?'Sign In':'تسجيل الدخول',style: TextStyle(color: Colors.blue,fontSize: 14.sp),),)
+                           child: Text(lang.lang=='en'?'Sign In':'تسجيل الدخول',style: TextStyle(color: ColorsManager.white,fontSize: 14.sp),),)
                        ],),
                       SizedBox(height: 10.h,),
                       // TextButton(onPressed: (){

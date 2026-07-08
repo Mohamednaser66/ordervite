@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
@@ -429,12 +430,12 @@ class _OrderState extends State<Order> {
                       begin: Alignment.topRight,
                       end: Alignment.topLeft,
                       colors: [
-                        Color.fromRGBO(21, 42, 72, 1),
-                        Color.fromRGBO(7, 15, 33, 1),
+                        ColorsManager.darkerGreen,
+                        ColorsManager.primaryGreen,
                       ],
                     ),
 
-                    color: Color.fromRGBO(7, 15, 33, 0.9),
+                    color: ColorsManager.darkerGreen,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(18.0.r),
                       topRight: Radius.circular(18.0.r),

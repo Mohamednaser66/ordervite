@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -31,7 +32,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
       width: 200.w,
       child: Container(
         decoration: BoxDecoration(
-          color: Color.fromRGBO(7, 15, 33, 0.9),
+          color: ColorsManager.darkerGreen,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(18.0.r),
             topRight: Radius.circular(18.0.r),
@@ -42,7 +43,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
             SizedBox(
             height:   150.h,
               child: DrawerHeader(
-                decoration: BoxDecoration(color: Colors.blue),
+                decoration: BoxDecoration(color: ColorsManager.primaryGreen),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -85,7 +86,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.home, color: Colors.blue),
+              leading: Icon(Icons.home, color: ColorsManager.primaryGreen),
               title: Text(
                 widget.lang.lang == "en" ? 'Home ' : 'الرئيسية ',
                 style: TextStyle(
@@ -98,7 +99,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
                   Navigator.of(context).pushNamedAndRemoveUntil(RoutesManager.suHome,(route) => false,),
             ),
             ListTile(
-              leading: Icon(Icons.card_travel, color: Colors.blue),
+              leading: Icon(Icons.card_travel, color: ColorsManager.primaryGreen),
               title: Text(
                 widget.lang.lang == "en" ? 'Products ' : ' المنتجات  ',
                 style: TextStyle(
@@ -111,7 +112,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
                   Navigator.of(context).pushNamed(RoutesManager.productsScreen),
             ),
             ListTile(
-              leading: Icon(Icons.card_travel, color: Colors.blue),
+              leading: Icon(Icons.card_travel, color: ColorsManager.primaryGreen),
               title: Text(
                 widget.lang.lang == "en" ? 'Profile ' : ' الملف الشخصي ',
                 style: TextStyle(
@@ -124,7 +125,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
                   Navigator.pushNamedAndRemoveUntil(context, RoutesManager.suProfile,(route) => false,),
             ),
             ListTile(
-              leading: Icon(Icons.logout, color: Colors.blue),
+              leading: Icon(Icons.logout, color: ColorsManager.primaryGreen),
               title: Text(
                 widget.lang.lang == "en" ? 'Log out ' : ' تسجيل خروج ',
                 style: TextStyle(
@@ -142,7 +143,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.label_important_sharp, color: Colors.blue),
+              leading: Icon(Icons.label_important_sharp, color: ColorsManager.primaryGreen),
               title: Text(
                 widget.lang.lang == "en" ? ' عربي' : ' English ',
                 style: TextStyle(
