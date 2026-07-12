@@ -79,14 +79,15 @@ class _CreatProfileState extends State<SUProfilePage> {
     _mobile2.dispose();
     super.dispose();
   }
-Future<void> _deleteData()async{
-  SharedPreferences preferences = await SharedPreferences.getInstance();
-preferences.remove("username");
-preferences.remove("email");
-preferences.remove("token");
-preferences.remove("id");
 
-}
+  Future<void> _deleteData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.remove("username");
+    preferences.remove("email");
+    preferences.remove("token");
+    preferences.remove("id");
+  }
+
   Future<void> getPref() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
@@ -166,7 +167,7 @@ preferences.remove("id");
       Navigator.pushNamedAndRemoveUntil(
         context,
         RoutesManager.suHome,
-            (route) => false,
+        (route) => false,
         arguments: message,
       );
     } catch (e) {
@@ -174,8 +175,7 @@ preferences.remove("id");
 
       showDialog(
         context: context,
-        builder: (c) =>
-         AlertDialog(
+        builder: (c) => AlertDialog(
           title: Text('Warning', style: TextStyle(color: Colors.red)),
           content: Text(
             'Please check your network',
@@ -193,180 +193,227 @@ preferences.remove("id");
     return Directionality(
       textDirection: lang.lang == "en" ? TextDirection.ltr : TextDirection.rtl,
       child: BlocProvider<SupplierProfileCubit>(
-  create: (context) => SupplierProfileCubit(api: Api()),
-  child: Scaffold(
-        drawer: SupplierDrawer(username: username??'', email: email??'', lang: lang, isSignIn: isSignIn),
-        key: _scaffoldkey,
-        appBar: AppBar(title: Text(username ?? "")),
-        body: Form(
-          key: _globalkey,
-          child: ListView(
-            padding: REdgeInsets.all(20.r),
-            children: [
-              Center(
-                child: Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    CircleAvatar(
-                      radius: 80,
-                      backgroundImage: _imageFile != null
-                          ? FileImage(File(_imageFile!.path))
-                          : (logo_src == null
-                          ? const AssetImage("assets/app_face.png")
-                      as ImageProvider :  AssetImage("assets/app_face.png")
+        create: (context) => SupplierProfileCubit(api: Api()),
+        child: Scaffold(
+          drawer: SupplierDrawer(
+            username: username ?? '',
+            email: email ?? '',
+            lang: lang,
+            isSignIn: isSignIn,
+          ),
+          key: _scaffoldkey,
+          appBar: AppBar(title: Text(username ?? "")),
+          body: Form(
+            key: _globalkey,
+            child: ListView(
+              padding: REdgeInsets.all(20.r),
+              children: [
+                Center(
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 80,
+                        backgroundImage: _imageFile != null
+                            ? FileImage(File(_imageFile!.path)) as ImageProvider
+                            : (logo_src != null && logo_src != "null"
+                                  ? NetworkImage(logo_src!) as ImageProvider
+                                  : null),
+                        child:
+                            _imageFile == null &&
+                                (logo_src == null || logo_src == "null")
+                            ? Icon(Icons.person, size: 80, color: Colors.grey)
+                            : null,
                       ),
-                    ),
-                    Padding(
-                      padding:  REdgeInsets.all(8.0),
-                      child: IconButton(
-                        onPressed: () {
-                          showModalBottomSheet(
-                              context: context, builder:(_)=> ProfileBottomSheet(
-                            onCameraClick: () => takePhoto(ImageSource.camera),
-                            onGalleryClick: () => takePhoto(ImageSource.gallery),
-                            title: lang.lang == 'en'
-                                ? 'Choose Profile Photo'
-                                : 'اختار الصوره الشخصيه',
-                          )
-                          );
-                        },
-                        icon: Icon(Icons.camera_alt, color: ColorsManager.primaryGreen,),
+                      Padding(
+                        padding: REdgeInsets.all(8.0),
+                        child: IconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (_) => ProfileBottomSheet(
+                                onCameraClick: () =>
+                                    takePhoto(ImageSource.camera),
+                                onGalleryClick: () =>
+                                    takePhoto(ImageSource.gallery),
+                                title: lang.lang == 'en'
+                                    ? 'Choose Profile Photo'
+                                    : 'اختار الصوره الشخصيه',
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: ColorsManager.primaryGreen,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(height: 20.h),
-              CustomTextFormField(
-                validation: AppValidators.validateUsername,
-                controller: _username,
-                icon: Icon(Icons.person_rounded,color: ColorsManager.primaryGreen,),
-                hintText: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
-                lable: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
-              ),
-              SizedBox(height: 20.h),
-              CustomTextFormField(
-                validation: AppValidators.emailOrPhoneValidator,
-                controller: _email,
-                icon: Icon(Icons.email, color: ColorsManager.primaryGreen,),
-                hintText: lang.lang == 'en'
-                    ? 'Enter Email'
-                    : 'ادخل البريد الالكترونى',
-                lable: lang.lang == 'en'
-                    ? 'Enter Email'
-                    : 'ادخل البريد الالكترونى',
-              ),
-              SizedBox(height: 20.h),
-              CustomTextFormField(
-                controller: _password,
-                icon: Icon(Icons.key, color: ColorsManager.primaryGreen,),
-                validation: AppValidators.validateChangePassword,
-                secure: true,
-                hintText: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
-                lable: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
-              ),
-              SizedBox(height: 20.h),
-              CustomTextFormField(
-                controller: _c_password,
-                icon: Icon(Icons.key, color: ColorsManager.primaryGreen,),
-                hintText: lang.lang == 'en'
-                    ? 'Confirm Password'
-                    : 'تاكيد كلمة المرور',
-                lable: lang.lang == 'en'
-                    ? 'Confirm Password'
-                    : 'تاكيد كلمة المرور',
-                secure: true,
-                validation: (val) =>
-                    AppValidators.validateConfirmChangePassword(
-                      val,
-                      _password.text,
-                    ),
-              ),
-              SizedBox(height: 20.h),
-              CustomTextFormField(
-                controller: _mobile1,
-                icon: Icon(Icons.phone, color: ColorsManager.primaryGreen,),
-                validation: AppValidators.validatePhoneNumber,
-                hintText: lang.lang == 'en' ? 'Mobile 1' : 'رقم الهاتف 1',
-                lable: lang.lang == 'en' ? 'Mobile 1' : 'رقم الهاتف 1',
-              ),
-              SizedBox(height: 20.h),
-              CustomTextFormField(
-                controller: _mobile2,
-                icon: Icon(Icons.phone, color: ColorsManager.primaryGreen,),
-                validation: AppValidators.validatePhoneNumber,
-                hintText: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
-                lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
-              ),
-              SizedBox(height: 30.h),
-              SizedBox(height: 30.h),
-              ElevatedButton(
-                onPressed: updateProfile,
-                child: circular
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(lang.lang == "en" ? "Submit" : "حفظ"),
-              ),
-              SizedBox(height: 12.h,),
-              BlocConsumer<SupplierProfileCubit, SupplierProfileState>(
-                listener: (context, state) {
-                  if (state is DeleteSupplierSuccess) {
-                    _deleteData();
-                    AuthService.removeToken();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Account deleted successfully')),
-                    );
-                    Navigator.pushNamedAndRemoveUntil(context, RoutesManager.landingPage,(route) => false,);
-                  }
+                SizedBox(height: 20.h),
+                CustomTextFormField(
+                  validation: AppValidators.validateUsername,
+                  controller: _username,
+                  icon: Icon(
+                    Icons.person_rounded,
+                    color: ColorsManager.primaryGreen,
+                  ),
+                  hintText: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
+                  lable: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
+                ),
+                SizedBox(height: 20.h),
+                CustomTextFormField(
+                  validation: AppValidators.emailOrPhoneValidator,
+                  controller: _email,
+                  icon: Icon(Icons.email, color: ColorsManager.primaryGreen),
+                  hintText: lang.lang == 'en'
+                      ? 'Enter Email'
+                      : 'ادخل البريد الالكترونى',
+                  lable: lang.lang == 'en'
+                      ? 'Enter Email'
+                      : 'ادخل البريد الالكترونى',
+                ),
+                SizedBox(height: 20.h),
+                CustomTextFormField(
+                  controller: _password,
+                  icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
+                  validation: AppValidators.validateChangePassword,
+                  secure: true,
+                  hintText: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
+                  lable: lang.lang == 'en' ? 'Password' : 'كلمة المرور',
+                ),
+                SizedBox(height: 20.h),
+                CustomTextFormField(
+                  controller: _c_password,
+                  icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
+                  hintText: lang.lang == 'en'
+                      ? 'Confirm Password'
+                      : 'تاكيد كلمة المرور',
+                  lable: lang.lang == 'en'
+                      ? 'Confirm Password'
+                      : 'تاكيد كلمة المرور',
+                  secure: true,
+                  validation: (val) =>
+                      AppValidators.validateConfirmChangePassword(
+                        val,
+                        _password.text,
+                      ),
+                ),
+                SizedBox(height: 20.h),
+                CustomTextFormField(
+                  controller: _mobile1,
+                  icon: Icon(Icons.phone, color: ColorsManager.primaryGreen),
+                  validation: AppValidators.validatePhoneNumber,
+                  hintText: lang.lang == 'en' ? 'Mobile 1' : 'رقم الهاتف 1',
+                  lable: lang.lang == 'en' ? 'Mobile 1' : 'رقم الهاتف 1',
+                ),
+                SizedBox(height: 20.h),
+                CustomTextFormField(
+                  controller: _mobile2,
+                  icon: Icon(Icons.phone, color: ColorsManager.primaryGreen),
+                  validation: AppValidators.validatePhoneNumber,
+                  hintText: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
+                  lable: lang.lang == 'en' ? 'Mobile 2' : 'رقم الهاتف 2',
+                ),
+                SizedBox(height: 30.h),
+                SizedBox(height: 30.h),
+                ElevatedButton(
+                  onPressed: updateProfile,
+                  child: circular
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(lang.lang == "en" ? "Submit" : "حفظ"),
+                ),
+                SizedBox(height: 12.h),
+                BlocConsumer<SupplierProfileCubit, SupplierProfileState>(
+                  listener: (context, state) {
+                    if (state is DeleteSupplierSuccess) {
+                      _deleteData();
+                      AuthService.removeToken();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Account deleted successfully')),
+                      );
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RoutesManager.landingPage,
+                        (route) => false,
+                      );
+                    }
 
-                  if (state is DeleteSupplierError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(lang.lang=='en'?state.error??'Failed':state.error??'sss')),
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  if (state is DeleteSupplierLoading) {
-                    return Center(child: CircularProgressIndicator(color: ColorsManager.primaryGreen,));
-                  }
-                  return ElevatedButton.icon(
-                    onPressed: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text('Delete Account'),
-                          content: Text('Are you sure you want to delete your account?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: Text('Cancel',style: TextStyle(color: Colors.red),),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              child: Text('Delete', style: TextStyle(color: Colors.red)),
-                            ),
-                          ],
+                    if (state is DeleteSupplierError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            lang.lang == 'en'
+                                ? state.error ?? 'Failed'
+                                : state.error ?? 'sss',
+                          ),
                         ),
                       );
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is DeleteSupplierLoading) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: ColorsManager.primaryGreen,
+                        ),
+                      );
+                    }
+                    return ElevatedButton.icon(
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text('Delete Account'),
+                            content: Text(
+                              'Are you sure you want to delete your account?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
 
-                      if (confirm != true) return;
+                        if (confirm != true) return;
 
-                      context.read<SupplierProfileCubit>().deleteSupplierAccount(token!);
-                    },
-                    icon: Icon(Icons.delete, size: 24.sp, color: Colors.white),
-                    label: Text(
-                      'Delete Account',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                },
-              )],
+                        context
+                            .read<SupplierProfileCubit>()
+                            .deleteSupplierAccount(token!);
+                      },
+                      icon: Icon(
+                        Icons.delete,
+                        size: 24.sp,
+                        color: Colors.white,
+                      ),
+                      label: Text(
+                        'Delete Account',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
-),
     );
   }
 }

@@ -38,10 +38,9 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   Future<void> _initServices() async {
-
-
     await initNotifications();
   }
+
   Future<void> _initialize() async {
     await _loadLanguage();
 
@@ -176,6 +175,9 @@ class _LandingPageState extends State<LandingPage> {
         data['pricecheck']?.toString() ?? '',
         orderState,
         data['supplier_id']?.toString() ?? '',
+        orderNote: data['order_note']?.toString().trim().isNotEmpty == true
+            ? data['order_note'].toString()
+            : null,
       );
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -212,7 +214,7 @@ class _LandingPageState extends State<LandingPage> {
       context: context,
       builder: (c) => AlertDialog(
         title: const Text('Warning', style: TextStyle(color: Colors.red)),
-        content:  Text(
+        content: Text(
           'Please check your network',
           style: TextStyle(fontSize: 15.sp, color: Colors.red),
         ),
@@ -227,7 +229,7 @@ class _LandingPageState extends State<LandingPage> {
     }
 
     return Scaffold(
-      backgroundColor:ColorsManager.darkerGreen,
+      backgroundColor: ColorsManager.darkerGreen,
       body: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

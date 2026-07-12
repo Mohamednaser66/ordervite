@@ -10,6 +10,7 @@ class OrderData {
   final String order_pricecheck;
   final String order_state;
   final String order_supplier_id;
+  final String? orderNote;
 
   OrderData(
     this.disLat,
@@ -22,8 +23,9 @@ class OrderData {
     this.order_price,
     this.order_pricecheck,
     this.order_state,
-    this.order_supplier_id,
-  );
+    this.order_supplier_id, {
+    this.orderNote,
+  });
 }
 
 class OrderDist {
@@ -56,7 +58,7 @@ class OrderDist {
     this.order_state,
     this.order_shippier_id, {
     this.orderNote,
-         this.orderType
+    this.orderType,
   });
 }
 

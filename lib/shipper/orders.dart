@@ -205,7 +205,9 @@ class _ShOrdersState extends State<ShOrders> {
             if (snapshot.connectionState == ConnectionState.waiting &&
                 !snapshot.hasData) {
               return const Center(
-                child: CircularProgressIndicator(color: ColorsManager.primaryGreen),
+                child: CircularProgressIndicator(
+                  color: ColorsManager.primaryGreen,
+                ),
               );
             }
 
@@ -260,6 +262,9 @@ class _ShOrdersState extends State<ShOrders> {
                 final id = order["id"]?.toString() ?? '';
                 final size = order["size"]?.toString() ?? '';
                 final cost = order["cost"]?.toString() ?? '';
+                final orderNote =
+                    order["order_note"]?.toString() ??
+                    order["orderNote"]?.toString();
 
                 String sizeLabel;
                 if (lang.lang == "en") {
@@ -292,6 +297,9 @@ class _ShOrdersState extends State<ShOrders> {
                       order["pricecheck"]?.toString() ?? '',
                       order["order_state"]?.toString() ?? '',
                       order["supplier_id"]?.toString() ?? '',
+                      orderNote: orderNote?.trim().isNotEmpty == true
+                          ? orderNote
+                          : null,
                     );
                     Navigator.pushNamed(
                       context,

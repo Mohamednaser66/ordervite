@@ -4,6 +4,7 @@ import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/classes.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/core/images_manager.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/main.dart';
@@ -59,6 +60,7 @@ class _SHHomePageState extends State<SHHomePage> {
   bool isSignIn = false;
   bool isMessage = true;
   bool isVerifed = true;
+  bool isLoading = false;
   late final StreamController<List<dynamic>?> _orderController;
   dynamic order_id_session;
   dynamic order_data_session;
@@ -79,6 +81,7 @@ class _SHHomePageState extends State<SHHomePage> {
     }
     return headers;
   }
+
   void _showSnackBar(
     String message, {
     Color backgroundColor = Colors.redAccent,
@@ -94,6 +97,7 @@ class _SHHomePageState extends State<SHHomePage> {
       ),
     );
   }
+
   Future<LocationData?> _getCurrentLocation() async {
     final locationService = Location();
     bool serviceEnabled = await locationService.serviceEnabled();
@@ -139,7 +143,7 @@ class _SHHomePageState extends State<SHHomePage> {
 
   void _updateMarker(LatLng position) async {
     final icon = await BitmapDescriptor.asset(
-       ImageConfiguration(size: Size(20.w, 20.h)),
+      ImageConfiguration(size: Size(20.w, 20.h)),
       ImagesManager.cycle,
     );
 
@@ -194,113 +198,156 @@ class _SHHomePageState extends State<SHHomePage> {
   }
 
   Future<void> getPref() async {
-    final preferences = await SharedPreferences.getInstance();
-
-    order_id_session = preferences.get('order_id_session');
-    if (order_id_session != null) {
-      order_data_session = preferences.get('order_data $order_id_session');
-    }
-    username =preferences.getString('gmailName')??preferences.getString('username');
-    email = preferences.getString('gmailEmail')??preferences.getString('email');
-    token = preferences.getString('gmailToken')??preferences.getString('token');
-    id =preferences.getString('gmailToken')?? preferences.getString('id');
-    if (username != null && email != null && token != null && id != null) {
-      if (mounted) {
-        setState(() {
-          isSignIn = true;
-        });
-      }
-    }
-
-    if (token == null || id == null) {
-      return;
-    }
-
-    final shipperId = int.tryParse(id!);
-    if (shipperId == null) {
-      _showSnackBar(
-        Lang.of(context).lang == 'en'
-            ? 'Invalid user identifier.'
-            : 'معرف المستخدم غير صالح.',
-      );
-      return;
-    }
+    setState(() {
+      isLoading = true;
+    });
 
     try {
-      final response = await http.get(
-        Uri.parse('https://www.ordervite.com/api/shippier/show/$shipperId'),
-        headers: _authHeaders,
-      );
+      final preferences = await SharedPreferences.getInstance();
 
-      if (response.statusCode != 200) {
-        _showSnackBar(
-          Lang.of(context).lang == 'en'
-              ? 'Unable to load profile information.'
-              : 'لا يمكن تحميل معلومات الملف الشخصي.',
-        );
+      order_id_session = preferences.get('order_id_session');
+      if (order_id_session != null) {
+        order_data_session = preferences.get('order_data $order_id_session');
+      }
+      username =
+          preferences.getString('gmailName') ??
+          preferences.getString('username');
+      email =
+          preferences.getString('gmailEmail') ?? preferences.getString('email');
+      token =
+          preferences.getString('gmailToken') ?? preferences.getString('token');
+      id = preferences.getString('gmailToken') ?? preferences.getString('id');
+      if (username != null && email != null && token != null && id != null) {
+        if (mounted) {
+          setState(() {
+            isSignIn = true;
+          });
+        }
+      }
+
+      if (token == null || id == null) {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
         return;
       }
 
-      final responseBody = jsonDecode(response.body);
-      if (responseBody['success'] != true || responseBody['data'] == null) {
+      final shipperId = int.tryParse(id!);
+      if (shipperId == null) {
         _showSnackBar(
           Lang.of(context).lang == 'en'
-              ? 'Profile data is unavailable.'
-              : 'بيانات الملف الشخصي غير متوفرة.',
+              ? 'Invalid user identifier.'
+              : 'معرف المستخدم غير صالح.',
         );
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
         return;
       }
 
-      final data = responseBody['data'];
-      final fetchedLogo = data['logo']?.toString();
-      final userEmail = data['name']?['email']?.toString();
-      final userName = data['name']?['name']?.toString();
+      try {
+        final response = await http.get(
+          Uri.parse('https://www.ordervite.com/api/shippier/show/$shipperId'),
+          headers: _authHeaders,
+        );
+
+        if (response.statusCode != 200) {
+          _showSnackBar(
+            Lang.of(context).lang == 'en'
+                ? 'Unable to load profile information.'
+                : 'لا يمكن تحميل معلومات الملف الشخصي.',
+          );
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
+          return;
+        }
+
+        final responseBody = jsonDecode(response.body);
+        if (responseBody['success'] != true || responseBody['data'] == null) {
+          _showSnackBar(
+            Lang.of(context).lang == 'en'
+                ? 'Profile data is unavailable.'
+                : 'بيانات الملف الشخصي غير متوفرة.',
+          );
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
+          return;
+        }
+
+        final data = responseBody['data'];
+        final fetchedLogo = data['logo']?.toString();
+        final userEmail = data['name']?['email']?.toString();
+        final userName = data['name']?['name']?.toString();
+
+        if (!mounted) return;
+        setState(() {
+          logo_src = fetchedLogo;
+          if (logo_src != null) {
+            preferences.setString('logo_src', logo_src!);
+          }
+          if (userEmail != null) {
+            email = userEmail;
+            preferences.setString('email', userEmail);
+          }
+          if (userName != null) {
+            username = userName;
+            preferences.setString('username', userName);
+          }
+        });
+      } catch (error) {
+        debugPrint('Profile fetch failed: $error');
+        _showSnackBar(
+          Lang.of(context).lang == 'en'
+              ? 'Failed to load profile. Please try again.'
+              : 'فشل تحميل الملف الشخصي. حاول مرة أخرى.',
+        );
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+        return;
+      }
+
+      final location = await _getCurrentLocation();
+      final currentLocation = location != null
+          ? LatLng(location.latitude ?? 0, location.longitude ?? 0)
+          : const LatLng(30.0444, 31.2357);
 
       if (!mounted) return;
       setState(() {
-        logo_src = fetchedLogo;
-        if (logo_src != null) {
-          preferences.setString('logo_src', logo_src!);
-        }
-        if (userEmail != null) {
-          email = userEmail;
-          preferences.setString('email', userEmail);
-        }
-        if (userName != null) {
-          username = userName;
-          preferences.setString('username', userName);
-        }
+        _initialCamera = CameraPosition(target: currentLocation, zoom: 14.0);
+        sourceLatLong = currentLocation;
+        _updateMarker(currentLocation);
+        isLoading = false;
       });
+
+      _mapController.future.then((controller) {
+        controller.animateCamera(
+          CameraUpdate.newLatLngZoom(currentLocation, 14.0),
+        );
+      });
+
+      if (location != null) {
+        await _updateLocationOnServer(location);
+      }
     } catch (error) {
-      debugPrint('Profile fetch failed: $error');
-      _showSnackBar(
-        Lang.of(context).lang == 'en'
-            ? 'Failed to load profile. Please try again.'
-            : 'فشل تحميل الملف الشخصي. حاول مرة أخرى.',
-      );
-      return;
-    }
-
-    final location = await _getCurrentLocation();
-    final currentLocation = location != null
-        ? LatLng(location.latitude ?? 0, location.longitude ?? 0)
-        : const LatLng(30.0444, 31.2357);
-
-    if (!mounted) return;
-    setState(() {
-      _initialCamera = CameraPosition(target: currentLocation, zoom: 14.0);
-      sourceLatLong = currentLocation;
-      _updateMarker(currentLocation);
-    });
-
-    _mapController.future.then((controller) {
-      controller.animateCamera(
-        CameraUpdate.newLatLngZoom(currentLocation, 14.0),
-      );
-    });
-
-    if (location != null) {
-      await _updateLocationOnServer(location);
+      debugPrint('getPref failed: $error');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -343,7 +390,7 @@ class _SHHomePageState extends State<SHHomePage> {
   @override
   void initState() {
     super.initState();
-     _init();
+    _init();
     _orderController = StreamController<List<dynamic>?>.broadcast();
 
     timer = Timer.periodic(const Duration(seconds: 10), (_) {
@@ -357,18 +404,20 @@ class _SHHomePageState extends State<SHHomePage> {
 
     _initialize();
   }
+
   Future<void> _init() async {
     await initNotifications();
 
     await Future.delayed(Duration(milliseconds: 500));
 
     final trackingStatus =
-    await AppTrackingTransparency.trackingAuthorizationStatus;
+        await AppTrackingTransparency.trackingAuthorizationStatus;
 
     if (trackingStatus == TrackingStatus.notDetermined) {
       await AppTrackingTransparency.requestTrackingAuthorization();
     }
   }
+
   Future<void> _initialize() async {
     await getPref();
     await _registerFcmToken();
@@ -554,6 +603,18 @@ class _SHHomePageState extends State<SHHomePage> {
                   markers: _markers,
                 ),
               ),
+              if (isLoading)
+                Positioned(
+                  child: Container(
+                    color: Colors.black54,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(ColorsManager.primaryGreen),
+                        strokeWidth: 6.0,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

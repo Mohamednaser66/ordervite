@@ -51,6 +51,8 @@ class _ShOrderState extends State<ShOrder> {
   String? _orderSupplierId;
   String? _orderPrice;
   String? _orderState;
+  String? _orderNote;
+  final TextEditingController _priceController = TextEditingController();
   String? _disLat;
   String? _disLong;
   String? _sorLat;
@@ -86,10 +88,10 @@ class _ShOrderState extends State<ShOrder> {
 
     final prefs = await SharedPreferences.getInstance();
 
-    _username =prefs.getString('gmailName')?? prefs.getString("username");
-    _email =prefs.getString('gmailEmail')?? prefs.getString("email");
-    _token =prefs.getString('gmailToken')?? prefs.getString("token");
-    _userId = prefs.getString('gmailToken')??prefs.getString("id");
+    _username = prefs.getString('gmailName') ?? prefs.getString("username");
+    _email = prefs.getString('gmailEmail') ?? prefs.getString("email");
+    _token = prefs.getString('gmailToken') ?? prefs.getString("token");
+    _userId = prefs.getString('gmailToken') ?? prefs.getString("id");
 
     setState(() {
       _disLat = orderData.disLat;
@@ -103,6 +105,10 @@ class _ShOrderState extends State<ShOrder> {
       _orderPriceCheck = orderData.order_pricecheck;
       _orderSupplierId = orderData.order_supplier_id;
       _orderState = orderData.order_state;
+      _orderNote = orderData.orderNote;
+      if (_priceController.text.trim().isEmpty && _orderPrice != null) {
+        _priceController.text = _orderPrice!;
+      }
 
       _sourceLatLong = LatLng(double.parse(_sorLat!), double.parse(_sorLong!));
       _destinationLatLong = LatLng(
@@ -831,6 +837,51 @@ class _ShOrderState extends State<ShOrder> {
                       ? "Supplier ID: $_orderSupplierId"
                       : "كود المورد : $_orderSupplierId",
                 ),
+                if (_orderNote != null && _orderNote!.trim().isNotEmpty) ...[
+                  SizedBox(height: 6.h),
+                  Text(
+                    lang.lang == "en"
+                        ? "Order Note: $_orderNote"
+                        : "ملاحظة الطلب: $_orderNote",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  TextFormField(
+                    controller: _priceController,
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      setState(() {
+                        _orderPrice = value.trim().isEmpty ? '0' : value.trim();
+                      });
+                    },
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: lang.lang == "en"
+                          ? 'Enter package price'
+                          : 'أدخل سعر الشحنة',
+                      labelText: lang.lang == "en"
+                          ? 'Package Price'
+                          : 'سعر الشحنة',
+                      contentPadding: REdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                  ),
+                ],
                 SizedBox(height: 8.h),
                 _buildInfoRow(
                   lang.lang == "en"
@@ -1115,6 +1166,7 @@ class _ShOrderState extends State<ShOrder> {
 
   @override
   void dispose() {
+    _priceController.dispose();
     _cubit.close();
     super.dispose();
   }

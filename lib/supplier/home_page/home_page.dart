@@ -463,7 +463,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget buildBody(Lang lang) {
     return SafeArea(
       child: _initialLocation == null
-          ? Center(child: CircularProgressIndicator(color: Colors.blue))
+          ? Center(child: CircularProgressIndicator(color: ColorsManager.primaryGreen))
           : Stack(
               children: [
                 GoogleMap(

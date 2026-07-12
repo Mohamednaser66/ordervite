@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,13 +49,14 @@ class _CreatProfileState extends State<SHProfilePage> {
   String? verified;
 
   bool isSignIn = false;
-deleteData()async{
-  SharedPreferences preferences =await SharedPreferences.getInstance();
-  preferences.remove("username");
-  preferences.remove('email');
-  preferences.remove('token');
-  preferences.remove('id');
-}
+  deleteData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.remove("username");
+    preferences.remove('email');
+    preferences.remove('token');
+    preferences.remove('id');
+  }
+
   getPref() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
@@ -63,7 +65,7 @@ deleteData()async{
     email = preferences.getString("email");
 
     if (username != null && email != null) {
-      if(!mounted)return;
+      if (!mounted) return;
       setState(() {
         username = preferences.getString("username");
         email = preferences.getString("email");
@@ -86,12 +88,12 @@ deleteData()async{
 
     var reposnsebody = jsonDecode(response.body);
     if (reposnsebody["success"] == true) {}
-       if(!mounted)return;
+    if (!mounted) return;
     setState(() {
-      _username =  TextEditingController(
+      _username = TextEditingController(
         text: reposnsebody["data"]["name"]["name"].toString(),
       );
-      _email =  TextEditingController(
+      _email = TextEditingController(
         text: reposnsebody["data"]["name"]["email"].toString(),
       );
       _mobile1 = TextEditingController(
@@ -181,448 +183,526 @@ deleteData()async{
       textDirection: lang.lang == "en" ? TextDirection.ltr : TextDirection.rtl,
 
       child: BlocProvider(
-  create: (context) => ShipperProfileCubit(api: api),
-  child: Scaffold(
-        key: _scaffoldkey,
+        create: (context) => ShipperProfileCubit(api: api),
+        child: Scaffold(
+          key: _scaffoldkey,
 
-        drawer: ShipperDrawer(
-          username: username ?? '',
-          email: email ?? '',
-          lang: lang,
-          isSignIn: isSignIn,
-        ),
+          drawer: ShipperDrawer(
+            username: username ?? '',
+            email: email ?? '',
+            lang: lang,
+            isSignIn: isSignIn,
+          ),
 
-        appBar: AppBar(
-          title: Text(
-            username ?? '',
-            style: TextStyle(
-              fontSize: 25.sp,
-              fontWeight: FontWeight.bold,
-              fontStyle: FontStyle.normal,
-              color: Colors.white,
+          appBar: AppBar(
+            title: Text(
+              username ?? '',
+              style: TextStyle(
+                fontSize: 25.sp,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.normal,
+                color: Colors.white,
+              ),
             ),
           ),
-        ),
 
-        body: Form(
-          key: _globalkey,
-          child: Padding(
-            padding:  REdgeInsets.all(10.0),
-            child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 3.h),
-              children: <Widget>[
-                this.verified.toString() == "0"
-                    ? Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              lang.lang == "en"
-                                  ? "Your profile is incomplete, please fill the make sure you enter correct  data profile,please wait  we will  review  your data."
-                                  : "ملف بياناتك الشخصية غير مكتمل، يُرجى التأكد من إدخال ملف بيانات صحيح، يُرجى الانتظار حتى نراجع بياناتك. ",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20.sp,
+          body: Form(
+            key: _globalkey,
+            child: Padding(
+              padding: REdgeInsets.all(10.0),
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 3.h),
+                children: <Widget>[
+                  this.verified.toString() == "0"
+                      ? Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                lang.lang == "en"
+                                    ? "Your profile is incomplete, please fill the make sure you enter correct  data profile,please wait  we will  review  your data."
+                                    : "ملف بياناتك الشخصية غير مكتمل، يُرجى التأكد من إدخال ملف بيانات صحيح، يُرجى الانتظار حتى نراجع بياناتك. ",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20.sp,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    : Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              " ",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20.sp,
+                          ],
+                        )
+                      : Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                " ",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20.sp,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
 
-                this.verified.toString() == "2"
-                    ? Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              lang.lang == "en"
-                                  ? "Your profile is blocked, please contact us to active your profile ."
-                                  : "الحساب مغلق من فضلك تواصل معنا لتفعيل حسابك ",
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20.sp,
+                  this.verified.toString() == "2"
+                      ? Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                lang.lang == "en"
+                                    ? "Your profile is blocked, please contact us to active your profile ."
+                                    : "الحساب مغلق من فضلك تواصل معنا لتفعيل حسابك ",
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20.sp,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    : Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              "",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20.sp,
+                          ],
+                        )
+                      : Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                "",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20.sp,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                SizedBox(height: 10.h),
+                          ],
+                        ),
+                  SizedBox(height: 10.h),
 
-                Center(
-                  child: Stack(
-                    alignment: Alignment.bottomCenter,
+                  Center(
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: <Widget>[
+                        CircleAvatar(
+                          radius: 80.0,
+                          backgroundImage: _imageFile != null
+                              ? FileImage(File(_imageFile!.path))
+                                    as ImageProvider
+                              : (logo_src != null && logo_src != "null"
+                                    ? NetworkImage(logo_src!) as ImageProvider
+                                    : null),
+                          child:
+                              _imageFile == null &&
+                                  (logo_src == null || logo_src == "null")
+                              ? Icon(Icons.person, size: 80, color: Colors.grey)
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: 10.0.h,
+                          child: InkWell(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: ((builder) => ProfileBottomSheet(
+                                  onCameraClick: () =>
+                                      takePhoto(ImageSource.camera),
+                                  onGalleryClick: () =>
+                                      takePhoto(ImageSource.gallery),
+                                  title: lang.lang == 'en'
+                                      ? 'Choose Profile Photo'
+                                      : 'اختار الصوره الشخصيه',
+                                )),
+                              );
+                            },
+                            child: Icon(
+                              Icons.camera_alt,
+                              color: Colors.teal,
+                              size: 28.sp,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                  CustomTextFormField(
+                    validation: AppValidators.validateFullName,
+                    controller: _username,
+                    icon: Icon(Icons.person, color: ColorsManager.primaryGreen),
+                    hintText: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
+                    lable: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
+                  ),
+                  SizedBox(height: 20.h),
+                  CustomTextFormField(
+                    validation: AppValidators.emailOrPhoneValidator,
+                    controller: _email,
+                    icon: Icon(Icons.mail, color: ColorsManager.primaryGreen),
+                    hintText: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',
+                    lable: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',
+                  ),
+                  SizedBox(height: 20.h),
+                  Text(
+                    lang.lang == "en"
+                        ? "If you do not change password please password must be empty "
+                        : "لو لم تريد تغيير كلمة السر يجب ترك الخانات فارغه ",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12.sp,
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                  CustomTextFormField(
+                    validation: AppValidators.validateChangePassword,
+                    controller: _password,
+                    icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
+                    hintText: lang.lang == 'en'
+                        ? 'Enter Password'
+                        : 'ادخل كلمة السر',
+                    lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
+                    secure: true,
+                  ),
+                  SizedBox(height: 20.h),
+                  CustomTextFormField(
+                    validation: (val) =>
+                        AppValidators.validateConfirmChangePassword(
+                          val,
+                          _password.text,
+                        ),
+
+                    secure: true,
+                    controller: _c_password,
+                    icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
+                    hintText: lang.lang == 'en'
+                        ? 'Confirm Password'
+                        : 'تاكيد كلمة السر',
+                    lable: lang.lang == 'en'
+                        ? 'Confirm Password'
+                        : 'تاكيد كلمة السر',
+                  ),
+                  SizedBox(height: 20.h),
+                  CustomTextFormField(
+                    validation: AppValidators.validatePhoneNumber,
+                    controller: _mobile1,
+                    icon: Icon(Icons.phone, color: ColorsManager.primaryGreen),
+                    hintText: lang.lang == 'en'
+                        ? 'Enter Mobile 1'
+                        : 'ادخل رقم التليفون 1',
+                    lable: lang.lang == 'en' ? ' Mobile 1' : ' رقم التليفون 1',
+                  ),
+                  SizedBox(height: 20.h),
+                  CustomTextFormField(
+                    validation: AppValidators.validatePhoneNumber,
+                    controller: _mobile2,
+                    icon: Icon(Icons.phone, color: ColorsManager.primaryGreen),
+                    hintText: lang.lang == 'en'
+                        ? 'Enter Mobile 2'
+                        : 'ادخل رقم التليفون 2',
+                    lable: lang.lang == 'en' ? ' Mobile 2' : ' رقم التليفون 2',
+                  ),
+                  SizedBox(height: 20.h),
+                  Row(
                     children: <Widget>[
-                      CircleAvatar(
-                        radius: 80.0,
-                        backgroundImage: logo_src == null
-                            ? AssetImage("assets/app_face.png")
-                            : AssetImage("assets/app_face.png"),
-                      ),
-                      Positioned(
-                        bottom: 10.0.h,
-                        child: InkWell(
-                          onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              builder: ((builder) => ProfileBottomSheet(
-                                onCameraClick: () =>
-                                    takePhoto(ImageSource.camera),
-                                onGalleryClick: () =>
-                                    takePhoto(ImageSource.gallery),
-                                title: lang.lang == 'en'
-                                    ? 'Choose Profile Photo'
-                                    : 'اختار الصوره الشخصيه',
-                              )),
-                            );
-                          },
-                          child: Icon(
-                            Icons.camera_alt,
-                            color: Colors.teal,
-                            size: 28.sp,
+                      Expanded(
+                        child: Text(
+                          lang.lang == "en"
+                              ? "Please Choose  National ID photo"
+                              : "أختر صورة البطاقة الشخصية",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.sp,
                           ),
+                        ),
+                      ),
+                      Center(
+                        child: Stack(
+                          children: <Widget>[
+                            Container(
+                              height: 100.h,
+                              width: 100.w,
+
+                              decoration: _imageIdFile != null
+                                  ? BoxDecoration(
+                                      borderRadius: BorderRadius.circular(
+                                        15.0.r,
+                                      ),
+                                      image: DecorationImage(
+                                        image: FileImage(
+                                          File(_imageIdFile!.path),
+                                        ),
+                                        fit: BoxFit.fill,
+                                      ),
+                                    )
+                                  : (id_image_src != null &&
+                                            id_image_src != "null"
+                                        ? BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              15.0.r,
+                                            ),
+                                            image: DecorationImage(
+                                              image: NetworkImage(
+                                                id_image_src!,
+                                              ),
+                                              fit: BoxFit.fill,
+                                            ),
+                                          )
+                                        : BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              15.0.r,
+                                            ),
+                                            color: Colors.grey[300],
+                                          )),
+                              child:
+                                  _imageIdFile == null &&
+                                      (id_image_src == null ||
+                                          id_image_src == "null")
+                                  ? Center(
+                                      child: Icon(
+                                        Icons.image,
+                                        size: 50,
+                                        color: Colors.grey,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+
+                            Positioned(
+                              bottom: 20.0.h,
+                              right: 20.0.w,
+                              child: InkWell(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: ((builder) => ProfileBottomSheet(
+                                      onCameraClick: () =>
+                                          takeIdPhoto(ImageSource.camera),
+                                      onGalleryClick: () =>
+                                          takeIdPhoto(ImageSource.gallery),
+                                      title: lang.lang == 'en'
+                                          ? 'Choose ID Photo'
+                                          : 'اختار صورة البطاقه',
+                                    )),
+                                  );
+                                },
+                                child: Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.teal,
+                                  size: 28.sp,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
-                SizedBox(height: 20.h),
-                CustomTextFormField(
-                  validation: AppValidators.validateFullName,
-                  controller: _username,
-                  icon: Icon(Icons.person, color: ColorsManager.primaryGreen),
-                  hintText: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
-                  lable: lang.lang == 'en' ? 'User Name' : 'اسم المستخدم',
-                ),
-                SizedBox(height: 20.h),
-                CustomTextFormField(
-                  validation: AppValidators.emailOrPhoneValidator,
-                  controller: _email,
-                  icon: Icon(Icons.mail, color: ColorsManager.primaryGreen),
-                  hintText: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',
-                  lable: lang.lang == 'en' ? 'Email' : 'البريد الالكتروتى',
-                ),
-                SizedBox(height: 20.h),
-                Text(
-                  lang.lang == "en"
-                      ? "If you do not change password please password must be empty "
-                      : "لو لم تريد تغيير كلمة السر يجب ترك الخانات فارغه ",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12.sp,
-                  ),
-                ),
-                SizedBox(height: 20.h),
-                CustomTextFormField(
-                  validation: AppValidators.validateChangePassword,
-                  controller: _password,
-                  icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
-                  hintText: lang.lang == 'en'
-                      ? 'Enter Password'
-                      : 'ادخل كلمة السر',
-                  lable: lang.lang == 'en' ? 'Password' : 'كلمة السر',
-                  secure: true,
-                ),
-                SizedBox(height: 20.h),
-                CustomTextFormField(
-                  validation: (val) =>
-                      AppValidators.validateConfirmChangePassword(val, _password.text),
 
-                  secure: true,
-                  controller: _c_password,
-                  icon: Icon(Icons.key, color: ColorsManager.primaryGreen),
-                  hintText: lang.lang == 'en'
-                      ? 'Confirm Password'
-                      : 'تاكيد كلمة السر',
-                  lable: lang.lang == 'en'
-                      ? 'Confirm Password'
-                      : 'تاكيد كلمة السر',
-                ),
-                SizedBox(height: 20.h),
-                CustomTextFormField(
-                  validation: AppValidators.validatePhoneNumber,
-                  controller: _mobile1,
-                  icon: Icon(Icons.phone, color: ColorsManager.primaryGreen),
-                  hintText: lang.lang == 'en'
-                      ? 'Enter Mobile 1'
-                      : 'ادخل رقم التليفون 1',
-                  lable: lang.lang == 'en' ? ' Mobile 1' : ' رقم التليفون 1',
-                ),
-                SizedBox(height: 20.h),
-                CustomTextFormField(
-                  validation: AppValidators.validatePhoneNumber,
-                  controller: _mobile2,
-                  icon: Icon(Icons.phone, color: ColorsManager.primaryGreen),
-                  hintText: lang.lang == 'en'
-                      ? 'Enter Mobile 2'
-                      : 'ادخل رقم التليفون 2',
-                  lable: lang.lang == 'en' ? ' Mobile 2' : ' رقم التليفون 2',
-                ),
-                SizedBox(height: 20.h),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        lang.lang == "en"
-                            ? "Please Choose  National ID photo"
-                            : "أختر صورة البطاقة الشخصية",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20.sp,
-                        ),
-                      ),
-                    ),
-                    Center(
-                      child: Stack(
-                        children: <Widget>[
-                          Container(
-                            height: 100.h,
-                            width: 100.w,
-
-                            decoration:  BoxDecoration(
-                              borderRadius:  BorderRadius.circular(15.0.r),
-
-                              image: DecorationImage(
-                                image: id_image_src == null
-                                    ? AssetImage("assets/app_face.png")
-                                    : AssetImage("assets/app_face.png"),
-
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
-
-                          Positioned(
-                            bottom: 20.0.h,
-                            right: 20.0.w,
-                            child: InkWell(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  builder: ((builder) => ProfileBottomSheet(
-                                    onCameraClick:()=> takeIdPhoto(ImageSource.camera),
-                                    onGalleryClick:()=> takeIdPhoto(
-                                      ImageSource.gallery,
-                                    ),
-                                    title: lang.lang == 'en'
-                                        ? 'Choose ID Photo'
-                                        : 'اختار صورة البطاقه',
-                                  )),
-                                );
-                              },
-                              child: Icon(
-                                Icons.camera_alt,
-                                color: Colors.teal,
-                                size: 28.sp,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 20.h),
-                InkWell(
-                  onTap: () async {
-                    if(!_globalkey.currentState!.validate())return;
-                    setState(() {
-                      circular = true;
-                    });
-
-                    await SharedPreferences.getInstance();
-
-                    try {
-                      String Url =
-                          "https://www.ordervite.com/api/shippier/logo_profile/$id";
-
-                      var request = http.MultipartRequest('POST', Uri.parse(Url));
-                      if (_imageFile != null) {
-                        request.files.add(
-                          await http.MultipartFile.fromPath(
-                            "logo_src",
-                            _imageFile!.path,
-                          ),
-                        );
-                      }
-                      if (_imageIdFile != null) {
-                        request.files.add(
-                          await http.MultipartFile.fromPath(
-                            "id_image_src",
-                            _imageIdFile!.path,
-                          ),
-                        );
-                      }
-
-                      request.fields['name'] = _username.text;
-                      request.fields['email'] = _email.text;
-                      request.fields['password'] = _password.text;
-                      request.fields['c_password'] = _c_password.text;
-                      request.fields['mobile1'] = _mobile1.text;
-                      request.fields['mobile2'] = _mobile2.text;
-                      request.headers.addAll({
-                        "Content-type": "multipart/form-data",
-                        "Authorization": "Bearer $token",
-                      });
-                      request.send();
-
+                  SizedBox(height: 20.h),
+                  InkWell(
+                    onTap: () async {
+                      if (!_globalkey.currentState!.validate()) return;
                       setState(() {
-                        circular = false;
+                        circular = true;
                       });
-                      getPref();
-                      savePref(
-                        _username.text,
-                        _email.text,
-                        this.token,
-                        this.id,
-                        'shipper',
-                        this.logo_src ?? '',
-                        this.id_image_src ?? '',
-                      );
-                      Message message =  Message(
-                        lang.lang == "en"
-                            ? "profile editing sucsses"
-                            : "تم تحديث البيانات بنجاح ",
-                      );
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        RoutesManager.shHome,
-                        (route) => false,
-                        arguments: message,
-                      );
-                    } catch (e) {
-                      showDialog<bool>(
-                        context: context,
-                        builder: (c) => AlertDialog(
-                          title: Text(
-                            lang.lang == "en" ? 'Warning' : 'تحذير',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                          content: Text(
-                            lang.lang == "en"
-                                ? 'Please check your network  '
-                                : '  يرجي التحقق من اتصال الشبكة الخاص بك   ',
-                            style: TextStyle(fontSize: 15.sp, color: Colors.red),
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  child: Center(
-                    child: Container(
-                      width: 200.w,
-                      height: 50.h,
-                      decoration: BoxDecoration(
-                        color: Colors.teal,
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Center(
-                        child: circular
-                            ? CircularProgressIndicator()
-                            : Text(
-                                lang.lang == "en" ? "Submit" : "حفظ",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
+
+                      await SharedPreferences.getInstance();
+
+                      try {
+                        String Url =
+                            "https://www.ordervite.com/api/shippier/logo_profile/$id";
+
+                        var request = http.MultipartRequest(
+                          'POST',
+                          Uri.parse(Url),
+                        );
+                        if (_imageFile != null) {
+                          request.files.add(
+                            await http.MultipartFile.fromPath(
+                              "logo_src",
+                              _imageFile!.path,
+                            ),
+                          );
+                        }
+                        if (_imageIdFile != null) {
+                          request.files.add(
+                            await http.MultipartFile.fromPath(
+                              "id_image_src",
+                              _imageIdFile!.path,
+                            ),
+                          );
+                        }
+
+                        request.fields['name'] = _username.text;
+                        request.fields['email'] = _email.text;
+                        request.fields['password'] = _password.text;
+                        request.fields['c_password'] = _c_password.text;
+                        request.fields['mobile1'] = _mobile1.text;
+                        request.fields['mobile2'] = _mobile2.text;
+                        request.headers.addAll({
+                          "Content-type": "multipart/form-data",
+                          "Authorization": "Bearer $token",
+                        });
+                        request.send();
+
+                        setState(() {
+                          circular = false;
+                        });
+                        getPref();
+                        savePref(
+                          _username.text,
+                          _email.text,
+                          this.token,
+                          this.id,
+                          'shipper',
+                          this.logo_src ?? '',
+                          this.id_image_src ?? '',
+                        );
+                        Message message = Message(
+                          lang.lang == "en"
+                              ? "profile editing sucsses"
+                              : "تم تحديث البيانات بنجاح ",
+                        );
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          RoutesManager.shHome,
+                          (route) => false,
+                          arguments: message,
+                        );
+                      } catch (e) {
+                        showDialog<bool>(
+                          context: context,
+                          builder: (c) => AlertDialog(
+                            title: Text(
+                              lang.lang == "en" ? 'Warning' : 'تحذير',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            content: Text(
+                              lang.lang == "en"
+                                  ? 'Please check your network  '
+                                  : '  يرجي التحقق من اتصال الشبكة الخاص بك   ',
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: Colors.red,
                               ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: Center(
+                      child: Container(
+                        width: 200.w,
+                        height: 50.h,
+                        decoration: BoxDecoration(
+                          color: Colors.teal,
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Center(
+                          child: circular
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  lang.lang == "en" ? "Submit" : "حفظ",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 12.h,),
-            BlocConsumer<ShipperProfileCubit, ShipperProfileState>(
-              listener: (context, state) {
-                if (state is DeleteShipperSuccess) {
-                  deleteData();
-                  AuthService.removeToken();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Account deleted successfully')),
-                  );
-                  Navigator.pushNamedAndRemoveUntil(context, RoutesManager.landingPage,(route) => false,);
-                }
-
-                if (state is DeleteShipperError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(lang.lang=='en'?state.error??'Failed':state.error??'sss')),
-                  );
-                }
-              },
-              builder: (context, state) {
-                if (state is DeleteShipperLoading) {
-                  return Center(child: CircularProgressIndicator(color: Colors.blue,));
-                }
-                return ElevatedButton.icon(
-                  onPressed: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text('Delete Account'),
-                        content: Text('Are you sure you want to delete your account?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: Text('Cancel',style: TextStyle(color: Colors.red),),
+                  SizedBox(height: 12.h),
+                  BlocConsumer<ShipperProfileCubit, ShipperProfileState>(
+                    listener: (context, state) {
+                      if (state is DeleteShipperSuccess) {
+                        deleteData();
+                        AuthService.removeToken();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Account deleted successfully'),
                           ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: Text('Delete', style: TextStyle(color: Colors.red)),
+                        );
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          RoutesManager.landingPage,
+                          (route) => false,
+                        );
+                      }
+
+                      if (state is DeleteShipperError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              lang.lang == 'en'
+                                  ? state.error ?? 'Failed'
+                                  : state.error ?? 'sss',
+                            ),
                           ),
-                        ],
-                      ),
-                    );
+                        );
+                      }
+                    },
+                    builder: (context, state) {
+                      if (state is DeleteShipperLoading) {
+                        return Center(
+                          child: CircularProgressIndicator(color: Colors.blue),
+                        );
+                      }
+                      return ElevatedButton.icon(
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text('Delete Account'),
+                              content: Text(
+                                'Are you sure you want to delete your account?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
 
-                    if (confirm != true) return;
+                          if (confirm != true) return;
 
-                    context.read<ShipperProfileCubit>().deleteShipperAccount(token);
-                  },
-                  icon: Icon(Icons.delete, size: 24.sp, color: Colors.white),
-                  label: Text(
-                    'Delete Account',
-                    style: TextStyle(color: Colors.white),
+                          context
+                              .read<ShipperProfileCubit>()
+                              .deleteShipperAccount(token);
+                        },
+                        icon: Icon(
+                          Icons.delete,
+                          size: 24.sp,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          'Delete Account',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    },
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              },
-            )
-              ],
+                ],
+              ),
             ),
           ),
         ),
-),
       ),
     );
   }

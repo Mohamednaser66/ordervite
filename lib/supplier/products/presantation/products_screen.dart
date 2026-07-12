@@ -28,25 +28,20 @@ class _ProductsScreenState extends State<ProductsScreen> {
   var location;
   String placeaddress = "pick up your address";
   int selectedCategory = 0;
-  String selectedArea = 'zayed';
+  String selectedArea = 'new_cairo';
   List<PlacePredictions> placePredictionsList = [];
   String? sorlat;
   String? sorlng;
 
   static const Map<String, Map<String, String>> areaStoreLocation = {
-    'zayed': {
-      'en': 'Fixed store location: Sheikh Zayed warehouse',
-      'ar': 'مكان المخزن الثابت: مخزن الشيخ زايد',
-    },
-    'tagamoa': {
-      'en': 'Fixed store location: Tagamoa warehouse',
-      'ar': 'مكان المخزن الثابت: مخزن التجمع',
+    'new_cairo': {
+      'en': 'Fixed store location: New Cairo warehouse',
+      'ar': 'مكان المخزن الثابت: مخزن مصر الجديدة',
     },
   };
 
   static const Map<String, LatLng> areaStoreLatLng = {
-    'zayed': LatLng(30.059445, 31.1933067),
-    'tagamoa': LatLng(30.060671, 31.204131),
+    'new_cairo': LatLng(30.082726, 31.339483),
   };
 
   final List<CategoryData> categories = [
@@ -225,7 +220,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       orderNote: orderController.text.trim().isNotEmpty
           ? orderController.text.trim()
           : null,
-      orderType: 'goods'
+      orderType: 'goods',
     );
 
     Navigator.pushNamed(context, RoutesManager.orderPage, arguments: orderDist);
@@ -249,7 +244,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
               children: [
                 Text(
                   isEnglish ? 'Choose a category' : 'اختر الفئة',
-                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 12.h),
                 SizedBox(
@@ -315,16 +313,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 SizedBox(height: 24.h),
                 Text(
                   isEnglish ? 'Your order details' : 'تفاصيل الطلب',
-                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 8.h),
                 TextFormField(
                   controller: orderController,
                   validator: (value) => AppValidators.minLength(
-            value,
-            6,
-            isEnglish?'en':'ar',
-                    ),
+                    value,
+                    6,
+                    isEnglish ? 'en' : 'ar',
+                  ),
                   maxLines: 4,
                   style: TextStyle(fontSize: 18.sp, color: Colors.black),
                   decoration: InputDecoration(
@@ -347,25 +348,20 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 SizedBox(height: 24.h),
                 Text(
                   isEnglish ? 'Choose area' : 'اختر المنطقة',
-                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 8.h),
                 Row(
                   children: [
                     Expanded(
                       child: ChoiceChip(
-                        label: Text(isEnglish ? 'Zayed' : 'زايد'),
-                        selected: selectedArea == 'zayed',
-                        onSelected: (_) => setState(() => selectedArea = 'zayed'),
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: ChoiceChip(
-                        label: Text(isEnglish ? 'Tagamoa' : 'التجمع'),
-                        selected: selectedArea == 'tagamoa',
+                        label: Text(isEnglish ? 'New Cairo' : 'مصر الجديدة'),
+                        selected: selectedArea == 'new_cairo',
                         onSelected: (_) =>
-                            setState(() => selectedArea = 'tagamoa'),
+                            setState(() => selectedArea = 'new_cairo'),
                       ),
                     ),
                   ],
@@ -387,7 +383,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 SizedBox(height: 24.h),
                 Text(
                   isEnglish ? 'Destination address' : 'عنوان التوصيل',
-                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 8.h),
                 TextFormField(
@@ -425,7 +424,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       children: placePredictionsList.map((place) {
                         return InkWell(
                           onTap: () {
-                            getPlaceAddressDetails(context, place.place_id ?? '');
+                            getPlaceAddressDetails(
+                              context,
+                              place.place_id ?? '',
+                            );
                           },
                           child: Padding(
                             padding: REdgeInsets.symmetric(
@@ -442,7 +444,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                 SizedBox(width: 10.w),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         place.main_text ?? '',
