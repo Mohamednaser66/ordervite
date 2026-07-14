@@ -13,8 +13,11 @@ class SupplierDrawer extends StatefulWidget {
     required this.email,
     required this.lang,
     this.logo_src,
+    required this.id,
+
     required this.isSignIn,
   });
+  final String id;
   String? logo_src;
   final bool isSignIn;
   final String username;
@@ -110,6 +113,20 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
               ),
               onTap: () =>
                   Navigator.of(context).pushNamed(RoutesManager.productsScreen),
+            ),
+            ListTile(
+              leading: Icon(Icons.card_travel, color: ColorsManager.primaryGreen),
+              title: Text(
+                widget.lang.lang == "en" ? 'Order List ' : 'الطلبات ',
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(RoutesManager.userOrderList,arguments: widget.id),
+
             ),
             ListTile(
               leading: Icon(Icons.card_travel, color: ColorsManager.primaryGreen),

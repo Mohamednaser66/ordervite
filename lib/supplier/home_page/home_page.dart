@@ -130,6 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
     email = preferences.getString("email");
     token2 = preferences.getString("token");
     id = preferences.getString("id");
+    print('token====================$token2');
 
     if (username != null && email != null) {
       setState(() {
@@ -359,7 +360,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _init();
     _shipperController = StreamController();
-
     getPref();
     getCurrentLocation();
 
@@ -428,6 +428,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Scaffold(
             key: _scaffoldkey,
             drawer: SupplierDrawer(
+              id: id??'',
               username: username ?? '',
               email: email ?? '',
               lang: lang,

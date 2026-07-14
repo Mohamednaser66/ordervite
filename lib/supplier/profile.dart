@@ -196,6 +196,7 @@ class _CreatProfileState extends State<SUProfilePage> {
         create: (context) => SupplierProfileCubit(api: Api()),
         child: Scaffold(
           drawer: SupplierDrawer(
+            id: id??'',
             username: username ?? '',
             email: email ?? '',
             lang: lang,

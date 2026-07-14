@@ -20,29 +20,31 @@ class SuChatScreen extends StatefulWidget {
 }
 
 class _SuChatScreenState extends State<SuChatScreen> {
-  TextEditingController messageTextEditController = TextEditingController();
+  final TextEditingController messageTextEditController =
+      TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
-  late ScrollController _scrollController;
-  bool _scrolled = false;
+  Chat? _chat;
+  Future<List<Map<String, dynamic>>>? _messagesFuture;
+  bool _isInitialized = false;
   bool _isSending = false;
 
-  List<dynamic>? messages;
+  Future<List<Map<String, dynamic>>> _fetchMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+    final chat = _chat;
 
-  Future<List<dynamic>?> getMessages() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+    if (token == null || token.isEmpty || chat == null) {
+      return [];
+    }
 
-    String? token = preferences.getString("token");
-    if (token == null) return null;
-
-    final chat = ModalRoute.of(context)!.settings.arguments as Chat;
+    final id = int.tryParse(chat.conservistion_id) ?? -1;
+    if (id < 0) return [];
 
     try {
-      int id = int.parse(chat.conservistion_id, radix: 10);
-
-      String url =
+      final url =
           "https://www.ordervite.com/api/supplier/order/$id/messages/shipper";
-
-      var response = await http.get(
+      final response = await http.get(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
@@ -50,27 +52,35 @@ class _SuChatScreenState extends State<SuChatScreen> {
           'Authorization': 'Bearer $token',
         },
       );
-      var responseBody = jsonDecode(response.body);
 
-      if (responseBody["data"] != null) {
-        setState(() {
-          messages = responseBody["data"]["order message"] as List<dynamic>;
-        });
-        return messages;
+      if (response.statusCode != 200) {
+        return [];
       }
 
-      return null;
+      final responseBody = jsonDecode(response.body);
+      final rawMessages = responseBody["data"]?["order message"];
+      if (rawMessages is List) {
+        return rawMessages.cast<Map<String, dynamic>>();
+      }
     } catch (e) {
-      print(e.toString());
-      return null;
+      debugPrint('Failed to load supplier messages: $e');
     }
+
+    return [];
   }
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _scrolled = false;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isInitialized) return;
+
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is Chat) {
+      _chat = args;
+      _messagesFuture = _fetchMessages();
+      _isInitialized = true;
+    }
   }
 
   @override
@@ -80,7 +90,15 @@ class _SuChatScreenState extends State<SuChatScreen> {
     super.dispose();
   }
 
-  void _sendMessage(Chat chat, Lang lang) async {
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+  }
+
+  Future<void> _sendMessage(Chat chat, Lang lang) async {
     FocusScope.of(context).requestFocus(FocusNode());
 
     final messageText = messageTextEditController.text.trim();
@@ -90,38 +108,44 @@ class _SuChatScreenState extends State<SuChatScreen> {
       _isSending = true;
     });
 
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? token = preferences.getString("token");
-    if (token == null) {
-      setState(() {
-        _isSending = false;
-      });
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+    if (token == null || token.isEmpty) {
+      setState(() => _isSending = false);
       return;
     }
 
-    int id = int.parse(chat.conservistion_id, radix: 10);
-
-    String url =
-        "https://www.ordervite.com/api/supplier/order/messages/store/$id";
+    final id = int.tryParse(chat.conservistion_id) ?? -1;
+    if (id < 0) {
+      setState(() => _isSending = false);
+      return;
+    }
 
     try {
-      var response = await http.post(
-        Uri.parse(url),
-        body: {
+      final response = await http.post(
+        Uri.parse(
+          "https://www.ordervite.com/api/supplier/order/messages/store/$id",
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
           "user_id": chat.supplier_id.toString(),
           "type": "supplier",
           "body": messageText,
-        },
-        headers: {'Authorization': 'Bearer $token'},
+        }),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         messageTextEditController.clear();
         setState(() {
-          _scrolled = false; // To scroll to new message
-          messages = null; // Trigger reload
+          _messagesFuture = _fetchMessages();
         });
+        _scrollToBottom();
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -134,7 +158,8 @@ class _SuChatScreenState extends State<SuChatScreen> {
         );
       }
     } catch (e) {
-      print(e.toString());
+      debugPrint('send supplier chat message error: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(lang.lang == "en" ? "Network error" : "خطأ في الشبكة"),
@@ -142,16 +167,35 @@ class _SuChatScreenState extends State<SuChatScreen> {
         ),
       );
     } finally {
-      setState(() {
-        _isSending = false;
-      });
+      if (mounted) {
+        setState(() => _isSending = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    Lang lang = Lang.of(context);
-    final chat = ModalRoute.of(context)!.settings.arguments as Chat;
+    final lang = Lang.of(context);
+    final chat = _chat;
+
+    if (chat == null) {
+      return Directionality(
+        textDirection: lang.lang == "en"
+            ? TextDirection.ltr
+            : TextDirection.rtl,
+        child: Scaffold(
+          appBar: AppBar(title: Text(lang.lang == "en" ? 'Chat' : 'محادثة')),
+          body: Center(
+            child: Text(
+              lang.lang == "en"
+                  ? 'Chat data unavailable'
+                  : 'بيانات المحادثة غير متاحة',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Directionality(
       textDirection: lang.lang == "en" ? TextDirection.ltr : TextDirection.rtl,
@@ -172,10 +216,13 @@ class _SuChatScreenState extends State<SuChatScreen> {
                 chat.order_pricecheck.toString(),
                 chat.order_state.toString(),
                 chat.order_shippier_id.toString(),
-
               );
 
-              Navigator.pushNamed(context, RoutesManager.orderPage, arguments: orderDist);
+              Navigator.pushNamed(
+                context,
+                RoutesManager.orderPage,
+                arguments: orderDist,
+              );
             },
             icon: Icon(Icons.arrow_back_ios),
           ),
@@ -190,12 +237,14 @@ class _SuChatScreenState extends State<SuChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: FutureBuilder<List<dynamic>?>(
-                future: getMessages(),
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _messagesFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
+                  }
+
+                  if (snapshot.hasError) {
                     return Center(
                       child: Text(
                         lang.lang == "en"
@@ -204,45 +253,37 @@ class _SuChatScreenState extends State<SuChatScreen> {
                         style: TextStyle(fontSize: 18.sp, color: Colors.red),
                       ),
                     );
-                  } else if (snapshot.hasData && snapshot.data != null) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (!_scrolled && _scrollController.hasClients) {
-                        _scrollController.jumpTo(
-                          _scrollController.position.maxScrollExtent,
-                        );
-                        _scrolled = true;
-                      }
-                    });
-                    return ListView.builder(
-                      controller: _scrollController,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 6.h.w,
-                        vertical: 6.h,
-                      ),
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        final messageData = snapshot.data![index];
-                        final messageText = messageData["body"].toString();
-                        final messageType = messageData["type"].toString();
-                        final messageModal = MessageModal(body: messageText);
-                        if (messageType == "supplier") {
-                          return MyMessageCard(message: messageModal);
-                        } else {
-                          return FriendMessageCard(message: messageModal);
-                        }
-                      },
-                    );
-                  } else {
+                  }
+
+                  final messages = snapshot.data ?? [];
+                  if (messages.isEmpty) {
                     return Center(
                       child: Text(
                         lang.lang == "en" ? "No messages" : "لا توجد رسائل",
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          color: Colors.white,
-                        ),
+                        style: TextStyle(fontSize: 18.sp, color: Colors.white),
                       ),
                     );
                   }
+
+                  _scrollToBottom();
+                  return ListView.builder(
+                    controller: _scrollController,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6.h.w,
+                      vertical: 6.h,
+                    ),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final messageData = messages[index];
+                      final messageText = messageData["body"]?.toString() ?? '';
+                      final messageType = messageData["type"]?.toString() ?? '';
+                      final messageModal = MessageModal(body: messageText);
+                      if (messageType == "supplier") {
+                        return MyMessageCard(message: messageModal);
+                      }
+                      return FriendMessageCard(message: messageModal);
+                    },
+                  );
                 },
               ),
             ),

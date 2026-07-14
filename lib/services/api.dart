@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter_maps/core/constant_manager.dart';
 import 'package:path/path.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../supplier/models/SuOrdersList.dart';
 
 class Api {
   static final Api _api = Api._internal();
@@ -13,8 +16,39 @@ class Api {
 
   String? token;
 
+  Future<SuOrdersList?> fetchUserOrderList(String supplierId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
 
+    print("SupplierId = $supplierId");
+    print("Token = $token");
+    if (token == null || token.isEmpty) return null;
 
+    try {
+      final response = await http.get(
+        Uri.parse(
+          'https://www.ordervite.com/api/supplier/$supplierId/orders',
+        ),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print("Status Code = ${response.statusCode}");
+      print("Body = ${response.body}");
+
+      if (response.statusCode == 200) {
+        return SuOrdersList.fromJson(jsonDecode(response.body));
+      } else {
+        print(response.body);
+      }
+    } catch (e) {
+      print('Error fetching user order list: $e');
+    }
+
+    return null;
+  }
   Future<http.Response> httpGet(String endPath, {Map<String, String>? query}) async {
     Uri uri = Uri.http(ConstantManager.baseUrl, endPath, query);
     return await http.get(uri, headers: {

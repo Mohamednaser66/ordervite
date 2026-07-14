@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_maps/services/order_repository.dart';
+import 'package:flutter_maps/supplier/order/presentation/supplier_order__cubit.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'core/di/di.dart';
 import 'firebase_options.dart';
@@ -23,7 +26,8 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await initNotifications();
 
-  runApp(const MyApp());
+  runApp(BlocProvider(create: (context) =>  SupplierOrderCubit(OrderRepository()),
+  child: const MyApp()));
 }
 
 class PointObject {

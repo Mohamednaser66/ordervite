@@ -71,3 +71,16 @@ final class SupplierOrderError extends SupplierOrderState {
 
   SupplierOrderError(this.message);
 }
+class SupplierOrderListLoading extends SupplierOrderState {}
+
+class SupplierOrderListSuccess extends SupplierOrderState {
+  final SuOrdersList orders;
+
+  SupplierOrderListSuccess(this.orders);
+}
+
+class SupplierOrderListError extends SupplierOrderState {
+  final String message;
+
+  SupplierOrderListError(this.message);
+}

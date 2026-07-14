@@ -52,6 +52,7 @@ class _ShOrderState extends State<ShOrder> {
   String? _orderPrice;
   String? _orderState;
   String? _orderNote;
+  bool _shouldShowPriceField = false;
   final TextEditingController _priceController = TextEditingController();
   String? _disLat;
   String? _disLong;
@@ -109,6 +110,10 @@ class _ShOrderState extends State<ShOrder> {
       if (_priceController.text.trim().isEmpty && _orderPrice != null) {
         _priceController.text = _orderPrice!;
       }
+      _shouldShowPriceField =
+          _orderNote != null &&
+          _orderNote!.trim().isNotEmpty &&
+          (_orderPrice == null || _orderPrice!.trim().isEmpty||_orderPrice!.trim()=='0');
 
       _sourceLatLong = LatLng(double.parse(_sorLat!), double.parse(_sorLong!));
       _destinationLatLong = LatLng(
@@ -374,6 +379,38 @@ class _ShOrderState extends State<ShOrder> {
     }
   }
 
+  Future<void> _confirmOrderPrice(Lang lang) async {
+    final priceText = _priceController.text.trim();
+    if (_orderId == null || _token == null || priceText.isEmpty) {
+      _showSnackBar(
+        lang,
+        en: 'Please enter the package price first',
+        ar: 'يرجى إدخال سعر الشحنة أولاً',
+      );
+      return;
+    }
+
+    final success = await _cubit.updateOrderPrice(
+      orderId: _orderId!,
+      token: _token!,
+      price: priceText,
+    );
+
+    if (!success || !mounted) return;
+
+    setState(() {
+      _orderPrice = priceText;
+      _shouldShowPriceField = false;
+    });
+
+    _showSnackBar(
+      lang,
+      en: 'Package price saved successfully',
+      ar: 'تم حفظ سعر الشحنة بنجاح',
+      backgroundColor: Colors.green,
+    );
+  }
+
   Future<void> _onReceive(Lang lang) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -627,7 +664,6 @@ class _ShOrderState extends State<ShOrder> {
   @override
   Widget build(BuildContext context) {
     final lang = Lang.of(context);
-
     return BlocProvider.value(
       value: _cubit,
       child: BlocListener<ShipperOrderCubit, ShipperOrderState>(
@@ -652,7 +688,6 @@ class _ShOrderState extends State<ShOrder> {
               );
             });
           }
-
           if (state is ShipperOrderCurrentLoaded && state.orderData != null) {
             final data = state.orderData!;
             final newState = data['order_state']?.toString() ?? _orderState;
@@ -669,11 +704,14 @@ class _ShOrderState extends State<ShOrder> {
                 _isReceived = true;
                 _isDelivered = true;
               }
-
               _orderCost = data['cost']?.toString() ?? _orderCost;
               _orderPrice = data['price']?.toString() ?? _orderPrice;
               _orderSupplierId =
                   data['supplier_id']?.toString() ?? _orderSupplierId;
+              _shouldShowPriceField =
+                  _orderNote != null &&
+                  _orderNote!.trim().isNotEmpty &&
+                  (_orderPrice == null || _orderPrice!.trim().isEmpty);
             });
           }
 
@@ -818,84 +856,114 @@ class _ShOrderState extends State<ShOrder> {
           ),
           child: Padding(
             padding: EdgeInsets.all(8.0.r),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildOrderStatusText(lang),
-                SizedBox(height: 8.h),
-                ShOrderIcons(
-                  isConfirm: _isConfirm,
-                  isDelviered: _isDelivered,
-                  isReceived: _isReceived,
-                ),
-                SizedBox(height: 8.h),
-                _buildInfoRow(
-                  lang.lang == "en"
-                      ? "Order ID: $_orderId"
-                      : "كود الطلب :$_orderId",
-                  lang.lang == "en"
-                      ? "Supplier ID: $_orderSupplierId"
-                      : "كود المورد : $_orderSupplierId",
-                ),
-                if (_orderNote != null && _orderNote!.trim().isNotEmpty) ...[
-                  SizedBox(height: 6.h),
-                  Text(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildOrderStatusText(lang),
+                  SizedBox(height: 8.h),
+                  ShOrderIcons(
+                    isConfirm: _isConfirm,
+                    isDelviered: _isDelivered,
+                    isReceived: _isReceived,
+                  ),
+                  SizedBox(height: 8.h),
+                  _buildInfoRow(
                     lang.lang == "en"
-                        ? "Order Note: $_orderNote"
-                        : "ملاحظة الطلب: $_orderNote",
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                        ? "Order ID: $_orderId"
+                        : "كود الطلب :$_orderId",
+                    lang.lang == "en"
+                        ? "Supplier ID: $_orderSupplierId"
+                        : "كود المورد : $_orderSupplierId",
+                  ),
+                  if (_orderNote != null && _orderNote!.trim().isNotEmpty) ...[
+                    SizedBox(height: 6.h),
+                    Text(
+                      lang.lang == "en"
+                          ? "Order Note: $_orderNote"
+                          : "ملاحظة الطلب: $_orderNote",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
+                  ],
+                  if (_shouldShowPriceField) ...[
+                    SizedBox(height: 6.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _priceController,
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              setState(() {
+                                _orderPrice = value.trim().isEmpty
+                                    ? null
+                                    : value.trim();
+                              });
+                            },
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              hintText: lang.lang == "en"
+                                  ? 'Enter package price'
+                                  : 'أدخل سعر الشحنة',
+                              labelText: lang.lang == "en"
+                                  ? 'Package Price'
+                                  : 'سعر الشحنة',
+                              contentPadding: REdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+                        ElevatedButton.icon(
+                          onPressed: () => _confirmOrderPrice(lang),
+                          icon: Icon(Icons.check, size: 18.sp),
+                          label: Text(
+                            lang.lang == "en" ? 'Confirm Price' : 'تأكيد السعر',
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorsManager.primaryGreen,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  SizedBox(height: 8.h),
+                  _buildInfoRow(
+                    lang.lang == "en"
+                        ? "Shipping Cost: $_orderCost L.E."
+                        : "تكلفة الشحن : $_orderCost جم",
+                    lang.lang == "en"
+                        ? "Package Price: $_orderPrice L.E."
+                        : "سعر الشحنة : $_orderPrice جم",
                   ),
                   SizedBox(height: 6.h),
-                  TextFormField(
-                    controller: _priceController,
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      setState(() {
-                        _orderPrice = value.trim().isEmpty ? '0' : value.trim();
-                      });
-                    },
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: lang.lang == "en"
-                          ? 'Enter package price'
-                          : 'أدخل سعر الشحنة',
-                      labelText: lang.lang == "en"
-                          ? 'Package Price'
-                          : 'سعر الشحنة',
-                      contentPadding: REdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                  ),
+                  _buildPaymentMethodText(lang),
+                  SizedBox(height: 10.h),
+                  _buildActionButtons(lang),
                 ],
-                SizedBox(height: 8.h),
-                _buildInfoRow(
-                  lang.lang == "en"
-                      ? "Shipping Cost: $_orderCost L.E."
-                      : "تكلفة الشحن : $_orderCost جم",
-                  lang.lang == "en"
-                      ? "Package Price: $_orderPrice L.E."
-                      : "سعر الشحنة : $_orderPrice جم",
-                ),
-                SizedBox(height: 6.h),
-                _buildPaymentMethodText(lang),
-                SizedBox(height: 10.h),
-                _buildActionButtons(lang),
-              ],
+              ),
             ),
           ),
         ),

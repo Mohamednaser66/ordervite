@@ -30,6 +30,7 @@ class _SearchScreenState extends State<SearchScreen> {
   String placeaddress = "pick up your address";
   String username = '';
   String email = '';
+  String? id;
   String? token2;
   String? logo_src;
   bool isSignIn = false;
@@ -136,6 +137,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (!mounted) return;
     if (username.isNotEmpty && email.isNotEmpty) {
       setState(() {
+        id =preferences.getString('id');
         token2 = preferences.getString("token") ?? '';
         logo_src = preferences.getString("logo_src") ?? '';
         isSignIn = true;
@@ -267,6 +269,7 @@ class _SearchScreenState extends State<SearchScreen> {
         key: _scaffoldkey,
         backgroundColor: ColorsManager.darkerGreen,
         drawer: SupplierDrawer(
+          id: id??'',
           username: username,
           email: email,
           lang: lang,

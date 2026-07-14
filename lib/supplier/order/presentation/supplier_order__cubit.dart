@@ -6,7 +6,9 @@ import 'package:flutter_maps/config/app_config.dart';
 import 'package:flutter_maps/core/map_utils.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/models/order.dart';
+import 'package:flutter_maps/services/api.dart';
 import 'package:flutter_maps/services/order_repository.dart';
+import 'package:flutter_maps/supplier/models/SuOrdersList.dart';
 import 'package:flutter_maps/supplier/models/finance_config.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:meta/meta.dart';
@@ -15,7 +17,6 @@ part 'supplier_order__state.dart';
 
 class SupplierOrderCubit extends Cubit<SupplierOrderState> {
   final OrderRepository _orderRepository;
-
   Timer? _autoCancelTimer;
   bool _timerStarted = false;
   String? _previousOrderState;
@@ -382,5 +383,20 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
     _autoCancelTimer?.cancel();
     _orderStreamSubscription?.cancel();
     return super.close();
+  }
+  Future<void> getUserOrderList(String supplierId) async {
+    emit(SupplierOrderListLoading());
+
+    try {
+      final result = await Api().fetchUserOrderList(supplierId);
+
+      if (result != null) {
+        emit(SupplierOrderListSuccess(result));
+      } else {
+        emit(SupplierOrderListError("No Data"));
+      }
+    } catch (e) {
+      emit(SupplierOrderListError(e.toString()));
+    }
   }
 }

@@ -80,6 +80,7 @@ class _TermsState extends State<Terms> {
         ),
 
         drawer: SupplierDrawer(
+          id: id??'',
           username: username ?? '',
           email: email ?? '',
           lang: lang,

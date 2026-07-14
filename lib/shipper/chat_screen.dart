@@ -25,6 +25,7 @@ class _ShChatScreenState extends State<ShChatScreen> {
   Chat? _chat;
   Future<List<dynamic>>? _messagesFuture;
   bool _isInitialized = false;
+  bool _isSending = false;
 
   Future<List<dynamic>> _fetchMessages() async {
     final preferences = await SharedPreferences.getInstance();
@@ -204,7 +205,10 @@ class _ShChatScreenState extends State<ShChatScreen> {
 
                   return ListView.builder(
                     controller: _scrollController,
-                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6.w,
+                      vertical: 6.h,
+                    ),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final item = messages[index] as Map<String, dynamic>;
@@ -277,71 +281,95 @@ class _ShChatScreenState extends State<ShChatScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () async {
-                      FocusScope.of(context).unfocus();
+                    onTap: _isSending
+                        ? null
+                        : () async {
+                            FocusScope.of(context).unfocus();
 
-                      final messageText = messageTextEditController.text.trim();
-                      if (messageText.isEmpty || _chat == null) return;
+                            final messageText = messageTextEditController.text
+                                .trim();
+                            if (messageText.isEmpty || _chat == null) return;
 
-                      final preferences = await SharedPreferences.getInstance();
-                      final token = preferences.getString("token");
-                      final chatData = _chat;
+                            final preferences =
+                                await SharedPreferences.getInstance();
+                            final token = preferences.getString("token");
+                            final chatData = _chat;
 
-                      if (token == null || token.isEmpty || chatData == null)
-                        return;
-                      if (chatData.shippier_id == null ||
-                          chatData.shippier_id!.isEmpty)
-                        return;
+                            if (token == null ||
+                                token.isEmpty ||
+                                chatData == null)
+                              return;
+                            if (chatData.shippier_id == null ||
+                                chatData.shippier_id!.isEmpty)
+                              return;
 
-                      try {
-                        final id =
-                            int.tryParse(chatData.conservistion_id) ?? -1;
-                        if (id < 0) return;
+                            setState(() => _isSending = true);
 
-                        final url =
-                            "https://www.ordervite.com/api/shippier/order/messages/store/$id";
-                        await http.post(
-                          Uri.parse(url),
-                          headers: {'Authorization': 'Bearer $token'},
-                          body: {
-                            "user_id": chatData.shippier_id,
-                            "type": "shipper",
-                            "body": messageText,
+                            try {
+                              final id =
+                                  int.tryParse(chatData.conservistion_id) ?? -1;
+                              if (id < 0) return;
+
+                              final url =
+                                  "https://www.ordervite.com/api/shippier/order/messages/store/$id";
+                              await http.post(
+                                Uri.parse(url),
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  'Accept': 'application/json',
+                                  'Authorization': 'Bearer $token',
+                                },
+                                body: jsonEncode({
+                                  "user_id": chatData.shippier_id,
+                                  "type": "shipper",
+                                  "body": messageText,
+                                }),
+                              );
+
+                              final apiToken = chatData.api_token;
+                              final messageId = chatData.conservistion_id;
+                              final notifyUrl =
+                                  "https://www.ordervite.com/api/notify/page/ordervite/you have new message for your order $messageId/$apiToken/1/ordervite/shipper/new message";
+
+                              await http.get(
+                                Uri.parse(notifyUrl),
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  'Accept': 'application/json',
+                                  'Authorization': 'Bearer $token',
+                                },
+                              );
+
+                              messageTextEditController.clear();
+                              setState(() {
+                                _messagesFuture = _fetchMessages();
+                              });
+                            } catch (e) {
+                              debugPrint('Failed to send chat message: $e');
+                            } finally {
+                              if (mounted) {
+                                setState(() => _isSending = false);
+                              }
+                            }
                           },
-                        );
-
-                        final apiToken = chatData.api_token;
-                        final messageId = chatData.conservistion_id;
-                        final notifyUrl =
-                            "https://www.ordervite.com/api/notify/page/ordervite/you have new message for your order $messageId/$apiToken/1/ordervite/shipper/new message";
-
-                        await http.get(
-                          Uri.parse(notifyUrl),
-                          headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'Authorization': 'Bearer $token',
-                          },
-                        );
-
-                        setState(() {
-                          _messagesFuture = _fetchMessages();
-                        });
-                      } catch (e) {
-                        // ignore: avoid_print
-                        print('Failed to send chat message: $e');
-                      }
-
-                      messageTextEditController.clear();
-                    },
                     child: Container(
                       padding: EdgeInsets.all(12.r),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-
                         color: Colors.grey,
                       ),
-                      child: Icon(Icons.send),
+                      child: _isSending
+                          ? SizedBox(
+                              width: 20.w,
+                              height: 20.h,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            )
+                          : Icon(Icons.send),
                     ),
                   ),
                 ],

@@ -82,6 +82,23 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 
+  bool _shouldLoadConfirmedOrderPrice(String state) {
+    return state == 'shipper confirmed' &&
+        _orderNote != null &&
+        _orderNote!.trim().isNotEmpty &&
+        (_orderPrice == null ||
+            _orderPrice!.trim().isEmpty ||
+            _orderPrice!.trim() == '0');
+  }
+
+  String? _extractPriceFromData(Map<String, dynamic> data) {
+    final rawPrice = data['price'] ?? data['order_price'];
+    if (rawPrice == null) return null;
+    final trimmed = rawPrice.toString().trim();
+    if (trimmed.isEmpty || trimmed == '0') return null;
+    return trimmed;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -102,7 +119,7 @@ class _OrderPageState extends State<OrderPage> {
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is! OrderDist) return;
     final orderDist = args;
-    orderType =args.orderType;
+    orderType = args.orderType;
     _isDataLoaded = true;
 
     final prefs = await SharedPreferences.getInstance();
@@ -182,7 +199,13 @@ class _OrderPageState extends State<OrderPage> {
     final stateName = data["state_name"]?.toString();
     if (stateName == null || _token == null) return;
 
-    await _cubit.handleOrderStateMessage(data, _token!);
+    final confirmedShipperId = await _cubit.handleOrderStateMessage(
+      data,
+      _token!,
+    );
+    if (confirmedShipperId != null && confirmedShipperId.isNotEmpty) {
+      _orderShipperId = confirmedShipperId;
+    }
 
     LatLng? newShipperLatLng;
     if (data["sh_latitude"] != null && data["sh_longitude"] != null) {
@@ -206,6 +229,12 @@ class _OrderPageState extends State<OrderPage> {
       if (stateName == "shipper confirmed") {
         _orderShipperId = data["state_type"]?.toString() ?? _orderShipperId;
         _isShipperConfirmed = true;
+        if (_shouldLoadConfirmedOrderPrice(stateName)) {
+          final orderPrice = _extractPriceFromData(data);
+          if (orderPrice != null) {
+            _orderPrice = orderPrice;
+          }
+        }
         _updateShipperPolyline();
       } else if (stateName == "order received") {
         _isShipperReceived = true;
@@ -272,9 +301,9 @@ class _OrderPageState extends State<OrderPage> {
   Future<void> _createOrder(Lang lang) async {
     final orderPrice = _priceController.text.trim().isNotEmpty
         ? _priceController.text.trim()
-        : '0';
+        : null;
 
-    if (orderPrice == '0' && _orderNote == null) {
+    if (orderPrice == null && _orderNote == null) {
       _showSnackBar(
         lang,
         en: 'Please fill all order entries',
@@ -295,7 +324,7 @@ class _OrderPageState extends State<OrderPage> {
       token: _token!,
       supplierId: _userId!,
       size: _packageSize,
-      price: orderPrice,
+      price: orderPrice ?? '0',
       priceCheck: _paymentMethod,
       source: _sourceLatLng!,
       destination: _destinationLatLng!,
@@ -478,6 +507,16 @@ class _OrderPageState extends State<OrderPage> {
 
     setState(() {
       _orderState = state;
+      if (order.shipperId.isNotEmpty) {
+        _orderShipperId = order.shipperId;
+      }
+
+      if (_shouldLoadConfirmedOrderPrice(state) &&
+          order.price != null &&
+          order.price!.trim().isNotEmpty &&
+          order.price!.trim() != '0') {
+        _orderPrice = order.price!.trim();
+      }
 
       if (newShipperLatLng != null) {
         _shipperLatLng = newShipperLatLng;
@@ -507,152 +546,149 @@ class _OrderPageState extends State<OrderPage> {
   @override
   Widget build(BuildContext context) {
     final lang = Lang.of(context);
-    return BlocProvider.value(
-      value: _cubit,
-      child: BlocListener<SupplierOrderCubit, SupplierOrderState>(
-        listener: (context, state) {
-          if (state is SupplierOrderRouteLoaded) {
-            setState(() {
-              _polylines.clear();
-              _polylines.add(
-                Polyline(
-                  polylineId: const PolylineId("route"),
-                  points: state.polylinePoints,
-                  color: Colors.blueAccent,
-                  width: 5,
-                ),
-              );
-              _distance = state.distance;
-            });
-            _animateCamera();
-          }
-          if (state is SupplierOrderCreated) {
-            final order = state.order;
-            setState(() {
-              _isConfirm = true;
-              _orderId = order.id;
-              _orderCost = order.cost;
-              _orderPrice = order.price;
-              _orderPriceCheck = order.priceCheck;
-              _orderState = order.state;
-              _orderShipperId = order.shipperId;
-            });
-            _showSnackBar(
-              lang,
-              en: 'Your order is created successfully, please wait for a shipper confirmation ...',
-              ar: 'تم إنشاء طلبك بنجاح، يُرجى انتظار التأكيد من قِبل مسئول الشحن...',
-              backgroundColor: Colors.green,
-            );
-            if (_userId != null && _token != null)
-              _cubit.listenToCurrentOrder(_userId!, _token!);
-          }
-          if (state is SupplierOrderCurrentLoaded && state.order != null)
-            _updateOrderStateUI(state.order!);
-          if (state is SupplierOrderStatusChanged)
-            _updateOrderStateUI(state.order);
-          if (state is SupplierOrderMessageCountUpdated)
-            setState(() => _unreadMessageCount = state.count);
-          if (state is SupplierOrderError)
-            _showSnackBar(lang, en: state.message, ar: state.message);
-          if (state is SupplierOrderCompleted) _navigateToRating();
-          if (state is SupplierOrderCancelled)
-            _navigateToHome("Order is Canceled", "تم إلغاء الطلب ");
-        },
-        child: WillPopScope(
-          onWillPop: () async {
-            await showDialog(
-              context: context,
-              builder: (c) => AlertDialog(
-                title: Text(
-                  _loc(lang, 'Warning', 'تحذير'),
-                  style: const TextStyle(color: Colors.red),
-                ),
-                content: Text(
-                  _loc(
-                    lang,
-                    'Please you cant exist until order complete',
-                    'من فضلك انتظر حتي يتم اكتمال مراحل الطلب ',
-                  ),
-                  style: const TextStyle(fontSize: 15, color: Colors.red),
-                ),
+    return BlocListener<SupplierOrderCubit, SupplierOrderState>(
+      listener: (context, state) {
+        if (state is SupplierOrderRouteLoaded) {
+          setState(() {
+            _polylines.clear();
+            _polylines.add(
+              Polyline(
+                polylineId: const PolylineId("route"),
+                points: state.polylinePoints,
+                color: Colors.blueAccent,
+                width: 5,
               ),
             );
-            return false;
-          },
-          child: Directionality(
-            textDirection: lang.lang == "en"
-                ? TextDirection.ltr
-                : TextDirection.rtl,
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  lang.lang == "en" ? 'OrderVite' : ' أوردرفيت ',
-                  style: TextStyle(
-                    fontSize: 25.sp,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.normal,
-                    color: Colors.white,
-                  ),
+            _distance = state.distance;
+          });
+          _animateCamera();
+        }
+        if (state is SupplierOrderCreated) {
+          final order = state.order;
+          setState(() {
+            _isConfirm = true;
+            _orderId = order.id;
+            _orderCost = order.cost;
+            _orderPrice = order.price;
+            _orderPriceCheck = order.priceCheck;
+            _orderState = order.state;
+            _orderShipperId = order.shipperId;
+          });
+          _showSnackBar(
+            lang,
+            en: 'Your order is created successfully, please wait for a shipper confirmation ...',
+            ar: 'تم إنشاء طلبك بنجاح، يُرجى انتظار التأكيد من قِبل مسئول الشحن...',
+            backgroundColor: Colors.green,
+          );
+          if (_userId != null && _token != null)
+            _cubit.listenToCurrentOrder(_userId!, _token!);
+        }
+        if (state is SupplierOrderCurrentLoaded && state.order != null)
+          _updateOrderStateUI(state.order!);
+        if (state is SupplierOrderStatusChanged)
+          _updateOrderStateUI(state.order);
+        if (state is SupplierOrderMessageCountUpdated)
+          setState(() => _unreadMessageCount = state.count);
+        if (state is SupplierOrderError)
+          _showSnackBar(lang, en: state.message, ar: state.message);
+        if (state is SupplierOrderCompleted) _navigateToRating();
+        if (state is SupplierOrderCancelled)
+          _navigateToHome("Order is Canceled", "تم إلغاء الطلب ");
+      },
+      child: WillPopScope(
+        onWillPop: () async {
+          await showDialog(
+            context: context,
+            builder: (c) => AlertDialog(
+              title: Text(
+                _loc(lang, 'Warning', 'تحذير'),
+                style: const TextStyle(color: Colors.red),
+              ),
+              content: Text(
+                _loc(
+                  lang,
+                  'Please you cant exist until order complete',
+                  'من فضلك انتظر حتي يتم اكتمال مراحل الطلب ',
                 ),
-                actions: [
-                  NamedIcon(
-                    text: lang.lang == "en" ? 'Chats' : 'محادثات ',
-                    iconData: Icons.message,
-                    order_id: _orderId ?? '',
-                    api_token: _shipperApiToken ?? '',
-                    notificationCount: _unreadMessageCount,
-                    disLat: _destinationLatLng?.latitude.toString(),
-                    disLong: _destinationLatLng?.longitude.toString(),
-                    sorLat: _sourceLatLng?.latitude.toString(),
-                    sorlong: _sourceLatLng?.longitude.toString(),
-                    isConfirm: _isConfirm,
-                    order_cost: _orderCost ?? '',
-                    order_price: _orderPrice ?? '',
-                    order_pricecheck: _orderPriceCheck ?? '',
-                    order_state: _orderState ?? '',
-                    order_supplier_id: _userId ?? '',
-                    order_shippier_id: _orderShipperId,
-                    permission: _isConfirm,
+                style: const TextStyle(fontSize: 15, color: Colors.red),
+              ),
+            ),
+          );
+          return false;
+        },
+        child: Directionality(
+          textDirection: lang.lang == "en"
+              ? TextDirection.ltr
+              : TextDirection.rtl,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(
+                lang.lang == "en" ? 'OrderVite' : ' أوردرفيت ',
+                style: TextStyle(
+                  fontSize: 25.sp,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.normal,
+                  color: Colors.white,
+                ),
+              ),
+              actions: [
+                NamedIcon(
+                  text: lang.lang == "en" ? 'Chats' : 'محادثات ',
+                  iconData: Icons.message,
+                  order_id: _orderId ?? '',
+                  api_token: _shipperApiToken ?? '',
+                  notificationCount: _unreadMessageCount,
+                  disLat: _destinationLatLng?.latitude.toString(),
+                  disLong: _destinationLatLng?.longitude.toString(),
+                  sorLat: _sourceLatLng?.latitude.toString(),
+                  sorlong: _sourceLatLng?.longitude.toString(),
+                  isConfirm: _isConfirm,
+                  order_cost: _orderCost ?? '',
+                  order_price: _orderPrice ?? '',
+                  order_pricecheck: _orderPriceCheck ?? '',
+                  order_state: _orderState ?? '',
+                  order_supplier_id: _userId ?? '',
+                  order_shippier_id: _orderShipperId,
+                  permission: _isConfirm,
+                ),
+              ],
+              automaticallyImplyLeading: false,
+            ),
+            body: InkWell(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+              },
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: _initialCamera != null
+                        ? GoogleMap(
+                            zoomControlsEnabled: true,
+                            scrollGesturesEnabled: true,
+                            zoomGesturesEnabled: true,
+                            initialCameraPosition: _initialCamera!,
+                            markers: _markers,
+                            polylines: _polylines,
+                            onMapCreated: (controller) =>
+                                _mapController.complete(controller),
+                            myLocationButtonEnabled: true,
+                            mapType: MapType.normal,
+                          )
+                        : Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.blue,
+                            ),
+                          ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: !_isConfirm
+                        ? _buildOrderForm(lang)
+                        : _buildOrderStatus(lang),
                   ),
                 ],
-                automaticallyImplyLeading: false,
-              ),
-              body: InkWell(
-                onTap: () {
-                  FocusScope.of(context).unfocus();
-                },
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: _initialCamera != null
-                          ? GoogleMap(
-                              zoomControlsEnabled: true,
-                              scrollGesturesEnabled: true,
-                              zoomGesturesEnabled: true,
-                              initialCameraPosition: _initialCamera!,
-                              markers: _markers,
-                              polylines: _polylines,
-                              onMapCreated: (controller) =>
-                                  _mapController.complete(controller),
-                              myLocationButtonEnabled: true,
-                              mapType: MapType.normal,
-                            )
-                          : Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.blue,
-                              ),
-                            ),
-                    ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: !_isConfirm
-                          ? _buildOrderForm(lang)
-                          : _buildOrderStatus(lang),
-                    ),
-                  ],
-                ),
               ),
             ),
           ),
@@ -668,7 +704,7 @@ class _OrderPageState extends State<OrderPage> {
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.topLeft,
-          colors: [ColorsManager.darkerGreen,ColorsManager.primaryGreen],
+          colors: [ColorsManager.darkerGreen, ColorsManager.primaryGreen],
         ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(18.r),
@@ -681,11 +717,17 @@ class _OrderPageState extends State<OrderPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              orderType=='goods'?const SizedBox.shrink(): _buildSectionTitle(
-                lang.lang == "en" ? 'Choose Package Size ' : 'اختار حجم الطرد ',
-              ),
+              orderType == 'goods'
+                  ? const SizedBox.shrink()
+                  : _buildSectionTitle(
+                      lang.lang == "en"
+                          ? 'Choose Package Size '
+                          : 'اختار حجم الطرد ',
+                    ),
               SizedBox(height: 6.h),
-              orderType=='goods'?const SizedBox.shrink():_buildSizeSelector(),
+              orderType == 'goods'
+                  ? const SizedBox.shrink()
+                  : _buildSizeSelector(),
               SizedBox(height: 6.h),
               _buildSectionTitle(
                 lang.lang == "en"
@@ -701,52 +743,60 @@ class _OrderPageState extends State<OrderPage> {
               SizedBox(height: 6.h),
               _buildPaymentSelector(),
               SizedBox(height: 6.h),
-              orderType=='goods'?const SizedBox.shrink(): _buildSectionTitle(
-                lang.lang == "en"
-                    ? 'Enter Package Price  '
-                    : '  ادخل سعر الطرد  ',
-              ),
+              orderType == 'goods'
+                  ? const SizedBox.shrink()
+                  : _buildSectionTitle(
+                      lang.lang == "en"
+                          ? 'Enter Package Price  '
+                          : '  ادخل سعر الطرد  ',
+                    ),
               SizedBox(height: 6.h),
-              orderType=='goods'?const SizedBox.shrink(): TextFormField(
-                controller: _priceController,
-                keyboardType: TextInputType.number,
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLength: 30,
-                onChanged: (value) => setState(() {}),
-                decoration: InputDecoration(
-                  contentPadding: REdgeInsets.only(top: 20, bottom: 20),
-                  hintText: lang.lang == "en"
-                      ? "Package Price"
-                      : "  سعر الطرد ",
-                  hintStyle: TextStyle(
-                    fontSize: 12.sp,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  fillColor: Colors.white,
-                  filled: true,
-                  prefixIcon: Padding(
-                    padding: REdgeInsets.only(left: 5),
-                    child: Icon(Icons.money, size: 24.sp, color: ColorsManager.primaryGreen),
-                  ),
-                  labelText: lang.lang == "en"
-                      ? "click here to set the price"
-                      : "اضغط هنا لتحديد السعر",
-                  labelStyle: TextStyle(
-                    fontSize: 15.sp,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.r),
-                    borderSide: const BorderSide(color: Colors.black),
-                  ),
-                ),
-              ),
+              orderType == 'goods'
+                  ? const SizedBox.shrink()
+                  : TextFormField(
+                      controller: _priceController,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLength: 30,
+                      onChanged: (value) => setState(() {}),
+                      decoration: InputDecoration(
+                        contentPadding: REdgeInsets.only(top: 20, bottom: 20),
+                        hintText: lang.lang == "en"
+                            ? "Package Price"
+                            : "  سعر الطرد ",
+                        hintStyle: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        fillColor: Colors.white,
+                        filled: true,
+                        prefixIcon: Padding(
+                          padding: REdgeInsets.only(left: 5),
+                          child: Icon(
+                            Icons.money,
+                            size: 24.sp,
+                            color: ColorsManager.primaryGreen,
+                          ),
+                        ),
+                        labelText: lang.lang == "en"
+                            ? "click here to set the price"
+                            : "اضغط هنا لتحديد السعر",
+                        labelStyle: TextStyle(
+                          fontSize: 15.sp,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.r),
+                          borderSide: const BorderSide(color: Colors.black),
+                        ),
+                      ),
+                    ),
               SizedBox(height: 6.h),
               Row(
                 children: [
@@ -835,7 +885,9 @@ class _OrderPageState extends State<OrderPage> {
               child: ElevatedButton(
                 onPressed: () => setState(() => _packageSize = size),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isSelected ? ColorsManager.primaryGreen : Colors.grey,
+                  backgroundColor: isSelected
+                      ? ColorsManager.primaryGreen
+                      : Colors.grey,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
                   ),
@@ -889,7 +941,9 @@ class _OrderPageState extends State<OrderPage> {
               child: ElevatedButton(
                 onPressed: () => setState(() => _paymentMethod = payment),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isSelected ? ColorsManager.primaryGreen : Colors.grey,
+                  backgroundColor: isSelected
+                      ? ColorsManager.primaryGreen
+                      : Colors.grey,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
                   ),
@@ -915,7 +969,7 @@ class _OrderPageState extends State<OrderPage> {
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.topLeft,
-          colors: [ColorsManager.darkerGreen,ColorsManager.primaryGreen],
+          colors: [ColorsManager.darkerGreen, ColorsManager.primaryGreen],
         ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(18.r),

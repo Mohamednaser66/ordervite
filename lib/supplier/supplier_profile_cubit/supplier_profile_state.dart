@@ -10,3 +10,4 @@ final class DeleteSupplierError extends SupplierProfileState {
   DeleteSupplierError({required this.error});
 }
 final class DeleteSupplierLoading extends SupplierProfileState {}
+

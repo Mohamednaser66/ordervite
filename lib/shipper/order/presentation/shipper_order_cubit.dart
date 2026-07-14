@@ -55,7 +55,6 @@ class ShipperOrderCubit extends Cubit<ShipperOrderState> {
     _orderStreamSubscription = null;
   }
 
-
   Future<void> fetchRoute(
     LatLng source,
     LatLng destination,
@@ -137,6 +136,39 @@ class ShipperOrderCubit extends Cubit<ShipperOrderState> {
       }
 
       emit(ShipperOrderCurrentLoaded(responseBody["data"]));
+      return true;
+    } catch (e) {
+      emit(ShipperOrderError(_mapError(e)));
+      return false;
+    }
+  }
+
+  Future<bool> updateOrderPrice({
+    required String orderId,
+    required String token,
+    required String price,
+  }) async {
+    emit(ShipperOrderLoading());
+
+    try {
+      final id = int.parse(orderId);
+      final url = "${AppConfig.baseUrl}/shippier/order_update/$id";
+
+      final response = await http
+          .put(
+            Uri.parse(url),
+            body: {"price": price},
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        emit(ShipperOrderError("Failed to update order price."));
+        return false;
+      }
+
+      final data = jsonDecode(response.body);
+      emit(ShipperOrderCurrentLoaded(data["data"]));
       return true;
     } catch (e) {
       emit(ShipperOrderError(_mapError(e)));

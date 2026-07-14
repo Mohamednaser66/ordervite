@@ -15,6 +15,7 @@ import 'package:flutter_maps/supplier/chat_screen.dart';
 import 'package:flutter_maps/supplier/home_page/home_page.dart';
 import 'package:flutter_maps/supplier/authantication/login.dart';
 import 'package:flutter_maps/supplier/order.dart';
+import 'package:flutter_maps/supplier/orderList.dart';
 import 'package:flutter_maps/supplier/products/presantation/cart.dart';
 import 'package:flutter_maps/supplier/profile.dart';
 import 'package:flutter_maps/supplier/authantication/register.dart';
@@ -54,9 +55,18 @@ class RoutesManager {
   static const String landingPage = '/landingPage';
   static const String productsScreen = '/productsScreen';
   static const String otpScreen = '/otpScreen';
+  static const String userOrderList = '/userOrderList';
 
   static Map<String, WidgetBuilder> router = {
     login: (_) => LogIn(),
+    userOrderList:  (context) {
+  final supplierId =
+  ModalRoute.of(context)!.settings.arguments as String;
+
+  return UserOrderList(
+  supplierId: supplierId,
+  );
+  },
     otpScreen: (_) => OtpScreen(verificationId: '', role: '',),
     registerWithPhone: (_) => RegisterWithPhone(),
     cart: (_) {

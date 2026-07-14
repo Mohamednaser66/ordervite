@@ -358,10 +358,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   children: [
                     Expanded(
                       child: ChoiceChip(
-                        label: Text(isEnglish ? 'New Cairo' : 'مصر الجديدة'),
-                        selected: selectedArea == 'new_cairo',
+                        label: Text(isEnglish ? "Heliopolis" : 'مصر الجديدة'),
+                        selected: selectedArea == "Heliopolis" ,
                         onSelected: (_) =>
-                            setState(() => selectedArea = 'new_cairo'),
+                            setState(() => selectedArea = "Heliopolis" ),
                       ),
                     ),
                   ],
