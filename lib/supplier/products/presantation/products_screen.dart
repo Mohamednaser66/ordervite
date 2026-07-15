@@ -310,6 +310,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     },
                   ),
                 ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                   Navigator.pushNamed(context, RoutesManager.goodsScreen);
+
+
+                    },
+                    icon: const Icon(Icons.inventory_2),
+                    label:  Text(
+                        isEnglish?"Goods List":"قائمة المنتجات"),
+                  ),
+                ),
                 SizedBox(height: 24.h),
                 Text(
                   isEnglish ? 'Your order details' : 'تفاصيل الطلب',

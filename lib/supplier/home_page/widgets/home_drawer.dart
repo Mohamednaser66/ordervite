@@ -102,7 +102,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
                   Navigator.of(context).pushNamedAndRemoveUntil(RoutesManager.suHome,(route) => false,),
             ),
             ListTile(
-              leading: Icon(Icons.card_travel, color: ColorsManager.primaryGreen),
+              leading: Icon(Icons.shopping_cart, color: ColorsManager.primaryGreen),
               title: Text(
                 widget.lang.lang == "en" ? 'Products ' : ' المنتجات  ',
                 style: TextStyle(
@@ -129,7 +129,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
 
             ),
             ListTile(
-              leading: Icon(Icons.card_travel, color: ColorsManager.primaryGreen),
+              leading: Icon(Icons.person_rounded, color: ColorsManager.primaryGreen),
               title: Text(
                 widget.lang.lang == "en" ? 'Profile ' : ' الملف الشخصي ',
                 style: TextStyle(

@@ -17,6 +17,7 @@ import 'package:flutter_maps/supplier/authantication/login.dart';
 import 'package:flutter_maps/supplier/order.dart';
 import 'package:flutter_maps/supplier/orderList.dart';
 import 'package:flutter_maps/supplier/products/presantation/cart.dart';
+import 'package:flutter_maps/supplier/products/presantation/goods_list_screen.dart';
 import 'package:flutter_maps/supplier/profile.dart';
 import 'package:flutter_maps/supplier/authantication/register.dart';
 import 'package:flutter_maps/supplier/review.dart';
@@ -56,6 +57,7 @@ class RoutesManager {
   static const String productsScreen = '/productsScreen';
   static const String otpScreen = '/otpScreen';
   static const String userOrderList = '/userOrderList';
+  static const String goodsScreen = '/goodsScreen';
 
   static Map<String, WidgetBuilder> router = {
     login: (_) => LogIn(),
@@ -69,6 +71,7 @@ class RoutesManager {
   },
     otpScreen: (_) => OtpScreen(verificationId: '', role: '',),
     registerWithPhone: (_) => RegisterWithPhone(),
+    goodsScreen: (_) => GoodsListScreen(),
     cart: (_) {
       return Cart();
     },
