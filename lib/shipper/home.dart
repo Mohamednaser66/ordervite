@@ -451,7 +451,6 @@ class _SHHomePageState extends State<SHHomePage> {
     final preferences = await SharedPreferences.getInstance();
     final lang = Lang.of(context);
     token = preferences.getString('token');
-
     if (token == null) {
       debugPrint('Daily orders prevented: missing auth token.');
       return null;
@@ -567,6 +566,7 @@ class _SHHomePageState extends State<SHHomePage> {
             email: email ?? '',
             lang: lang,
             isSignIn: isSignIn,
+            id: id??'',
           ),
           appBar: AppBar(
             title: Text(

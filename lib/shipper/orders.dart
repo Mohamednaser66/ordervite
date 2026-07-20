@@ -186,7 +186,7 @@ class _ShOrdersState extends State<ShOrders> {
           username: _username ?? '',
           email: _email ?? '',
           lang: lang,
-          isSignIn: _isSignIn,
+          isSignIn: _isSignIn, id: _id??'',
         ),
         appBar: AppBar(
           title: Text(
@@ -299,7 +299,9 @@ class _ShOrdersState extends State<ShOrders> {
                       order["supplier_id"]?.toString() ?? '',
                       orderNote: orderNote?.trim().isNotEmpty == true
                           ? orderNote
-                          : null,
+                          : null, destinationAddress: order["destination_address"], sourceAddress: order["source_address"],
+
+
                     );
                     Navigator.pushNamed(
                       context,

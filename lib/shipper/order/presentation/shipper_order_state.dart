@@ -43,4 +43,16 @@ final class ShipperOrderError extends ShipperOrderState {
   final String message;
 
   ShipperOrderError(this.message);
+}class SupplierOrderListLoading extends ShipperOrderState {}
+
+class ShipperOrderListSuccess extends ShipperOrderState {
+  final ShipperOrdersList orders;
+
+  ShipperOrderListSuccess(this.orders);
+}
+
+class ShipperOrderListError extends ShipperOrderState {
+  final String message;
+
+  ShipperOrderListError(this.message);
 }

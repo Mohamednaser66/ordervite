@@ -1,4 +1,4 @@
-import 'dart:async';
+ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -142,7 +142,7 @@ class _ShChatScreenState extends State<ShChatScreen> {
                 chatData.order_price.toString(),
                 chatData.order_pricecheck.toString(),
                 chatData.order_state.toString(),
-                chatData.order_supplier_id.toString(),
+                chatData.order_supplier_id.toString(), destinationAddress: chatData.destinationAddress, sourceAddress: chatData.sourceAddress,orderNote: chatData.order_note,
               );
 
               Navigator.pushNamed(

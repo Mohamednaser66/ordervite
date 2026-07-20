@@ -177,7 +177,7 @@ class _LandingPageState extends State<LandingPage> {
         data['supplier_id']?.toString() ?? '',
         orderNote: data['order_note']?.toString().trim().isNotEmpty == true
             ? data['order_note'].toString()
-            : null,
+            : null, destinationAddress: data["destination_address"], sourceAddress: data["source_address"],
       );
 
       WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -5,8 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:flutter_maps/config/app_config.dart';
+import 'package:flutter_maps/core/app_validators.dart';
 import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_maps/core/map_utils.dart';
+import 'package:flutter_maps/core/widgets/custom_text_form_field.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/models/order.dart';
 import 'package:flutter_maps/services/order_repository.dart';
@@ -55,6 +57,9 @@ class _OrderPageState extends State<OrderPage> {
   bool _isConfirmOrder = false;
   String? _distance;
   String? orderType;
+  late TextEditingController destinationAddressController ;
+   TextEditingController? sourceAddressController ;
+  final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _priceController = TextEditingController();
   String _packageSize = 'small';
@@ -81,7 +86,36 @@ class _OrderPageState extends State<OrderPage> {
       ),
     );
   }
+  static String? validateSourceAddress(String? value, String lang) {
+    if (value == null || value.trim().isEmpty) {
+      return lang == 'en'
+          ? "Please enter the source address."
+          : "يرجى إدخال عنوان الاستلام.";
+    }
 
+    if (value.trim().length < 10) {
+      return lang == 'en'
+          ? "Please enter a complete source address."
+          : "يرجى إدخال عنوان استلام كامل.";
+    }
+
+    return null;
+  }
+  static String? validateDestinationAddress(String? value, String lang) {
+    if (value == null || value.trim().isEmpty) {
+      return lang == 'en'
+          ? "Please enter the destination address."
+          : "يرجى إدخال عنوان الوجهة.";
+    }
+
+    if (value.trim().length < 10) {
+      return lang == 'en'
+          ? "Please enter a complete destination address."
+          : "يرجى إدخال عنوان وجهة كامل.";
+    }
+
+    return null;
+  }
   bool _shouldLoadConfirmedOrderPrice(String state) {
     return state == 'shipper confirmed' &&
         _orderNote != null &&
@@ -105,6 +139,8 @@ class _OrderPageState extends State<OrderPage> {
     _cubit = SupplierOrderCubit(_orderRepository);
     _locationTracker.requestPermission();
     _initializeFcm();
+    destinationAddressController =TextEditingController();
+    sourceAddressController =TextEditingController();
   }
 
   @override
@@ -147,6 +183,7 @@ class _OrderPageState extends State<OrderPage> {
       );
       _initialCamera = CameraPosition(target: _sourceLatLng!, zoom: 17.0);
     });
+
 
     _markers.addAll([
       Marker(
@@ -330,6 +367,8 @@ class _OrderPageState extends State<OrderPage> {
       destination: _destinationLatLng!,
       distance: _distance ?? '0.0',
       orderNote: _orderNote,
+      destinationAddress: destinationAddressController.text,
+      sourceAddress: sourceAddressController?.text
     );
   }
 
@@ -649,7 +688,7 @@ class _OrderPageState extends State<OrderPage> {
                   order_state: _orderState ?? '',
                   order_supplier_id: _userId ?? '',
                   order_shippier_id: _orderShipperId,
-                  permission: _isConfirm,
+                  permission: _isConfirm, orderNote: _orderNote??'', destinationAddress: destinationAddressController.text, sourceAddress: sourceAddressController?.text??'',
                 ),
               ],
               automaticallyImplyLeading: false,
@@ -711,143 +750,190 @@ class _OrderPageState extends State<OrderPage> {
           topRight: Radius.circular(18.r),
         ),
       ),
-      child: Padding(
-        padding: REdgeInsets.symmetric(horizontal: 24, vertical: 18),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              orderType == 'goods'
-                  ? const SizedBox.shrink()
-                  : _buildSectionTitle(
-                      lang.lang == "en"
-                          ? 'Choose Package Size '
-                          : 'اختار حجم الطرد ',
-                    ),
-              SizedBox(height: 6.h),
-              orderType == 'goods'
-                  ? const SizedBox.shrink()
-                  : _buildSizeSelector(),
-              SizedBox(height: 6.h),
-              _buildSectionTitle(
-                lang.lang == "en"
-                    ? 'Distance: $_distance km'
-                    : 'المسافة: $_distance كم',
-              ),
-              SizedBox(height: 6.h),
-              _buildSectionTitle(
-                lang.lang == "en"
-                    ? 'Choose Payment Method'
-                    : ' اختر  نظام الدفع  ',
-              ),
-              SizedBox(height: 6.h),
-              _buildPaymentSelector(),
-              SizedBox(height: 6.h),
-              orderType == 'goods'
-                  ? const SizedBox.shrink()
-                  : _buildSectionTitle(
-                      lang.lang == "en"
-                          ? 'Enter Package Price  '
-                          : '  ادخل سعر الطرد  ',
-                    ),
-              SizedBox(height: 6.h),
-              orderType == 'goods'
-                  ? const SizedBox.shrink()
-                  : TextFormField(
-                      controller: _priceController,
-                      keyboardType: TextInputType.number,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
+      child: Form(
+        key: _formKey,
+        child: Padding(
+          padding: REdgeInsets.symmetric(horizontal: 24, vertical: 18),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                orderType == 'goods'
+                    ? const SizedBox.shrink()
+                    : _buildSectionTitle(
+                        lang.lang == "en"
+                            ? 'Choose Package Size '
+                            : 'اختار حجم الطرد ',
                       ),
-                      maxLength: 30,
-                      onChanged: (value) => setState(() {}),
-                      decoration: InputDecoration(
-                        contentPadding: REdgeInsets.only(top: 20, bottom: 20),
-                        hintText: lang.lang == "en"
-                            ? "Package Price"
-                            : "  سعر الطرد ",
-                        hintStyle: TextStyle(
-                          fontSize: 12.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        fillColor: Colors.white,
-                        filled: true,
-                        prefixIcon: Padding(
-                          padding: REdgeInsets.only(left: 5),
-                          child: Icon(
-                            Icons.money,
-                            size: 24.sp,
-                            color: ColorsManager.primaryGreen,
-                          ),
-                        ),
-                        labelText: lang.lang == "en"
-                            ? "click here to set the price"
-                            : "اضغط هنا لتحديد السعر",
-                        labelStyle: TextStyle(
+                SizedBox(height: 6.h),
+                orderType == 'goods'
+                    ? const SizedBox.shrink()
+                    : _buildSizeSelector(),
+                SizedBox(height: 6.h),
+                _buildSectionTitle(
+                  lang.lang == "en"
+                      ? 'Distance: $_distance km'
+                      : 'المسافة: $_distance كم',
+                ),
+                SizedBox(height: 6.h),
+                _buildSectionTitle(
+                  lang.lang == "en"
+                      ? 'Choose Payment Method'
+                      : ' اختر  نظام الدفع  ',
+                ),
+                SizedBox(height: 6.h),
+                _buildPaymentSelector(),
+                SizedBox(height: 6.h,),
+                orderType== 'goods'?const SizedBox.shrink():
+                    Text(lang.lang=='en'?"Street Name - Building Number - Floor - Unit Number":"اسم الشارع - رقم المبنى - الدور - رقم الوحدة"),
+                SizedBox(height: 6.h,),
+                orderType== 'goods'?const SizedBox.shrink():
+                CustomTextFormField(controller: sourceAddressController!,validation:(value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return lang.lang == 'en'
+                        ? "Please enter the source address."
+                        : "يرجى إدخال عنوان الاستلام.";
+                  }
+
+                  if (value.trim().length < 10) {
+                    return lang.lang == 'en'
+                        ? "Please enter a complete source address."
+                        : "يرجى إدخال عنوان استلام كامل.";
+                  }
+
+                  return null;
+                }, icon: Icon(Icons.location_on_sharp ,color: ColorsManager.primaryGreen,),
+                    hintText:lang.lang=='en'?"Please enter the source address.":"يرجى إدخال عنوان الاستلام." ,
+                    lable:lang.lang=='en'?"Please enter the source address.":"يرجى إدخال عنوان الاستلام." ),
+                SizedBox(height: 6.h,),
+                Text(lang.lang=='en'?"Street Name - Building Number - Floor - Unit Number":"اسم الشارع - رقم المبنى - الدور - رقم الوحدة"),
+                SizedBox(height: 6.h,),
+                CustomTextFormField(controller: destinationAddressController,
+                    validation: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return lang.lang == 'en'
+                            ? "Please enter the destination address."
+                            : "يرجى إدخال عنوان الوجهة.";
+                      }
+
+                      if (value.trim().length < 10) {
+                        return lang.lang == 'en'
+                            ? "Please enter a complete destination address."
+                            : "يرجى إدخال عنوان وجهة كامل.";
+                      }
+
+                      return null;
+                    },
+                    icon: Icon(Icons.location_on_sharp ,color: ColorsManager.primaryGreen,),
+                    hintText:lang.lang=='en'?"Please enter the destination address.":"يرجى إدخال عنوان التسليم." ,
+                    lable:lang.lang=='en'?"Please enter the destination address.":"يرجى إدخال عنوان التسليم." ),
+                SizedBox(height: 6.h),
+                orderType == 'goods'
+                    ? const SizedBox.shrink()
+                    : _buildSectionTitle(
+                        lang.lang == "en"
+                            ? 'Enter Package Price  '
+                            : '  ادخل سعر الطرد  ',
+                      ),
+                SizedBox(height: 6.h),
+                orderType == 'goods'
+                    ? const SizedBox.shrink()
+                    : TextFormField(
+                        controller: _priceController,
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
                           fontSize: 15.sp,
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.r),
-                          borderSide: const BorderSide(color: Colors.black),
-                        ),
-                      ),
-                    ),
-              SizedBox(height: 6.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 34.h,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _createOrder(lang),
-                        icon: Icon(Icons.done_all, size: 20.sp),
-                        label: Text(
-                          lang.lang == "en" ? "Confirm" : "تأكيد ",
-                          style: TextStyle(
+                        maxLength: 30,
+                        onChanged: (value) => setState(() {}),
+                        decoration: InputDecoration(
+                          contentPadding: REdgeInsets.only(top: 20, bottom: 20),
+                          hintText: lang.lang == "en"
+                              ? "Package Price"
+                              : "  سعر الطرد ",
+                          hintStyle: TextStyle(
                             fontSize: 12.sp,
-                            color: Colors.white,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          fillColor: Colors.white,
+                          filled: true,
+                          prefixIcon: Padding(
+                            padding: REdgeInsets.only(left: 5),
+                            child: Icon(
+                              Icons.money,
+                              size: 24.sp,
+                              color: ColorsManager.primaryGreen,
+                            ),
+                          ),
+                          labelText: lang.lang == "en"
+                              ? "click here to set the price"
+                              : "اضغط هنا لتحديد السعر",
+                          labelStyle: TextStyle(
+                            fontSize: 15.sp,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.r),
+                            borderSide: const BorderSide(color: Colors.black),
                           ),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorsManager.primaryGreen,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
+                      ),
+                SizedBox(height: 6.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 34.h,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _createOrder(lang),
+                          icon: Icon(Icons.done_all, size: 20.sp),
+                          label: Text(
+                            lang.lang == "en" ? "Confirm" : "تأكيد ",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorsManager.primaryGreen,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 40.w),
-                  Expanded(
-                    child: SizedBox(
-                      height: 34.h,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _showCancelDialog(lang),
-                        icon: Icon(Icons.cancel, size: 20.sp),
-                        label: Text(
-                          lang.lang == "en" ? "Cancel" : "إلغاء",
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: Colors.white,
+                    SizedBox(width: 40.w),
+                    Expanded(
+                      child: SizedBox(
+                        height: 34.h,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _showCancelDialog(lang),
+                          icon: Icon(Icons.cancel, size: 20.sp),
+                          label: Text(
+                            lang.lang == "en" ? "Cancel" : "إلغاء",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

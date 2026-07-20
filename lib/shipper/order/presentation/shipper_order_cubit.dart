@@ -8,6 +8,7 @@ import 'package:flutter_maps/core/map_utils.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/api.dart';
 import 'package:flutter_maps/services/realtime_service.dart';
+import 'package:flutter_maps/shipper/models/ShipperOrdersList.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
@@ -441,4 +442,20 @@ class ShipperOrderCubit extends Cubit<ShipperOrderState> {
     _orderStreamSubscription?.cancel();
     return super.close();
   }
+  Future<void> getShipperOrdersList(String shipperId) async {
+    emit(SupplierOrderListLoading());
+
+    try {
+      final result = await Api().fetchShipperOrderList(shipperId);
+
+      if (result != null) {
+        emit(ShipperOrderListSuccess(result));
+      } else {
+        emit(ShipperOrderListError("No Data"));
+      }
+    } catch (e) {
+      emit(ShipperOrderListError(e.toString()));
+    }
+  }
+
 }

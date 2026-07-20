@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_maps/core/constant_manager.dart';
+import 'package:flutter_maps/shipper/models/ShipperOrdersList.dart';
 import 'package:path/path.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,9 +20,6 @@ class Api {
   Future<SuOrdersList?> fetchUserOrderList(String supplierId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-
-    print("SupplierId = $supplierId");
-    print("Token = $token");
     if (token == null || token.isEmpty) return null;
 
     try {
@@ -35,11 +33,48 @@ class Api {
         },
       );
 
+      if (response.statusCode == 200) {
+        return SuOrdersList.fromJson(jsonDecode(response.body));
+      } else {
+        print(response.body);
+      }
+    } catch (e) {
+      print('Error fetching user order list: $e');
+    }
+
+    return null;
+  }
+  Future<ShipperOrdersList?> fetchShipperOrderList(String shipperId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final url = 'https://www.ordervite.com/api/shippier/$shipperId/orders';
+    print(url);
+    if (token == null || token.isEmpty) return null;
+
+    try {
+      print(url);
+      print("ID = $shipperId");
+      print("Token = $token");
+      print({
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      });
+      final response = await http.get(
+        Uri.parse(
+            "https://www.ordervite.com/api/shippier/$shipperId/orders",
+        ),
+
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
       print("Status Code = ${response.statusCode}");
       print("Body = ${response.body}");
 
       if (response.statusCode == 200) {
-        return SuOrdersList.fromJson(jsonDecode(response.body));
+        return ShipperOrdersList.fromJson(jsonDecode(response.body));
       } else {
         print(response.body);
       }

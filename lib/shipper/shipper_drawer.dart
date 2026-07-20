@@ -13,11 +13,12 @@ class ShipperDrawer extends StatefulWidget {
     this.logo_src,
     required this.email,
     required this.lang,
-    required this.isSignIn,
+    required this.isSignIn, required this.id,
   });
   final String username;
   String? logo_src;
   final String email;
+  final String id;
   final Lang lang;
   final bool isSignIn;
 
@@ -121,8 +122,22 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               ),
 
               onTap: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(RoutesManager.shOrders,(route) => false,);
+                Navigator.of(context).pushNamedAndRemoveUntil(RoutesManager.shipperOrdersScreen,(route) => false,);
               },
+            ),
+            ListTile(
+              leading: Icon(Icons.card_travel, color: ColorsManager.primaryGreen),
+              title: Text(
+                widget.lang.lang == "en" ? 'Orders History ' :  "سجل الطلبات" ,
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(RoutesManager.shipperOrdersScreen,arguments: widget.id),
+
             ),
             ListTile(
               leading: Icon(Icons.card_travel, color: ColorsManager.primaryGreen),

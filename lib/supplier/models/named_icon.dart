@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NamedIcon extends StatelessWidget {
   final IconData iconData;
-  final String text;
+  final String text,orderNote,destinationAddress,sourceAddress;
   final int? notificationCount;
   final String? api_token, order_id, disLat, sorLat, disLong, sorlong;
   final bool? isConfirm, permission;
@@ -35,7 +35,7 @@ class NamedIcon extends StatelessWidget {
     this.order_state,
     this.order_supplier_id,
     this.order_shippier_id,
-    this.order_id,
+    this.order_id, required this.orderNote, required this.destinationAddress, required this.sourceAddress,
   });
 
   @override
@@ -71,7 +71,7 @@ class NamedIcon extends StatelessWidget {
             order_pricecheck ?? '',
             order_state ?? '',
             order_supplier_id ?? '',
-            order_shippier_id ?? '',
+            order_shippier_id ?? '', order_note: '', destinationAddress: '', sourceAddress: '',
           );
 
           Navigator.pushNamed(

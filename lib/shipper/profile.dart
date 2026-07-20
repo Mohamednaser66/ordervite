@@ -42,7 +42,7 @@ class _CreatProfileState extends State<SHProfilePage> {
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
   String? username;
   String? email;
-  late String id;
+   String? id;
   late String token;
   String? logo_src;
   String? id_image_src;
@@ -64,6 +64,16 @@ class _CreatProfileState extends State<SHProfilePage> {
 
     email = preferences.getString("email");
 
+    final savedId = preferences.getString("id");
+    final savedToken = preferences.getString("token");
+    if (savedId == null || savedToken == null) {
+      return;
+    }
+
+    id = savedId;
+    token = savedToken;
+
+
     if (username != null && email != null) {
       if (!mounted) return;
       setState(() {
@@ -72,7 +82,11 @@ class _CreatProfileState extends State<SHProfilePage> {
 
         token = preferences.getString("token")!;
         id = preferences.getString("id")!;
-
+        if (mounted) {
+          setState(() {
+            isSignIn = username != null && email != null;
+          });
+        }
         isSignIn = true;
       });
     }
@@ -191,7 +205,7 @@ class _CreatProfileState extends State<SHProfilePage> {
             username: username ?? '',
             email: email ?? '',
             lang: lang,
-            isSignIn: isSignIn,
+            isSignIn: isSignIn, id: id??'',
           ),
 
           appBar: AppBar(
@@ -552,7 +566,7 @@ class _CreatProfileState extends State<SHProfilePage> {
                           _username.text,
                           _email.text,
                           this.token,
-                          this.id,
+                          this.id??'',
                           'shipper',
                           this.logo_src ?? '',
                           this.id_image_src ?? '',

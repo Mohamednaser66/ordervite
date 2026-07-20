@@ -11,6 +11,8 @@ class OrderData {
   final String order_state;
   final String order_supplier_id;
   final String? orderNote;
+  final String destinationAddress;
+  final String sourceAddress;
 
   OrderData(
     this.disLat,
@@ -24,7 +26,7 @@ class OrderData {
     this.order_pricecheck,
     this.order_state,
     this.order_supplier_id, {
-    this.orderNote,
+    this.orderNote, required this.destinationAddress, required this.sourceAddress,
   });
 }
 
@@ -35,7 +37,8 @@ class OrderDist {
   final String sorlong;
 
   final bool isConfirm;
-
+ String? sourceAddress;
+ final String? destinationAddress;
   final String? order_id;
   final String? order_cost;
   final String? order_price;
@@ -46,6 +49,7 @@ class OrderDist {
   final String? orderType;
 
   OrderDist(
+
     this.disLat,
     this.sorLat,
     this.disLong,
@@ -59,6 +63,7 @@ class OrderDist {
     this.order_shippier_id, {
     this.orderNote,
     this.orderType,
+         this.sourceAddress, this.destinationAddress
   });
 }
 
@@ -96,6 +101,10 @@ class Chat {
   final String order_shippier_id;
 
   final String order_supplier_id;
+  final String order_note;
+  final String destinationAddress;
+  final String sourceAddress;
+
 
   Chat(
     this.conservistion_id,
@@ -115,6 +124,6 @@ class Chat {
     this.order_pricecheck,
     this.order_state,
     this.order_supplier_id,
-    this.order_shippier_id,
+    this.order_shippier_id, {required this.order_note, required this.destinationAddress, required this.sourceAddress}
   );
 }

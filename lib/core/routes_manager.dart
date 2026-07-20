@@ -11,6 +11,7 @@ import 'package:flutter_maps/shipper/order.dart';
 import 'package:flutter_maps/shipper/orders.dart';
 import 'package:flutter_maps/shipper/profile.dart';
 import 'package:flutter_maps/shipper/authantication/register.dart';
+import 'package:flutter_maps/shipper/shipper_history_screen.dart';
 import 'package:flutter_maps/supplier/chat_screen.dart';
 import 'package:flutter_maps/supplier/home_page/home_page.dart';
 import 'package:flutter_maps/supplier/authantication/login.dart';
@@ -58,6 +59,7 @@ class RoutesManager {
   static const String otpScreen = '/otpScreen';
   static const String userOrderList = '/userOrderList';
   static const String goodsScreen = '/goodsScreen';
+  static const String shipperOrdersScreen = '/shipperOrderScreen';
 
   static Map<String, WidgetBuilder> router = {
     login: (_) => LogIn(),
@@ -67,6 +69,14 @@ class RoutesManager {
 
   return UserOrderList(
   supplierId: supplierId,
+  );
+  },
+    shipperOrdersScreen:  (context) {
+  final shipperId =
+  ModalRoute.of(context)!.settings.arguments as String;
+
+  return ShipperHistoryScreen(
+  shipperId: shipperId,
   );
   },
     otpScreen: (_) => OtpScreen(verificationId: '', role: '',),

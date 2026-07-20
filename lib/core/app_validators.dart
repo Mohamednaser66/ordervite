@@ -1,6 +1,7 @@
 
 class AppValidators {
   AppValidators._();
+
   static String? minLength(
       String? value,
       int length,
@@ -115,6 +116,36 @@ class AppValidators {
     } else {
       return null;
     }
+  }
+ static String? validateSourceAddress(String? value, String lang) {
+    if (value == null || value.trim().isEmpty) {
+      return lang == 'en'
+          ? "Please enter the source address."
+          : "يرجى إدخال عنوان الاستلام.";
+    }
+
+    if (value.trim().length < 10) {
+      return lang == 'en'
+          ? "Please enter a complete source address."
+          : "يرجى إدخال عنوان استلام كامل.";
+    }
+
+    return null;
+  }
+ static String? validateDestinationAddress(String? value, String lang) {
+    if (value == null || value.trim().isEmpty) {
+      return lang == 'en'
+          ? "Please enter the destination address."
+          : "يرجى إدخال عنوان الوجهة.";
+    }
+
+    if (value.trim().length < 10) {
+      return lang == 'en'
+          ? "Please enter a complete destination address."
+          : "يرجى إدخال عنوان وجهة كامل.";
+    }
+
+    return null;
   }
 
 

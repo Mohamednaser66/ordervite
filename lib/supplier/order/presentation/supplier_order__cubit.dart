@@ -21,7 +21,6 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
   bool _timerStarted = false;
   String? _previousOrderState;
   StreamSubscription<Order?>? _orderStreamSubscription;
-
   SupplierOrderCubit(this._orderRepository) : super(SupplierOrderInitial());
 
   Future<void> fetchRoute(
@@ -98,6 +97,8 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
     required LatLng source,
     required LatLng destination,
     required String distance,
+    required String destinationAddress,
+    String? sourceAddress,
     String? orderNote,
     double? preCalculatedCost,
   }) async {
@@ -117,6 +118,8 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
 
       final orderData = _buildOrderData(
         supplierId: supplierId,
+        destinationAddress:destinationAddress ,
+        sourceAddress: sourceAddress,
         calculatedCost: calculatedCost,
         size: size,
         price: price,
@@ -151,6 +154,8 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
     required String distance,
     required FinanceConfig financeConfig,
     String? orderNote,
+    required String destinationAddress,
+    String? sourceAddress,
   }) {
     final commission = financeConfig.calculateCommission(calculatedCost);
     final shipperPay = calculatedCost - commission;
@@ -161,6 +166,8 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
       "size": size,
       "price": price,
       "order_state": "new",
+      "destination_address":destinationAddress,
+      "source_address":sourceAddress,
       "pricecheck": priceCheck,
       "so_longitude": source.longitude.toString(),
       "so_latitude": source.latitude.toString(),

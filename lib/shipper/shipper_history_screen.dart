@@ -1,32 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_maps/classes.dart';
-import 'package:flutter_maps/supplier/order/presentation/supplier_order__cubit.dart';
+import 'package:flutter_maps/shipper/order/presentation/shipper_order_cubit.dart';
+import 'package:flutter_maps/shipper/sh_orders_details.dart';
 import 'package:flutter_maps/supplier/order_details.dart';
+import 'package:flutter_maps/core/colors_manager.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../core/routes_manager.dart';
-import '../../core/colors_manager.dart';
-import '../../widgets/style.dart';
+class ShipperHistoryScreen extends StatefulWidget {
+  final String shipperId;
 
-class UserOrderList extends StatefulWidget {
-  final String supplierId;
-
-  const UserOrderList({
+  const ShipperHistoryScreen({
     super.key,
-    required this.supplierId,
+    required this.shipperId,
   });
 
   @override
-  State<UserOrderList> createState() => _UserOrderListState();
+  State<ShipperHistoryScreen> createState() => _ShipperHistoryScreenState();
 }
 
-class _UserOrderListState extends State<UserOrderList> {
+class _ShipperHistoryScreenState extends State<ShipperHistoryScreen> {
   @override
   void initState() {
     super.initState();
 
-    context.read<SupplierOrderCubit>().getUserOrderList(widget.supplierId);
+    context.read<ShipperOrderCubit>().getShipperOrdersList(widget.shipperId);
   }
 
   @override
@@ -35,21 +32,23 @@ class _UserOrderListState extends State<UserOrderList> {
       appBar: AppBar(
         title: const Text("Orders"),
       ),
-      body: BlocBuilder<SupplierOrderCubit, SupplierOrderState>(
+      body: BlocBuilder<ShipperOrderCubit, ShipperOrderState>(
         builder: (context, state) {
-          if (state is SupplierOrderListLoading) {
-            return  Center(
-              child: CircularProgressIndicator( color: ColorsManager.primaryGreen,),
+          if (state is ShipperOrderLoading) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: ColorsManager.primaryGreen,
+              ),
             );
           }
 
-          if (state is SupplierOrderListError) {
+          if (state is ShipperOrderListError) {
             return Center(
               child: Text(state.message),
             );
           }
 
-          if (state is SupplierOrderListSuccess) {
+          if (state is ShipperOrderListSuccess) {
             if (state.orders.data == null ||
                 state.orders.data!.isEmpty) {
               return const Center(
@@ -67,7 +66,7 @@ class _UserOrderListState extends State<UserOrderList> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => OrderDetailsScreen.SuOrderDetailsScreen(
+                        builder: (_) => ShipperOrderDetailsScreen(
                           order: order,
                         ),
                       ),

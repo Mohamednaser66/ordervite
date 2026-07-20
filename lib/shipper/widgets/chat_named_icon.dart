@@ -11,6 +11,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class ChatNamedIcon extends StatelessWidget {
   final IconData iconData;
   final String text;
+  final String sourceAddress;
+  final String destination;
+  final String orderNote;
   final int? notificationCount;
   final String? api_token;
   final String? order_id;
@@ -47,7 +50,7 @@ class ChatNamedIcon extends StatelessWidget {
     this.order_state,
     this.order_supplier_id,
     this.order_shippier_id,
-    this.order_id,
+    this.order_id, required this.sourceAddress, required this.destination, required this.orderNote,
   }) : super(key: key);
 
   @override
@@ -84,7 +87,7 @@ class ChatNamedIcon extends StatelessWidget {
           order_pricecheck ?? "",
           order_state ?? "",
           order_supplier_id ?? "",
-          order_shippier_id ?? "",
+          order_shippier_id ?? "", order_note: '', destinationAddress: '', sourceAddress: '',
         );
 
         Navigator.pushNamed(

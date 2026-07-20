@@ -39,7 +39,8 @@ class _ShOrderState extends State<ShOrder> {
   LatLng _destinationLatLong = const LatLng(30.060671, 31.204131);
   LatLng? _currentLatLong;
   LatLng? _lastUpdatedLocation;
-
+ String? sourceAddress;
+ String? destinationAddress;
   String? _username;
   String? _email;
   String? _userId;
@@ -664,165 +665,162 @@ class _ShOrderState extends State<ShOrder> {
   @override
   Widget build(BuildContext context) {
     final lang = Lang.of(context);
-    return BlocProvider.value(
-      value: _cubit,
-      child: BlocListener<ShipperOrderCubit, ShipperOrderState>(
-        listener: (context, state) {
-          if (state is ShipperOrderRouteLoaded) {
-            setState(() {
-              _polyline.removeWhere(
-                (p) =>
-                    p.polylineId ==
-                    const PolylineId('source_destination_route'),
-              );
-              _polyline.add(
-                Polyline(
-                  polylineId: const PolylineId('source_destination_route'),
-                  visible: true,
-                  width: 5,
-                  points: state.polylinePoints,
-                  color: Colors.blue,
-                  startCap: Cap.roundCap,
-                  endCap: Cap.roundCap,
-                ),
-              );
-            });
-          }
-          if (state is ShipperOrderCurrentLoaded && state.orderData != null) {
-            final data = state.orderData!;
-            final newState = data['order_state']?.toString() ?? _orderState;
-
-            setState(() {
-              _orderState = newState;
-              if (newState == "shipper confirmed") {
-                _isConfirm = true;
-              } else if (newState == "order received") {
-                _isConfirm = true;
-                _isReceived = true;
-              } else if (newState == "order delivered") {
-                _isConfirm = true;
-                _isReceived = true;
-                _isDelivered = true;
-              }
-              _orderCost = data['cost']?.toString() ?? _orderCost;
-              _orderPrice = data['price']?.toString() ?? _orderPrice;
-              _orderSupplierId =
-                  data['supplier_id']?.toString() ?? _orderSupplierId;
-              _shouldShowPriceField =
-                  _orderNote != null &&
-                  _orderNote!.trim().isNotEmpty &&
-                  (_orderPrice == null || _orderPrice!.trim().isEmpty);
-            });
-          }
-
-          if (state is ShipperOrderStatusChanged) {
-            final data = state.orderData;
-            final newState = data['order_state']?.toString() ?? '';
-            _showSnackBar(
-              lang,
-              en: 'Order status updated: $newState',
-              ar: 'تم تحديث حالة الطلب: $newState',
-              backgroundColor: Colors.green,
+    return BlocListener<ShipperOrderCubit, ShipperOrderState>(
+      listener: (context, state) {
+        if (state is ShipperOrderRouteLoaded) {
+          setState(() {
+            _polyline.removeWhere(
+              (p) =>
+                  p.polylineId ==
+                  const PolylineId('source_destination_route'),
             );
-          }
+            _polyline.add(
+              Polyline(
+                polylineId: const PolylineId('source_destination_route'),
+                visible: true,
+                width: 5,
+                points: state.polylinePoints,
+                color: Colors.blue,
+                startCap: Cap.roundCap,
+                endCap: Cap.roundCap,
+              ),
+            );
+          });
+        }
+        if (state is ShipperOrderCurrentLoaded && state.orderData != null) {
+          final data = state.orderData!;
+          final newState = data['order_state']?.toString() ?? _orderState;
 
-          if (state is ShipperOrderMessageCountUpdated) {
-            setState(() => _orderMessagesCount = state.count);
-          }
+          setState(() {
+            _orderState = newState;
+            if (newState == "shipper confirmed") {
+              _isConfirm = true;
+            } else if (newState == "order received") {
+              _isConfirm = true;
+              _isReceived = true;
+            } else if (newState == "order delivered") {
+              _isConfirm = true;
+              _isReceived = true;
+              _isDelivered = true;
+            }
+            _orderCost = data['cost']?.toString() ?? _orderCost;
+            _orderPrice = data['price']?.toString() ?? _orderPrice;
+            _orderSupplierId =
+                data['supplier_id']?.toString() ?? _orderSupplierId;
+            _shouldShowPriceField =
+                _orderNote != null &&
+                _orderNote!.trim().isNotEmpty &&
+                (_orderPrice == null || _orderPrice!.trim().isEmpty);
+          });
+        }
 
-          if (state is ShipperOrderError) {
-            _showSnackBar(lang, en: state.message, ar: state.message);
-          }
+        if (state is ShipperOrderStatusChanged) {
+          final data = state.orderData;
+          final newState = data['order_state']?.toString() ?? '';
+          _showSnackBar(
+            lang,
+            en: 'Order status updated: $newState',
+            ar: 'تم تحديث حالة الطلب: $newState',
+            backgroundColor: Colors.green,
+          );
+        }
 
-          if (state is ShipperOrderCancelled) {
-            _navigateToHome("Order canceled", "تم إلغاء الطلب");
-          }
+        if (state is ShipperOrderMessageCountUpdated) {
+          setState(() => _orderMessagesCount = state.count);
+        }
 
-          if (state is ShipperOrderCompleted) {
-            _navigateToHome("Order is complete", "تم اكمال الطلب بنجاح");
-          }
+        if (state is ShipperOrderError) {
+          _showSnackBar(lang, en: state.message, ar: state.message);
+        }
+
+        if (state is ShipperOrderCancelled) {
+          _navigateToHome("Order canceled", "تم إلغاء الطلب");
+        }
+
+        if (state is ShipperOrderCompleted) {
+          _navigateToHome("Order is complete", "تم اكمال الطلب بنجاح");
+        }
+      },
+      child: WillPopScope(
+        onWillPop: () async {
+          await showDialog(
+            context: context,
+            builder: (c) => AlertDialog(
+              title: Text(
+                _loc(lang, 'Warning', 'تحذير'),
+                style: const TextStyle(color: Colors.red),
+              ),
+              content: Text(
+                _loc(
+                  lang,
+                  'Please you cant exit until order complete',
+                  'من فضلك انتظر حتي يتم اكتمال مراحل الطلب',
+                ),
+                style: const TextStyle(fontSize: 15, color: Colors.red),
+              ),
+            ),
+          );
+          return false;
         },
-        child: WillPopScope(
-          onWillPop: () async {
-            await showDialog(
-              context: context,
-              builder: (c) => AlertDialog(
-                title: Text(
-                  _loc(lang, 'Warning', 'تحذير'),
-                  style: const TextStyle(color: Colors.red),
-                ),
-                content: Text(
-                  _loc(
-                    lang,
-                    'Please you cant exit until order complete',
-                    'من فضلك انتظر حتي يتم اكتمال مراحل الطلب',
-                  ),
-                  style: const TextStyle(fontSize: 15, color: Colors.red),
+        child: Directionality(
+          textDirection: lang.lang == "en"
+              ? TextDirection.ltr
+              : TextDirection.rtl,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(
+                lang.lang == "en" ? 'OrderVite' : ' أوردرفيت ',
+                style: TextStyle(
+                  fontSize: 25.sp,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.normal,
+                  color: Colors.white,
                 ),
               ),
-            );
-            return false;
-          },
-          child: Directionality(
-            textDirection: lang.lang == "en"
-                ? TextDirection.ltr
-                : TextDirection.rtl,
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  lang.lang == "en" ? 'OrderVite' : ' أوردرفيت ',
-                  style: TextStyle(
-                    fontSize: 25.sp,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.normal,
-                    color: Colors.white,
+              actions: [
+                ChatNamedIcon(
+                  text: lang.lang == "en" ? 'Chats' : 'محادثات ',
+                  iconData: Icons.message,
+                  order_id: _orderId ?? '',
+                  notificationCount: _orderMessagesCount,
+                  api_token: _token ?? '',
+                  disLat: _disLat ?? '',
+                  disLong: _disLong ?? '',
+                  sorLat: _sorLat ?? '',
+                  sorlong: _sorLong ?? '',
+                  isConfirm: _isConfirm,
+                  order_cost: _orderCost ?? '',
+                  order_price: _orderPrice ?? '',
+                  order_pricecheck: _orderPriceCheck ?? '',
+                  order_state: _orderState ?? '',
+                  order_supplier_id: _orderSupplierId ?? '',
+                  order_shippier_id: _userId ?? '',
+                  permission: _isConfirm, sourceAddress: sourceAddress??'', destination: destinationAddress??'', orderNote: _orderNote??'',
+                ),
+              ],
+              automaticallyImplyLeading: false,
+            ),
+            body: Stack(
+              children: [
+                Positioned.fill(
+                  child: GoogleMap(
+                    mapType: MapType.normal,
+                    polylines: _polyline,
+                    myLocationEnabled: true,
+                    initialCameraPosition: _initialCamera,
+                    onMapCreated: (controller) {
+                      _mapController.complete(controller);
+                    },
+                    markers: _markers,
                   ),
                 ),
-                actions: [
-                  ChatNamedIcon(
-                    text: lang.lang == "en" ? 'Chats' : 'محادثات ',
-                    iconData: Icons.message,
-                    order_id: _orderId ?? '',
-                    notificationCount: _orderMessagesCount,
-                    api_token: _token ?? '',
-                    disLat: _disLat ?? '',
-                    disLong: _disLong ?? '',
-                    sorLat: _sorLat ?? '',
-                    sorlong: _sorLong ?? '',
-                    isConfirm: _isConfirm,
-                    order_cost: _orderCost ?? '',
-                    order_price: _orderPrice ?? '',
-                    order_pricecheck: _orderPriceCheck ?? '',
-                    order_state: _orderState ?? '',
-                    order_supplier_id: _orderSupplierId ?? '',
-                    order_shippier_id: _userId ?? '',
-                    permission: _isConfirm,
-                  ),
-                ],
-                automaticallyImplyLeading: false,
-              ),
-              body: Stack(
-                children: [
-                  Positioned.fill(
-                    child: GoogleMap(
-                      mapType: MapType.normal,
-                      polylines: _polyline,
-                      myLocationEnabled: true,
-                      initialCameraPosition: _initialCamera,
-                      onMapCreated: (controller) {
-                        _mapController.complete(controller);
-                      },
-                      markers: _markers,
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: _buildBottomPanel(lang),
-                  ),
-                ],
-              ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: _buildBottomPanel(lang),
+                ),
+              ],
             ),
           ),
         ),
@@ -879,6 +877,7 @@ class _ShOrderState extends State<ShOrder> {
                   if (_orderNote != null && _orderNote!.trim().isNotEmpty) ...[
                     SizedBox(height: 6.h),
                     Text(
+                      softWrap: true,
                       lang.lang == "en"
                           ? "Order Note: $_orderNote"
                           : "ملاحظة الطلب: $_orderNote",
@@ -888,7 +887,21 @@ class _ShOrderState extends State<ShOrder> {
                         color: Colors.white,
                       ),
                     ),
+                    SizedBox(height: 6.h,),
+                    Text(lang.lang=='en'?'Source Address: $sourceAddress':'عنوان الاستلام:$sourceAddress' ,
+                        softWrap: true,
+                        style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,))
                   ],
+                  SizedBox(height: 6.h,),
+                  Text(lang.lang=='en'?'Destination Address: $destinationAddress':'عنوان التسليم :$destinationAddress',
+                      softWrap: true,
+                      style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,)),
                   if (_shouldShowPriceField) ...[
                     SizedBox(height: 6.h),
                     Row(
