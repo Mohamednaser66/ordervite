@@ -8,6 +8,7 @@ import 'package:flutter_maps/core/map_utils.dart';
 import 'package:flutter_maps/lang.dart';
 import 'package:flutter_maps/services/api.dart';
 import 'package:flutter_maps/services/realtime_service.dart';
+import 'package:flutter_maps/services/shipper_order_repository.dart';
 import 'package:flutter_maps/shipper/models/ShipperOrdersList.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -20,8 +21,43 @@ class ShipperOrderCubit extends Cubit<ShipperOrderState> {
 
   StreamSubscription<Map<String, dynamic>?>? _orderStreamSubscription;
   String? _previousOrderState;
-
+final ShipperOrderRepository repository = ShipperOrderRepository();
   ShipperOrderCubit() : super(ShipperOrderInitial());
+
+  Future<void> fetchRoute(
+      LatLng source,
+      LatLng destination,
+      String apiKey,
+      String routeId,
+      ) async {
+    if (isClosed) return;
+
+    emit(ShipperOrderLoading());
+
+    try {
+      final route = await repository.getRoute(
+        source,
+        destination,
+        apiKey,
+      );
+
+      final points = decodePolyline(route.encodedPoints);
+
+      if (!isClosed) {
+        emit(
+          ShipperOrderRouteLoaded(
+            polylinePoints: points,
+            distance: route.distance,
+            routeId: routeId,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!isClosed) {
+        emit(ShipperOrderError(e.toString()));
+      }
+    }
+  }
 
   void listenToCurrentOrder(String shipperId, String token) {
     _orderStreamSubscription?.cancel();
@@ -56,47 +92,6 @@ class ShipperOrderCubit extends Cubit<ShipperOrderState> {
     _orderStreamSubscription = null;
   }
 
-  Future<void> fetchRoute(
-    LatLng source,
-    LatLng destination,
-    String apiKey,
-  ) async {
-    emit(ShipperOrderLoading());
-    try {
-      final url =
-          "https://maps.googleapis.com/maps/api/directions/json?"
-          "origin=${source.latitude},${source.longitude}"
-          "&destination=${destination.latitude},${destination.longitude}"
-          "&key=$apiKey";
-
-      final response = await http
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode != 200) {
-        emit(ShipperOrderError("Failed to fetch route."));
-        return;
-      }
-
-      final json = jsonDecode(response.body);
-      if (json['routes'] == null || (json['routes'] as List).isEmpty) {
-        emit(ShipperOrderError("No route found."));
-        return;
-      }
-
-      final route = json['routes'][0];
-      final encodedPoints = route['overview_polyline']['points'];
-      final distanceValue = route['legs'][0]['distance']['value'];
-      final distance = (distanceValue / 1000).toStringAsFixed(2);
-      final points = decodePolyline(encodedPoints);
-
-      emit(ShipperOrderRouteLoaded(polylinePoints: points, distance: distance));
-    } catch (e) {
-      emit(ShipperOrderError(_mapError(e)));
-    }
-  }
-
-  /// Confirm order by shipper.
   Future<bool> confirmOrder({
     required String orderId,
     required String shipperId,

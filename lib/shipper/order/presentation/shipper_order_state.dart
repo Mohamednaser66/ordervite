@@ -10,10 +10,12 @@ final class ShipperOrderLoading extends ShipperOrderState {}
 final class ShipperOrderRouteLoaded extends ShipperOrderState {
   final List<LatLng> polylinePoints;
   final String distance;
+  final String routeId;
 
-  ShipperOrderRouteLoaded({
+   ShipperOrderRouteLoaded({
     required this.polylinePoints,
     required this.distance,
+    required this.routeId,
   });
 }
 

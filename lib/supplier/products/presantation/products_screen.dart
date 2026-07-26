@@ -22,6 +22,8 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   late TextEditingController orderController;
   late TextEditingController destinationController;
+  final TextEditingController storeController =
+  TextEditingController(text: "مصر الجديدة");
   final _formKey = GlobalKey<FormState>();
 
   Location _locationTracker = Location();
@@ -242,74 +244,74 @@ class _ProductsScreenState extends State<ProductsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  isEnglish ? 'Choose a category' : 'اختر الفئة',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 12.h),
-                SizedBox(
-                  height: 120.h,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: categories.length,
-                    separatorBuilder: (_, __) => SizedBox(width: 12.w),
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      final isSelected = selectedCategory == index;
-                      return GestureDetector(
-                        onTap: () => setState(() => selectedCategory = index),
-                        child: Container(
-                          width: 110.w,
-                          padding: REdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Colors.blue.shade50
-                                : Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(16.r),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Colors.blue
-                                  : Colors.grey.shade300,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? Colors.blue
-                                      : Colors.blueGrey.shade100,
-                                  shape: BoxShape.circle,
-                                ),
-                                padding: REdgeInsets.all(12),
-                                child: Icon(
-                                  category.icon,
-                                  size: 28.sp,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(height: 10.h),
-                              Text(
-                                isEnglish ? category.en : category.ar,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                // Text(
+                //   isEnglish ? 'Choose a category' : 'اختر الفئة',
+                //   style: TextStyle(
+                //     fontSize: 18.sp,
+                //     fontWeight: FontWeight.bold,
+                //   ),
+                // ),
+                // SizedBox(height: 12.h),
+                // SizedBox(
+                //   height: 120.h,
+                //   child: ListView.separated(
+                //     scrollDirection: Axis.horizontal,
+                //     itemCount: categories.length,
+                //     separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                //     itemBuilder: (context, index) {
+                //       final category = categories[index];
+                //       final isSelected = selectedCategory == index;
+                //       return GestureDetector(
+                //         onTap: () => setState(() => selectedCategory = index),
+                //         child: Container(
+                //           width: 110.w,
+                //           padding: REdgeInsets.all(12),
+                //           decoration: BoxDecoration(
+                //             color: isSelected
+                //                 ? Colors.blue.shade50
+                //                 : Colors.grey.shade100,
+                //             borderRadius: BorderRadius.circular(16.r),
+                //             border: Border.all(
+                //               color: isSelected
+                //                   ? Colors.blue
+                //                   : Colors.grey.shade300,
+                //               width: 1.5,
+                //             ),
+                //           ),
+                //           child: Column(
+                //             mainAxisAlignment: MainAxisAlignment.center,
+                //             children: [
+                //               Container(
+                //                 decoration: BoxDecoration(
+                //                   color: isSelected
+                //                       ? Colors.blue
+                //                       : Colors.blueGrey.shade100,
+                //                   shape: BoxShape.circle,
+                //                 ),
+                //                 padding: REdgeInsets.all(12),
+                //                 child: Icon(
+                //                   category.icon,
+                //                   size: 28.sp,
+                //                   color: Colors.white,
+                //                 ),
+                //               ),
+                //               SizedBox(height: 10.h),
+                //               Text(
+                //                 isEnglish ? category.en : category.ar,
+                //                 textAlign: TextAlign.center,
+                //                 style: TextStyle(
+                //                   fontSize: 14.sp,
+                //                   fontWeight: FontWeight.w600,
+                //                   color: Colors.black87,
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // ),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -367,18 +369,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   ),
                 ),
                 SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ChoiceChip(
-                        label: Text(isEnglish ? "Heliopolis" : 'مصر الجديدة'),
-                        selected: selectedArea == "Heliopolis" ,
-                        onSelected: (_) =>
-                            setState(() => selectedArea = "Heliopolis" ),
-                      ),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: ChoiceChip(
+                //         label: Text(isEnglish ? "Heliopolis" : 'مصر الجديدة'),
+                //         selected: selectedArea == "Heliopolis" ,
+                //         onSelected: (_) =>
+                //             setState(() => selectedArea = "Heliopolis" ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 SizedBox(height: 12.h),
                 Container(
                   width: double.infinity,

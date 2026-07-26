@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_maps/Core/routes_manager.dart';
+import 'package:flutter_maps/supplier/order/presentation/supplier_order__cubit.dart';
 import 'package:flutter_maps/widgets/rating.dart';
 import 'package:flutter_maps/classes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -146,7 +148,7 @@ class _RatingsPage extends State<RatingsPage> {
                                 ? "Order is complete and thanks for review $_rating"
                                 : "$_rating تم إتمام الطلب، ونشكرك على تقييم الخدمة",
                           );
-
+                          context.read<SupplierOrderCubit>().reset();
                           Navigator.pushReplacementNamed(
                             context,
                             RoutesManager.suHome,
@@ -180,6 +182,7 @@ class _RatingsPage extends State<RatingsPage> {
                               ? "Order is complete"
                               : "تم ااكتمال طلبك",
                         );
+                        context.read<SupplierOrderCubit>().reset();
                         Navigator.pushReplacementNamed(
                           context,
                           RoutesManager.suHome,

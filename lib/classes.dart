@@ -12,7 +12,7 @@ class OrderData {
   final String order_supplier_id;
   final String? orderNote;
   final String destinationAddress;
-  final String sourceAddress;
+  final String? sourceAddress;
 
   OrderData(
     this.disLat,

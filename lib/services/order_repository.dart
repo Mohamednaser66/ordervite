@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_maps/config/app_config.dart';
 import 'package:flutter_maps/models/order.dart';
 import 'package:flutter_maps/supplier/models/finance_config.dart';
@@ -185,8 +186,11 @@ class OrderRepository {
             headers: {'Authorization': 'Bearer $token'},
           )
           .timeout(_timeout);
+      debugPrint("STATUS CODE = ${response.statusCode}");
+      debugPrint("BODY = ${response.body}");
 
       if (response.statusCode != 200 && response.statusCode != 201) return null;
+
 
       final json = jsonDecode(response.body);
       if (json['data'] == null) return null;
@@ -378,4 +382,5 @@ class OrderRepository {
     _orderStreamController?.close();
     _orderStreamController = null;
   }
+
 }

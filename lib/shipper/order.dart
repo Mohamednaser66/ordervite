@@ -41,6 +41,7 @@ class _ShOrderState extends State<ShOrder> {
  String? sourceAddress;
  String? destinationAddress;
   String? _username;
+  bool _priceEntered = false;
   String? _email;
   String? _userId;
   String? _token;
@@ -115,10 +116,15 @@ bool _cubitInitialized=false;
       if (_priceController.text.trim().isEmpty && _orderPrice != null) {
         _priceController.text = _orderPrice!;
       }
+      _priceEntered = _orderPrice != null &&
+          _orderPrice!.trim().isNotEmpty &&
+          _orderPrice!.trim() != "0";
+
       _shouldShowPriceField =
           _orderNote != null &&
-          _orderNote!.trim().isNotEmpty &&
-          (_orderPrice == null || _orderPrice!.trim().isEmpty||_orderPrice!.trim()=='0');
+              _orderNote!.trim().isNotEmpty &&
+              !_priceEntered &&
+              !_isConfirm;
 
       _sourceLatLong = LatLng(double.parse(_sorLat!), double.parse(_sorLong!));
       _destinationLatLong = LatLng(
@@ -147,6 +153,7 @@ bool _cubitInitialized=false;
       _sourceLatLong,
       _destinationLatLong,
       AppConfig.googleMapsApiKey,
+      "source_destination_route",
     );
 
     if (_isConfirm && _userId != null && _token != null) {
@@ -352,6 +359,32 @@ bool _cubitInitialized=false;
       if (confirmed != true) return;
 
       if (_orderId == null || _userId == null || _token == null) return;
+      if (_shouldShowPriceField &&
+          _priceController.text.trim().isEmpty) {
+        _showSnackBar(
+          lang,
+          en: 'Please enter the package price first',
+          ar: 'يرجى إدخال سعر الشحنة أولاً',
+        );
+        return;
+      }
+
+      if (_priceController.text.trim().isNotEmpty) {
+        final priceSuccess = await _cubit.updateOrderPrice(
+          orderId: _orderId!,
+          token: _token!,
+          price: _priceController.text.trim(),
+        );
+
+        if (!priceSuccess) {
+          _showSnackBar(
+            lang,
+            en: 'Failed to save package price',
+            ar: 'فشل حفظ سعر الشحنة',
+          );
+          return;
+        }
+      }
 
       final success = await _cubit.confirmOrder(
         orderId: _orderId!,
@@ -364,6 +397,8 @@ bool _cubitInitialized=false;
       if (success && mounted) {
         setState(() {
           _isConfirm = true;
+          _priceEntered = true;
+          _shouldShowPriceField = false;
           _orderState = "shipper confirmed";
         });
         _showSnackBar(
@@ -381,38 +416,6 @@ bool _cubitInitialized=false;
         ar: 'يرجى التحقق من الموقع والإنترنت',
       );
     }
-  }
-
-  Future<void> _confirmOrderPrice(Lang lang) async {
-    final priceText = _priceController.text.trim();
-    if (_orderId == null || _token == null || priceText.isEmpty) {
-      _showSnackBar(
-        lang,
-        en: 'Please enter the package price first',
-        ar: 'يرجى إدخال سعر الشحنة أولاً',
-      );
-      return;
-    }
-
-    final success = await _cubit.updateOrderPrice(
-      orderId: _orderId!,
-      token: _token!,
-      price: priceText,
-    );
-
-    if (!success || !mounted) return;
-
-    setState(() {
-      _orderPrice = priceText;
-      _shouldShowPriceField = false;
-    });
-
-    _showSnackBar(
-      lang,
-      en: 'Package price saved successfully',
-      ar: 'تم حفظ سعر الشحنة بنجاح',
-      backgroundColor: Colors.green,
-    );
   }
 
   Future<void> _onReceive(Lang lang) async {
@@ -586,83 +589,26 @@ bool _cubitInitialized=false;
     await _updateSourceToDestinationPolyline();
   }
 
-  Future<List<LatLng>> _fetchRoutePoints(
-    LatLng origin,
-    LatLng destination,
-  ) async {
-    final url =
-        "https://maps.googleapis.com/maps/api/directions/json?"
-        "origin=${origin.latitude},${origin.longitude}"
-        "&destination=${destination.latitude},${destination.longitude}"
-        "&key=${AppConfig.googleMapsApiKey}";
 
-    try {
-      final response = await http
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode != 200) return [];
-
-      final json = jsonDecode(response.body);
-      if (json['routes'] == null || (json['routes'] as List).isEmpty) {
-        return [];
-      }
-
-      final route = json['routes'][0];
-      final encodedPoints = route['overview_polyline']?['points'] as String?;
-      if (encodedPoints == null || encodedPoints.isEmpty) {
-        return [];
-      }
-
-      return decodePolyline(encodedPoints);
-    } catch (e) {
-      debugPrint('Error fetching route points: $e');
-      return [];
-    }
-  }
 
   Future<void> _updateCurrentToSourcePolyline() async {
     if (_currentLatLong == null) return;
-    final points = await _fetchRoutePoints(_currentLatLong!, _sourceLatLong);
-    if (points.isEmpty) return;
 
-    setState(() {
-      _polyline.removeWhere(
-        (p) => p.polylineId == const PolylineId('current_source_route'),
-      );
-      _polyline.add(
-        Polyline(
-          polylineId: const PolylineId('current_source_route'),
-          visible: true,
-          width: 5,
-          points: points,
-          color: Colors.green,
-          startCap: Cap.roundCap,
-          endCap: Cap.roundCap,
-        ),
-      );
-    });
+    context.read<ShipperOrderCubit>().fetchRoute(
+      _currentLatLong!,
+      _sourceLatLong,
+      AppConfig.googleMapsApiKey,
+      "current_source_route",
+    );
   }
 
   Future<void> _updateSourceToDestinationPolyline() async {
-    final points = await _fetchRoutePoints(_sourceLatLong, _destinationLatLong);
-    if (points.isEmpty) return;
-
-    setState(() {
-      _polyline.removeWhere(
-        (p) => p.polylineId == const PolylineId('source_destination_route'),
-      );
-      _polyline.add(
-        Polyline(
-          polylineId: const PolylineId('source_destination_route'),
-          visible: true,
-          width: 5,
-          points: points,
-          color: Colors.blue,
-          startCap: Cap.roundCap,
-          endCap: Cap.roundCap,
-        ),
-      );
-    });
+    context.read<ShipperOrderCubit>().fetchRoute(
+      _sourceLatLong,
+      _destinationLatLong,
+      AppConfig.googleMapsApiKey,
+      "source_destination_route",
+    );
   }
 
   @override
@@ -673,17 +619,17 @@ bool _cubitInitialized=false;
         if (state is ShipperOrderRouteLoaded) {
           setState(() {
             _polyline.removeWhere(
-              (p) =>
-                  p.polylineId ==
-                  const PolylineId('source_destination_route'),
+                  (p) => p.polylineId.value == state.routeId,
             );
             _polyline.add(
               Polyline(
-                polylineId: const PolylineId('source_destination_route'),
+                polylineId: PolylineId(state.routeId),
                 visible: true,
                 width: 5,
                 points: state.polylinePoints,
-                color: Colors.blue,
+                color: state.routeId == "current_source_route"
+                    ? Colors.green
+                    : Colors.blue,
                 startCap: Cap.roundCap,
                 endCap: Cap.roundCap,
               ),
@@ -710,10 +656,15 @@ bool _cubitInitialized=false;
             _orderPrice = data['price']?.toString() ?? _orderPrice;
             _orderSupplierId =
                 data['supplier_id']?.toString() ?? _orderSupplierId;
+            _priceEntered = _orderPrice != null &&
+                _orderPrice!.trim().isNotEmpty &&
+                _orderPrice!.trim() != "0";
+
             _shouldShowPriceField =
                 _orderNote != null &&
-                _orderNote!.trim().isNotEmpty &&
-                (_orderPrice == null || _orderPrice!.trim().isEmpty);
+                    _orderNote!.trim().isNotEmpty &&
+                    !_priceEntered &&
+                    !_isConfirm;
           });
         }
 
@@ -895,7 +846,7 @@ bool _cubitInitialized=false;
 
                   ],
                   SizedBox(height: 6.h,),
-                  if(sourceAddress!.trim().isNotEmpty||sourceAddress!=null)...[
+                  if (sourceAddress != null && sourceAddress!.trim().isNotEmpty)...[
                     Text(lang.lang=='en'?'Source Address: ${sourceAddress??''}':'عنوان الاستلام:${sourceAddress??''}' ,
                         softWrap: true,
                         style: TextStyle(
@@ -912,62 +863,36 @@ bool _cubitInitialized=false;
                     color: Colors.white,)),
                   if (_shouldShowPriceField) ...[
                     SizedBox(height: 6.h),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _priceController,
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) {
-                              setState(() {
-                                _orderPrice = value.trim().isEmpty
-                                    ? null
-                                    : value.trim();
-                              });
-                            },
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: lang.lang == "en"
-                                  ? 'Enter package price'
-                                  : 'أدخل سعر الشحنة',
-                              labelText: lang.lang == "en"
-                                  ? 'Package Price'
-                                  : 'سعر الشحنة',
-                              contentPadding: REdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 12,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                            ),
-                          ),
+                    TextFormField(
+                      controller: _priceController,
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        setState(() {
+
+                        });
+                      },
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: lang.lang == "en"
+                            ? 'Enter package price'
+                            : 'أدخل سعر الشحنة',
+                        labelText: lang.lang == "en"
+                            ? 'Package Price'
+                            : 'سعر الشحنة',
+                        contentPadding: REdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
                         ),
-                        SizedBox(width: 8.w),
-                        ElevatedButton.icon(
-                          onPressed: () => _confirmOrderPrice(lang),
-                          icon: Icon(Icons.check, size: 18.sp),
-                          label: Text(
-                            lang.lang == "en" ? 'Confirm Price' : 'تأكيد السعر',
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              color: Colors.white,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ColorsManager.primaryGreen,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.r),
-                            ),
-                          ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                   SizedBox(height: 8.h),
@@ -1256,7 +1181,6 @@ bool _cubitInitialized=false;
   @override
   void dispose() {
     _priceController.dispose();
-    _cubit.close();
     super.dispose();
   }
 }

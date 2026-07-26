@@ -124,7 +124,6 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
                 paymentMethod: priceCheck,
               );
 
-      debugPrint("Calculated Cost = $calculatedCost");
 
       final orderData = _buildOrderData(
         supplierId: supplierId,
@@ -145,7 +144,7 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
 
       final order = await _orderRepository.createOrder(orderData, token);
 
-      debugPrint("Order Response = $order");
+
 
       if (order != null) {
         emit(SupplierOrderCreated(order));
@@ -195,7 +194,14 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
       'commission': commission.toStringAsFixed(2),
     };
   }
+  void reset() {
+    stopListeningToOrder();
+    stopAutoCancelTimer();
 
+    _previousOrderState = null;
+
+    emit(SupplierOrderInitial());
+  }
   void listenToCurrentOrder(String supplierId, String token) {
     _orderStreamSubscription?.cancel();
 

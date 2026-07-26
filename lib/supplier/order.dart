@@ -29,6 +29,7 @@ class OrderPage extends StatefulWidget {
 
 class _OrderPageState extends State<OrderPage> {
   bool _cubitInitialized = false;
+  bool _isCompletingOrder = false;
   late final SupplierOrderCubit _cubit;
   CameraPosition? _initialCamera;
   final Completer<GoogleMapController> _mapController = Completer();
@@ -44,7 +45,7 @@ class _OrderPageState extends State<OrderPage> {
   bool _isConfirm = false;
   String? _orderId;
   String? _orderCost;
-  String? _orderPrice;
+  String? _orderPrice="0";
   String? _orderPriceCheck;
   String _orderShipperId = "....";
   String? _orderState;
@@ -343,7 +344,7 @@ class _OrderPageState extends State<OrderPage> {
       token: _token!,
       supplierId: _userId!,
       size: _packageSize,
-      price: orderPrice ?? '0',
+      price: orderPrice ??'0',
       priceCheck: _paymentMethod,
       source: _sourceLatLng!,
       destination: _destinationLatLng!,
@@ -396,6 +397,8 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   Future<void> _completeOrder(Lang lang) async {
+    if (_isCompletingOrder) return;
+
     if (!_isConfirmOrder) {
       _showSnackBar(
         lang,
@@ -427,13 +430,19 @@ class _OrderPageState extends State<OrderPage> {
       ),
     );
 
-    if (confirmed == true) {
-      _cubit.completeOrder(
+    if (confirmed != true) return;
+
+    _isCompletingOrder = true;
+
+    try {
+      await _cubit.completeOrder(
         orderId: _orderId!,
         token: _token!,
         shipperApiToken: _shipperApiToken ?? '',
         lang: lang,
       );
+    } finally {
+      _isCompletingOrder = false;
     }
   }
 
@@ -536,6 +545,7 @@ class _OrderPageState extends State<OrderPage> {
           order.price != null &&
           order.price!.trim().isNotEmpty &&
           order.price!.trim() != '0') {
+
         _orderPrice = order.price!.trim();
       }
 
@@ -597,7 +607,7 @@ class _OrderPageState extends State<OrderPage> {
             _orderState = order.state;
             _orderShipperId = order.shipperId;
           });
-          debugPrint("_isConfirm = $_isConfirm");
+
 
           _showSnackBar(
             lang,
