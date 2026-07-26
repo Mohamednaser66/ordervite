@@ -122,7 +122,7 @@ class _ShipperDrawerState extends State<ShipperDrawer> {
               ),
 
               onTap: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(RoutesManager.shipperOrdersScreen,(route) => false,);
+                Navigator.of(context).pushNamedAndRemoveUntil(RoutesManager.shOrders,(route) => false,);
               },
             ),
             ListTile(

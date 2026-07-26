@@ -130,7 +130,6 @@ class _MyHomePageState extends State<MyHomePage> {
     email = preferences.getString("email");
     token2 = preferences.getString("token");
     id = preferences.getString("id");
-    print('token====================$token2');
 
     if (username != null && email != null) {
       setState(() {
@@ -169,7 +168,6 @@ class _MyHomePageState extends State<MyHomePage> {
     ).load("assets/mark.png");
     return byteData.buffer.asUint8List();
   }
-
   void updateMarkerAndCircle(LocationData newLocalData, Uint8List imageData) {
     final latlng = LatLng(
       newLocalData.latitude ?? 0,

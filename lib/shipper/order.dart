@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,7 +30,7 @@ class ShOrder extends StatefulWidget {
 }
 
 class _ShOrderState extends State<ShOrder> {
-  late CameraPosition _initialCamera;
+  CameraPosition? _initialCamera;
   final Completer<GoogleMapController> _mapController = Completer();
   final Set<Marker> _markers = {};
   final Set<Polyline> _polyline = {};
@@ -63,7 +62,7 @@ class _ShOrderState extends State<ShOrder> {
   bool _isConfirm = false;
   bool _isReceived = false;
   bool _isDelivered = false;
-
+bool _cubitInitialized=false;
   int _orderMessagesCount = 0;
 
   late final ShipperOrderCubit _cubit;
@@ -72,7 +71,6 @@ class _ShOrderState extends State<ShOrder> {
   @override
   void initState() {
     super.initState();
-    _cubit = ShipperOrderCubit();
     _listenToLocationChanges();
     _initializeFcm();
   }
@@ -80,6 +78,10 @@ class _ShOrderState extends State<ShOrder> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if(!_cubitInitialized){
+      _cubit =context.read<ShipperOrderCubit>();
+      _cubitInitialized =true;
+    }
     _loadPreferences();
   }
 
@@ -103,6 +105,8 @@ class _ShOrderState extends State<ShOrder> {
       _orderId = orderData.order_id;
       _isConfirm = orderData.isConfirm;
       _orderCost = orderData.order_cost;
+      sourceAddress = orderData.sourceAddress;
+      destinationAddress = orderData.destinationAddress;
       _orderPrice = orderData.order_price;
       _orderPriceCheck = orderData.order_pricecheck;
       _orderSupplierId = orderData.order_supplier_id;
@@ -340,7 +344,6 @@ class _ShOrderState extends State<ShOrder> {
         ),
       );
 
-      // Real-time data sync: Refresh order when dialog closes
       if (confirmed == false && mounted && _userId != null && _token != null) {
         _cubit.refreshCurrentOrder(_userId!, _token!);
         return;
@@ -800,14 +803,16 @@ class _ShOrderState extends State<ShOrder> {
               ],
               automaticallyImplyLeading: false,
             ),
-            body: Stack(
+            body:_initialCamera==null?  Center(
+              child: CircularProgressIndicator(color: ColorsManager.primaryGreen,),
+            ): Stack(
               children: [
                 Positioned.fill(
                   child: GoogleMap(
                     mapType: MapType.normal,
                     polylines: _polyline,
                     myLocationEnabled: true,
-                    initialCameraPosition: _initialCamera,
+                    initialCameraPosition: _initialCamera!,
                     onMapCreated: (controller) {
                       _mapController.complete(controller);
                     },
@@ -887,16 +892,19 @@ class _ShOrderState extends State<ShOrder> {
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 6.h,),
-                    Text(lang.lang=='en'?'Source Address: $sourceAddress':'عنوان الاستلام:$sourceAddress' ,
-                        softWrap: true,
-                        style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,))
+
                   ],
                   SizedBox(height: 6.h,),
-                  Text(lang.lang=='en'?'Destination Address: $destinationAddress':'عنوان التسليم :$destinationAddress',
+                  if(sourceAddress!.trim().isNotEmpty||sourceAddress!=null)...[
+                    Text(lang.lang=='en'?'Source Address: ${sourceAddress??''}':'عنوان الاستلام:${sourceAddress??''}' ,
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,))
+                  ],
+                  SizedBox(height: 6.h,),
+                  Text(lang.lang=='en'?'Destination Address: ${destinationAddress??''}':'عنوان التسليم :${destinationAddress??''}',
                       softWrap: true,
                       style: TextStyle(
                     fontSize: 14.sp,

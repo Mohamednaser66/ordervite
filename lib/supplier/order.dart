@@ -28,7 +28,7 @@ class OrderPage extends StatefulWidget {
 }
 
 class _OrderPageState extends State<OrderPage> {
-  final OrderRepository _orderRepository = OrderRepository();
+  bool _cubitInitialized = false;
   late final SupplierOrderCubit _cubit;
   CameraPosition? _initialCamera;
   final Completer<GoogleMapController> _mapController = Completer();
@@ -57,6 +57,7 @@ class _OrderPageState extends State<OrderPage> {
   bool _isConfirmOrder = false;
   String? _distance;
   String? orderType;
+  bool _ratingOpened = false;
   late TextEditingController destinationAddressController ;
    TextEditingController? sourceAddressController ;
   final _formKey = GlobalKey<FormState>();
@@ -86,36 +87,6 @@ class _OrderPageState extends State<OrderPage> {
       ),
     );
   }
-  static String? validateSourceAddress(String? value, String lang) {
-    if (value == null || value.trim().isEmpty) {
-      return lang == 'en'
-          ? "Please enter the source address."
-          : "يرجى إدخال عنوان الاستلام.";
-    }
-
-    if (value.trim().length < 10) {
-      return lang == 'en'
-          ? "Please enter a complete source address."
-          : "يرجى إدخال عنوان استلام كامل.";
-    }
-
-    return null;
-  }
-  static String? validateDestinationAddress(String? value, String lang) {
-    if (value == null || value.trim().isEmpty) {
-      return lang == 'en'
-          ? "Please enter the destination address."
-          : "يرجى إدخال عنوان الوجهة.";
-    }
-
-    if (value.trim().length < 10) {
-      return lang == 'en'
-          ? "Please enter a complete destination address."
-          : "يرجى إدخال عنوان وجهة كامل.";
-    }
-
-    return null;
-  }
   bool _shouldLoadConfirmedOrderPrice(String state) {
     return state == 'shipper confirmed' &&
         _orderNote != null &&
@@ -136,7 +107,6 @@ class _OrderPageState extends State<OrderPage> {
   @override
   void initState() {
     super.initState();
-    _cubit = SupplierOrderCubit(_orderRepository);
     _locationTracker.requestPermission();
     _initializeFcm();
     destinationAddressController =TextEditingController();
@@ -146,8 +116,12 @@ class _OrderPageState extends State<OrderPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadPreferences();
-  }
+    if (!_cubitInitialized) {
+      _cubit = context.read<SupplierOrderCubit>();
+      _cubitInitialized = true;
+    }
+
+    _loadPreferences();  }
 
   bool _isDataLoaded = false;
   Future<void> _loadPreferences() async {
@@ -317,7 +291,7 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   void _navigateToHome(String en, String ar) {
-    if (!mounted) return;
+
     final lang = Lang.of(context);
     Navigator.pushNamedAndRemoveUntil(
       context,
@@ -328,6 +302,10 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   void _navigateToRating() {
+    if (_ratingOpened || !mounted) return;
+
+    _ratingOpened = true;
+    _cubit.stopListeningToOrder();
     Navigator.pushReplacementNamed(
       context,
       RoutesManager.rating,
@@ -336,6 +314,10 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   Future<void> _createOrder(Lang lang) async {
+    if (!_formKey.currentState!.validate()) {
+      debugPrint('Form validation failed');
+      return;
+    }
     final orderPrice = _priceController.text.trim().isNotEmpty
         ? _priceController.text.trim()
         : null;
@@ -540,7 +522,7 @@ class _OrderPageState extends State<OrderPage> {
         final lng = double.parse(order.shipperLongitude!);
         newShipperLatLng = LatLng(lat, lng);
       } catch (e) {
-        // Invalid coordinates
+
       }
     }
 
@@ -577,8 +559,7 @@ class _OrderPageState extends State<OrderPage> {
         _isShipperReceived = true;
         _isShipperConfirmed = true;
         _updateShipperPolyline();
-      } else if (state == "order complete")
-        _navigateToRating();
+      }
     });
   }
 
@@ -587,8 +568,11 @@ class _OrderPageState extends State<OrderPage> {
     final lang = Lang.of(context);
     return BlocListener<SupplierOrderCubit, SupplierOrderState>(
       listener: (context, state) {
+        debugPrint("Current State = ${state.runtimeType}");
+
         if (state is SupplierOrderRouteLoaded) {
           setState(() {
+            _distance=state.distance;
             _polylines.clear();
             _polylines.add(
               Polyline(
@@ -598,8 +582,8 @@ class _OrderPageState extends State<OrderPage> {
                 width: 5,
               ),
             );
-            _distance = state.distance;
           });
+          debugPrint("Distance Saved In UI = $_distance");
           _animateCamera();
         }
         if (state is SupplierOrderCreated) {
@@ -613,6 +597,8 @@ class _OrderPageState extends State<OrderPage> {
             _orderState = order.state;
             _orderShipperId = order.shipperId;
           });
+          debugPrint("_isConfirm = $_isConfirm");
+
           _showSnackBar(
             lang,
             en: 'Your order is created successfully, please wait for a shipper confirmation ...',
@@ -688,7 +674,9 @@ class _OrderPageState extends State<OrderPage> {
                   order_state: _orderState ?? '',
                   order_supplier_id: _userId ?? '',
                   order_shippier_id: _orderShipperId,
-                  permission: _isConfirm, orderNote: _orderNote??'', destinationAddress: destinationAddressController.text, sourceAddress: sourceAddressController?.text??'',
+                  permission: _isConfirm, orderNote: _orderNote??'',
+                  destinationAddress: destinationAddressController.text,
+                  sourceAddress: sourceAddressController?.text??'',
                 ),
               ],
               automaticallyImplyLeading: false,
@@ -788,21 +776,25 @@ class _OrderPageState extends State<OrderPage> {
                     Text(lang.lang=='en'?"Street Name - Building Number - Floor - Unit Number":"اسم الشارع - رقم المبنى - الدور - رقم الوحدة"),
                 SizedBox(height: 6.h,),
                 orderType== 'goods'?const SizedBox.shrink():
-                CustomTextFormField(controller: sourceAddressController!,validation:(value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return lang.lang == 'en'
-                        ? "Please enter the source address."
-                        : "يرجى إدخال عنوان الاستلام.";
-                  }
+                CustomTextFormField(controller: sourceAddressController!,
+                  validation: (value) {
+                    debugPrint("Source Validation: '$value'");
 
-                  if (value.trim().length < 10) {
-                    return lang.lang == 'en'
-                        ? "Please enter a complete source address."
-                        : "يرجى إدخال عنوان استلام كامل.";
-                  }
+                    if (value == null || value.trim().isEmpty) {
+                      return lang.lang == 'en'
+                          ? "Please enter the source address."
+                          : "يرجى إدخال عنوان الاستلام.";
+                    }
 
-                  return null;
-                }, icon: Icon(Icons.location_on_sharp ,color: ColorsManager.primaryGreen,),
+                    if (value.trim().length < 10) {
+                      return lang.lang == 'en'
+                          ? "Please enter a complete source address."
+                          : "يرجى إدخال عنوان استلام كامل.";
+                    }
+
+                    return null;
+                  },
+                    icon: Icon(Icons.location_on_sharp ,color: ColorsManager.primaryGreen,),
                     hintText:lang.lang=='en'?"Please enter the source address.":"يرجى إدخال عنوان الاستلام." ,
                     lable:lang.lang=='en'?"Please enter the source address.":"يرجى إدخال عنوان الاستلام." ),
                 SizedBox(height: 6.h,),
@@ -810,6 +802,8 @@ class _OrderPageState extends State<OrderPage> {
                 SizedBox(height: 6.h,),
                 CustomTextFormField(controller: destinationAddressController,
                     validation: (value) {
+                      debugPrint("Destination Validation: '$value'");
+
                       if (value == null || value.trim().isEmpty) {
                         return lang.lang == 'en'
                             ? "Please enter the destination address."
@@ -823,8 +817,7 @@ class _OrderPageState extends State<OrderPage> {
                       }
 
                       return null;
-                    },
-                    icon: Icon(Icons.location_on_sharp ,color: ColorsManager.primaryGreen,),
+                    },                    icon: Icon(Icons.location_on_sharp ,color: ColorsManager.primaryGreen,),
                     hintText:lang.lang=='en'?"Please enter the destination address.":"يرجى إدخال عنوان التسليم." ,
                     lable:lang.lang=='en'?"Please enter the destination address.":"يرجى إدخال عنوان التسليم." ),
                 SizedBox(height: 6.h),
@@ -1223,7 +1216,6 @@ class _OrderPageState extends State<OrderPage> {
   @override
   void dispose() {
     _priceController.dispose();
-    _cubit.close();
     super.dispose();
   }
 }

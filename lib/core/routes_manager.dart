@@ -72,11 +72,11 @@ class RoutesManager {
   );
   },
     shipperOrdersScreen:  (context) {
-  final shipperId =
-  ModalRoute.of(context)!.settings.arguments as String;
+      final shipperId =
+      ModalRoute.of(context)?.settings.arguments as String?;
 
   return ShipperHistoryScreen(
-  shipperId: shipperId,
+  shipperId: shipperId??'',
   );
   },
     otpScreen: (_) => OtpScreen(verificationId: '', role: '',),

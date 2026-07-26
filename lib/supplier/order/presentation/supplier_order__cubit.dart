@@ -36,6 +36,8 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
         destination,
         apiKey,
       );
+
+
       if (isClosed) return;
 
       if (routeData == null) {
@@ -45,13 +47,12 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
 
       final points = decodePolyline(routeData['encodedPoints']);
       final distance = routeData['distance'];
-
       if (isClosed) return;
 
       emit(
         SupplierOrderRouteLoaded(polylinePoints: points, distance: distance),
       );
-    } catch (e) {
+    } catch (e,s) {
       if (isClosed) return;
       emit(SupplierOrderError(_mapError(e)));
     }
@@ -105,20 +106,29 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
     emit(SupplierOrderLoading());
 
     try {
+
+
       final financeConfig = await _orderRepository.getFinanceConfig(token);
 
+
       if (financeConfig == null) {
+        debugPrint("Finance Config is NULL");
         emit(SupplierOrderError("Could not fetch finance config."));
         return;
       }
 
       final calculatedCost =
           preCalculatedCost ??
-          financeConfig.calculateCost(size: size, paymentMethod: priceCheck);
+              financeConfig.calculateCost(
+                size: size,
+                paymentMethod: priceCheck,
+              );
+
+      debugPrint("Calculated Cost = $calculatedCost");
 
       final orderData = _buildOrderData(
         supplierId: supplierId,
-        destinationAddress:destinationAddress ,
+        destinationAddress: destinationAddress,
         sourceAddress: sourceAddress,
         calculatedCost: calculatedCost,
         size: size,
@@ -131,14 +141,19 @@ class SupplierOrderCubit extends Cubit<SupplierOrderState> {
         orderNote: orderNote,
       );
 
+
+
       final order = await _orderRepository.createOrder(orderData, token);
+
+      debugPrint("Order Response = $order");
 
       if (order != null) {
         emit(SupplierOrderCreated(order));
       } else {
         emit(SupplierOrderError("Failed to create order."));
       }
-    } catch (e) {
+    } catch (e, s) {
+
       emit(SupplierOrderError(_mapError(e)));
     }
   }
