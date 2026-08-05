@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,7 +13,6 @@ import 'package:flutter_maps/shipper/widgets/sh_order_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,8 +36,8 @@ class _ShOrderState extends State<ShOrder> {
   LatLng _destinationLatLong = const LatLng(30.060671, 31.204131);
   LatLng? _currentLatLong;
   LatLng? _lastUpdatedLocation;
- String? sourceAddress;
- String? destinationAddress;
+  String? sourceAddress;
+  String? destinationAddress;
   String? _username;
   bool _priceEntered = false;
   String? _email;
@@ -54,6 +52,7 @@ class _ShOrderState extends State<ShOrder> {
   String? _orderState;
   String? _orderNote;
   bool _shouldShowPriceField = false;
+  bool _hasLoadedPreferences = false;
   final TextEditingController _priceController = TextEditingController();
   String? _disLat;
   String? _disLong;
@@ -63,7 +62,7 @@ class _ShOrderState extends State<ShOrder> {
   bool _isConfirm = false;
   bool _isReceived = false;
   bool _isDelivered = false;
-bool _cubitInitialized=false;
+  bool _cubitInitialized = false;
   int _orderMessagesCount = 0;
 
   late final ShipperOrderCubit _cubit;
@@ -79,11 +78,13 @@ bool _cubitInitialized=false;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if(!_cubitInitialized){
-      _cubit =context.read<ShipperOrderCubit>();
-      _cubitInitialized =true;
+    if (!_cubitInitialized) {
+      _cubit = context.read<ShipperOrderCubit>();
+      _cubitInitialized = true;
     }
-    _loadPreferences();
+    if (!_hasLoadedPreferences) {
+      _loadPreferences();
+    }
   }
 
   Future<void> _loadPreferences() async {
@@ -116,15 +117,16 @@ bool _cubitInitialized=false;
       if (_priceController.text.trim().isEmpty && _orderPrice != null) {
         _priceController.text = _orderPrice!;
       }
-      _priceEntered = _orderPrice != null &&
+      _priceEntered =
+          _orderPrice != null &&
           _orderPrice!.trim().isNotEmpty &&
           _orderPrice!.trim() != "0";
 
       _shouldShowPriceField =
           _orderNote != null &&
-              _orderNote!.trim().isNotEmpty &&
-              !_priceEntered &&
-              !_isConfirm;
+          _orderNote!.trim().isNotEmpty &&
+          !_priceEntered &&
+          !_isConfirm;
 
       _sourceLatLong = LatLng(double.parse(_sorLat!), double.parse(_sorLong!));
       _destinationLatLong = LatLng(
@@ -132,6 +134,7 @@ bool _cubitInitialized=false;
         double.parse(_disLong!),
       );
       _initialCamera = CameraPosition(target: _sourceLatLong, zoom: 14.0);
+      _hasLoadedPreferences = true;
     });
 
     _markers.addAll([
@@ -359,8 +362,7 @@ bool _cubitInitialized=false;
       if (confirmed != true) return;
 
       if (_orderId == null || _userId == null || _token == null) return;
-      if (_shouldShowPriceField &&
-          _priceController.text.trim().isEmpty) {
+      if (_shouldShowPriceField && _priceController.text.trim().isEmpty) {
         _showSnackBar(
           lang,
           en: 'Please enter the package price first',
@@ -398,6 +400,9 @@ bool _cubitInitialized=false;
         setState(() {
           _isConfirm = true;
           _priceEntered = true;
+          _orderPrice = _priceController.text.trim().isNotEmpty
+              ? _priceController.text.trim()
+              : _orderPrice;
           _shouldShowPriceField = false;
           _orderState = "shipper confirmed";
         });
@@ -589,8 +594,6 @@ bool _cubitInitialized=false;
     await _updateSourceToDestinationPolyline();
   }
 
-
-
   Future<void> _updateCurrentToSourcePolyline() async {
     if (_currentLatLong == null) return;
 
@@ -618,9 +621,7 @@ bool _cubitInitialized=false;
       listener: (context, state) {
         if (state is ShipperOrderRouteLoaded) {
           setState(() {
-            _polyline.removeWhere(
-                  (p) => p.polylineId.value == state.routeId,
-            );
+            _polyline.removeWhere((p) => p.polylineId.value == state.routeId);
             _polyline.add(
               Polyline(
                 polylineId: PolylineId(state.routeId),
@@ -656,15 +657,16 @@ bool _cubitInitialized=false;
             _orderPrice = data['price']?.toString() ?? _orderPrice;
             _orderSupplierId =
                 data['supplier_id']?.toString() ?? _orderSupplierId;
-            _priceEntered = _orderPrice != null &&
+            _priceEntered =
+                _orderPrice != null &&
                 _orderPrice!.trim().isNotEmpty &&
                 _orderPrice!.trim() != "0";
 
             _shouldShowPriceField =
                 _orderNote != null &&
-                    _orderNote!.trim().isNotEmpty &&
-                    !_priceEntered &&
-                    !_isConfirm;
+                _orderNote!.trim().isNotEmpty &&
+                !_priceEntered &&
+                !_isConfirm;
           });
         }
 
@@ -749,35 +751,42 @@ bool _cubitInitialized=false;
                   order_state: _orderState ?? '',
                   order_supplier_id: _orderSupplierId ?? '',
                   order_shippier_id: _userId ?? '',
-                  permission: _isConfirm, sourceAddress: sourceAddress??'', destination: destinationAddress??'', orderNote: _orderNote??'',
+                  permission: _isConfirm,
+                  sourceAddress: sourceAddress ?? '',
+                  destination: destinationAddress ?? '',
+                  orderNote: _orderNote ?? '',
                 ),
               ],
               automaticallyImplyLeading: false,
             ),
-            body:_initialCamera==null?  Center(
-              child: CircularProgressIndicator(color: ColorsManager.primaryGreen,),
-            ): Stack(
-              children: [
-                Positioned.fill(
-                  child: GoogleMap(
-                    mapType: MapType.normal,
-                    polylines: _polyline,
-                    myLocationEnabled: true,
-                    initialCameraPosition: _initialCamera!,
-                    onMapCreated: (controller) {
-                      _mapController.complete(controller);
-                    },
-                    markers: _markers,
+            body: _initialCamera == null
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: ColorsManager.primaryGreen,
+                    ),
+                  )
+                : Stack(
+                    children: [
+                      Positioned.fill(
+                        child: GoogleMap(
+                          mapType: MapType.normal,
+                          polylines: _polyline,
+                          myLocationEnabled: true,
+                          initialCameraPosition: _initialCamera!,
+                          onMapCreated: (controller) {
+                            _mapController.complete(controller);
+                          },
+                          markers: _markers,
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: _buildBottomPanel(lang),
+                      ),
+                    ],
                   ),
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: _buildBottomPanel(lang),
-                ),
-              ],
-            ),
           ),
         ),
       ),
@@ -843,33 +852,41 @@ bool _cubitInitialized=false;
                         color: Colors.white,
                       ),
                     ),
-
                   ],
-                  SizedBox(height: 6.h,),
-                  if (sourceAddress != null && sourceAddress!.trim().isNotEmpty)...[
-                    Text(lang.lang=='en'?'Source Address: ${sourceAddress??''}':'عنوان الاستلام:${sourceAddress??''}' ,
-                        softWrap: true,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,))
-                  ],
-                  SizedBox(height: 6.h,),
-                  Text(lang.lang=='en'?'Destination Address: ${destinationAddress??''}':'عنوان التسليم :${destinationAddress??''}',
+                  SizedBox(height: 6.h),
+                  if (sourceAddress != null &&
+                      sourceAddress!.trim().isNotEmpty) ...[
+                    Text(
+                      lang.lang == 'en'
+                          ? 'Source Address: ${sourceAddress ?? ''}'
+                          : 'عنوان الاستلام:${sourceAddress ?? ''}',
                       softWrap: true,
                       style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,)),
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: 6.h),
+                  Text(
+                    lang.lang == 'en'
+                        ? 'Destination Address: ${destinationAddress ?? ''}'
+                        : 'عنوان التسليم :${destinationAddress ?? ''}',
+                    softWrap: true,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                   if (_shouldShowPriceField) ...[
                     SizedBox(height: 6.h),
                     TextFormField(
                       controller: _priceController,
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        setState(() {
-
-                        });
+                        setState(() {});
                       },
                       style: TextStyle(
                         fontSize: 14.sp,

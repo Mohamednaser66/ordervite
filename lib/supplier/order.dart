@@ -578,7 +578,6 @@ class _OrderPageState extends State<OrderPage> {
     final lang = Lang.of(context);
     return BlocListener<SupplierOrderCubit, SupplierOrderState>(
       listener: (context, state) {
-        debugPrint("Current State = ${state.runtimeType}");
 
         if (state is SupplierOrderRouteLoaded) {
           setState(() {

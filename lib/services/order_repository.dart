@@ -16,14 +16,12 @@ class OrderRepository {
   StreamController<Order?>? _orderStreamController;
   Timer? _pollTimer;
 
-  /// Alias for backward compatibility with OrderCubit
   Stream<Order> watchOrder(String userId, String token) async* {
     await for (final order in getOrderStream(userId, token)) {
       if (order != null) yield order;
     }
   }
 
-  /// Creates a broadcast stream that polls for the current order.
   Stream<Order?> getOrderStream(String userId, String token) {
     _orderStreamController ??= StreamController<Order?>.broadcast(
       onListen: () {
@@ -77,7 +75,6 @@ class OrderRepository {
     _pollTimer = null;
   }
 
-  /// Public method to fetch a single order (for refresh operations)
   Future<Order?> getOrder(String userId, String token) async {
     return _fetchCurrentOrder(userId, token);
   }
@@ -115,7 +112,6 @@ class OrderRepository {
     }
   }
 
-  /// Fetch route from Google Maps Directions API
   Future<Map<String, dynamic>?> getRoute(
     LatLng source,
     LatLng destination,
@@ -171,7 +167,6 @@ class OrderRepository {
     }
   }
 
-  /// Create a new order
   Future<Order?> createOrder(
     Map<String, dynamic> orderData,
     String token,
@@ -182,15 +177,18 @@ class OrderRepository {
       final response = await http
           .post(
             Uri.parse(url),
-            body: orderData,
-            headers: {'Authorization': 'Bearer $token'},
+            body: jsonEncode(orderData),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
           )
           .timeout(_timeout);
       debugPrint("STATUS CODE = ${response.statusCode}");
       debugPrint("BODY = ${response.body}");
 
       if (response.statusCode != 200 && response.statusCode != 201) return null;
-
 
       final json = jsonDecode(response.body);
       if (json['data'] == null) return null;
@@ -201,7 +199,6 @@ class OrderRepository {
     }
   }
 
-  /// Update order state (e.g., "order complete")
   Future<bool> updateOrderState(
     String orderId,
     String state,
@@ -350,7 +347,6 @@ class OrderRepository {
     }
   }
 
-  /// Notify order cancellation to shipper
   Future<bool> notifyOrderCancellation(
     String text,
     String shipperApiToken,
@@ -382,5 +378,4 @@ class OrderRepository {
     _orderStreamController?.close();
     _orderStreamController = null;
   }
-
 }
